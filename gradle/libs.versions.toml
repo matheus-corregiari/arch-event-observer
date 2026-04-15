@@ -7,8 +7,8 @@ detekt = "1.23.8"
 
 ## --- Build Config and SDK --- ##
 build-sdk-min = "20"
-build-sdk-compile = "36"
-build-tools = "36.1.0"
+build-sdk-compile = "37"
+build-tools = "37.0.0"
 
 ## JetBrains
 jetbrains-kotlin = "2.3.20"
@@ -48,11 +48,14 @@ androidx-arch-coreTesting = { module = "androidx.arch.core:core-testing", versio
 androidx-compose-lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-compose", version = "2.10.0" }
 androidx-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata", version = "2.10.0" }
 androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime", version = "2.10.0" }
+androidx-compose-testManifest = { module = "androidx.compose.ui:ui-test-manifest", version = "1.10.6" }
+androidx-test-junit = { module = "androidx.test.ext:junit-ktx", version = "1.3.0" }
 
 ## Tools
 detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 ktlint = { module = "org.jlleitschuh.gradle.ktlint:org.jlleitschuh.gradle.ktlint.gradle.plugin", version.ref = "ktlint" }
 vanniktech-publish = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "vanniktech-publish" }
+robolectric-test = { module = "org.robolectric:robolectric", version = "4.16.1" }
 
 ## Test
 mockk-test-android = { module = "io.mockk:mockk-android", version = "1.14.9" }
@@ -61,7 +64,6 @@ mockk-test-agent = { module = "io.mockk:mockk", version = "1.14.9" }
 # ------------------------------------------------------------------------------------------------ #
 [plugins]
 jetbrains-atomic = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "jetbrains-atomic" }
-jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }
 jetbrains-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "jetbrains-kotlin" }
 
 # ------------------------------------------------------------------------------------------------ #

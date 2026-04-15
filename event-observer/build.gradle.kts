@@ -24,8 +24,6 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.lifecycle.livedata)
         }
-        jvmMain.dependencies {
-        }
 
         // Test Libraries
         javaTest.dependencies {

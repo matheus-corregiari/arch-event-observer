@@ -31,6 +31,7 @@ kotlin {
     // Test Libraries
     sourceSets.commonTest.dependencies {
         implementation(libs.jetbrains.kotlin.test)
+        implementation(project(":test"))
         implementation(libs.jetbrains.coroutines.test)
         implementation(libs.jetbrains.compose.foundation)
         implementation(libs.jetbrains.compose.ui.test)

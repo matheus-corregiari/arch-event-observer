@@ -8,12 +8,13 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
 import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.result.DataResultStatus
+import br.com.arch.toolkit.test.PlatformTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.setMain
 import kotlin.test.Test
 
-class ComposableDataResultLoadingTest {
+class ComposableDataResultLoadingTest : PlatformTest() {
     init {
         Dispatchers.setMain(StandardTestDispatcher())
     }
