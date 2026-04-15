@@ -2,7 +2,6 @@
 
 package br.com.arch.toolkit.result
 
-import io.mockk.mockk
 import br.com.arch.toolkit.result.DataResultStatus.ERROR
 import br.com.arch.toolkit.result.DataResultStatus.LOADING
 import br.com.arch.toolkit.result.DataResultStatus.NONE
@@ -327,7 +326,7 @@ class DataResultMergeTest {
             DataResult<Map<String, *>>(
                 data = mapOf("success" to "data A"),
                 error = null,
-                status = SUCCESS,
+                status = SUCCESS
             )
         )
         assertEquals(
@@ -335,7 +334,7 @@ class DataResultMergeTest {
             DataResult<Map<String, *>>(
                 data = mapOf("loading" to 123),
                 error = null,
-                status = LOADING,
+                status = LOADING
             )
         )
         assertEquals(
@@ -343,7 +342,7 @@ class DataResultMergeTest {
             DataResult<Map<String, *>>(
                 data = null,
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -351,7 +350,7 @@ class DataResultMergeTest {
             DataResult<Map<String, *>>(
                 data = null,
                 error = null,
-                status = NONE,
+                status = NONE
             )
         )
         assertEquals(
@@ -359,7 +358,7 @@ class DataResultMergeTest {
             DataResult<Map<String, *>>(
                 data = null,
                 error = null,
-                status = NONE,
+                status = NONE
             )
         )
         //endregion
@@ -369,10 +368,10 @@ class DataResultMergeTest {
             DataResult<Map<String, *>>(
                 data = mapOf(
                     "success" to "data A",
-                    "loading" to 123,
+                    "loading" to 123
                 ),
                 error = null,
-                status = LOADING,
+                status = LOADING
             )
         )
         assertEquals(
@@ -381,10 +380,10 @@ class DataResultMergeTest {
                 data = mapOf(
                     "success" to "data A",
                     "loading" to 123,
-                    "error" to null,
+                    "error" to null
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -393,10 +392,10 @@ class DataResultMergeTest {
                 data = mapOf(
                     "success" to "data A",
                     "loading" to 123,
-                    "null" to null,
+                    "null" to null
                 ),
                 error = null,
-                status = LOADING,
+                status = LOADING
             )
         )
         assertEquals(
@@ -408,7 +407,7 @@ class DataResultMergeTest {
                     "none" to null
                 ),
                 error = null,
-                status = LOADING,
+                status = LOADING
             )
         )
         assertEquals(
@@ -418,10 +417,10 @@ class DataResultMergeTest {
                     "success" to "data A",
                     "loading" to 123,
                     "error" to null,
-                    "null" to null,
+                    "null" to null
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -434,7 +433,7 @@ class DataResultMergeTest {
                     "none" to null
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -448,7 +447,7 @@ class DataResultMergeTest {
                     "none" to null
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
 
@@ -457,10 +456,10 @@ class DataResultMergeTest {
             DataResult<Map<String, *>>(
                 data = mapOf(
                     "success" to "data A",
-                    "error" to null,
+                    "error" to null
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -469,10 +468,10 @@ class DataResultMergeTest {
                 data = mapOf(
                     "success" to "data A",
                     "error" to null,
-                    "loading" to 123,
+                    "loading" to 123
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -481,10 +480,10 @@ class DataResultMergeTest {
                 data = mapOf(
                     "success" to "data A",
                     "error" to null,
-                    "null" to null,
+                    "null" to null
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -496,7 +495,7 @@ class DataResultMergeTest {
                     "none" to null
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -506,10 +505,10 @@ class DataResultMergeTest {
                     "success" to "data A",
                     "error" to null,
                     "loading" to 123,
-                    "null" to null,
+                    "null" to null
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -522,7 +521,7 @@ class DataResultMergeTest {
                     "none" to null
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -536,7 +535,7 @@ class DataResultMergeTest {
                     "none" to null
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
 
@@ -545,10 +544,10 @@ class DataResultMergeTest {
             DataResult<Map<String, *>>(
                 data = mapOf(
                     "success" to "data A",
-                    "null" to null,
+                    "null" to null
                 ),
                 error = null,
-                status = SUCCESS,
+                status = SUCCESS
             )
         )
         assertEquals(
@@ -557,10 +556,10 @@ class DataResultMergeTest {
                 data = mapOf(
                     "success" to "data A",
                     "null" to null,
-                    "error" to null,
+                    "error" to null
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -569,10 +568,10 @@ class DataResultMergeTest {
                 data = mapOf(
                     "success" to "data A",
                     "null" to null,
-                    "loading" to 123,
+                    "loading" to 123
                 ),
                 error = null,
-                status = LOADING,
+                status = LOADING
             )
         )
         assertEquals(
@@ -584,7 +583,7 @@ class DataResultMergeTest {
                     "none" to null
                 ),
                 error = null,
-                status = SUCCESS,
+                status = SUCCESS
             )
         )
         assertEquals(
@@ -594,10 +593,10 @@ class DataResultMergeTest {
                     "success" to "data A",
                     "null" to null,
                     "error" to null,
-                    "loading" to 123,
+                    "loading" to 123
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -610,7 +609,7 @@ class DataResultMergeTest {
                     "none" to null
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -624,7 +623,7 @@ class DataResultMergeTest {
                     "none" to null
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
 
@@ -636,7 +635,7 @@ class DataResultMergeTest {
                     "none" to null
                 ),
                 error = null,
-                status = SUCCESS,
+                status = SUCCESS
             )
         )
         assertEquals(
@@ -645,10 +644,10 @@ class DataResultMergeTest {
                 data = mapOf(
                     "success" to "data A",
                     "none" to null,
-                    "error" to null,
+                    "error" to null
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -657,10 +656,10 @@ class DataResultMergeTest {
                 data = mapOf(
                     "success" to "data A",
                     "none" to null,
-                    "null" to null,
+                    "null" to null
                 ),
                 error = null,
-                status = SUCCESS,
+                status = SUCCESS
             )
         )
         assertEquals(
@@ -669,10 +668,10 @@ class DataResultMergeTest {
                 data = mapOf(
                     "success" to "data A",
                     "none" to null,
-                    "loading" to 123,
+                    "loading" to 123
                 ),
                 error = null,
-                status = LOADING,
+                status = LOADING
             )
         )
         assertEquals(
@@ -682,10 +681,10 @@ class DataResultMergeTest {
                     "success" to "data A",
                     "none" to null,
                     "error" to null,
-                    "null" to null,
+                    "null" to null
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -695,10 +694,10 @@ class DataResultMergeTest {
                     "success" to "data A",
                     "none" to null,
                     "error" to null,
-                    "loading" to 123,
+                    "loading" to 123
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
         assertEquals(
@@ -709,10 +708,10 @@ class DataResultMergeTest {
                     "none" to null,
                     "error" to null,
                     "null" to null,
-                    "loading" to 123,
+                    "loading" to 123
                 ),
                 error = error,
-                status = ERROR,
+                status = ERROR
             )
         )
     }

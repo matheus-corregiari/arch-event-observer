@@ -36,15 +36,19 @@ open class ResponseFlow<T> internal constructor(
     private var scope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var transformDispatcher: CoroutineDispatcher = Dispatchers.Default
 
+    /** Sets the scope used by observation helpers. */
     fun scope(scope: CoroutineScope) = apply { this.scope = scope }
+
+    /** Sets the dispatcher used for transformation callbacks. */
     fun transformDispatcher(dispatcher: CoroutineDispatcher) =
         apply { transformDispatcher = dispatcher }
 
+    /** Collects the flow with the supplied [ObserveWrapper] DSL. */
     suspend fun collect(wrapper: ObserveWrapper<T>.() -> Unit) =
         ObserveWrapper<T>().scope(scope).transformDispatcher(transformDispatcher).apply(wrapper)
             .suspendFunc { collect { data -> handleResult(data) } }
 
-    /* MUAHAHA */
+    /** Observes this flow from the supplied [LifecycleOwner]. */
     fun observe(
         owner: LifecycleOwner,
         wrapper: ObserveWrapper<T>.() -> Unit
@@ -56,8 +60,10 @@ open class ResponseFlow<T> internal constructor(
             )
         }
 
+    /** Maps the payload while keeping the [DataResult] envelope. */
     fun <R> map(transform: (T) -> R) = from(flow = innerFlow, transform = transform)
 
+    /** Converts this flow into a [ResponseStateFlow]. */
     fun state(
         scope: CoroutineScope = this.scope,
         started: SharingStarted = SharingStarted.WhileSubscribed(),
@@ -68,6 +74,7 @@ open class ResponseFlow<T> internal constructor(
         innerFlow = innerFlow.stateIn(scope = scope, started = started, initialValue = initial)
     )
 
+    /** Converts this flow into a [ResponseSharedFlow]. */
     fun shared(
         scope: CoroutineScope = this.scope,
         started: SharingStarted = SharingStarted.WhileSubscribed(),
@@ -85,17 +92,24 @@ open class ResponseFlow<T> internal constructor(
 
     companion object {
 
+        /** Creates an empty response flow. */
         operator fun <T> invoke(): ResponseFlow<T> = ResponseFlow(emptyFlow())
+
+        /** Creates a flow that emits a single [DataResult]. */
         operator fun <T> invoke(data: DataResult<T>): ResponseFlow<T> = ResponseFlow(flowOf(data))
 
+        /** Creates a flow from a fixed set of [DataResult] values. */
         operator fun <T> invoke(vararg data: DataResult<T>): ResponseFlow<T> =
             ResponseFlow(flowOf(*data))
 
+        /** Creates a flow from a list of [DataResult] values. */
         operator fun <T> invoke(dataList: List<DataResult<T>>): ResponseFlow<T> =
             ResponseFlow(dataList.asFlow())
 
+        /** Wraps an existing flow of [DataResult] values. */
         fun <T> from(flow: Flow<DataResult<T>>): ResponseFlow<T> = ResponseFlow(innerFlow = flow)
 
+        /** Wraps and maps an existing flow of [DataResult] values. */
         fun <T, R> from(
             flow: Flow<DataResult<R>>,
             transform: (R) -> T
@@ -105,10 +119,12 @@ open class ResponseFlow<T> internal constructor(
                 .catch { emit(dataResultError(it)) }
         )
 
+        /** Wraps a plain flow and turns each value into a successful [DataResult]. */
         fun <T> fromFlow(flow: Flow<T>): ResponseFlow<T> = from(
             flow = flow.map(::dataResultSuccess)
         )
 
+        /** Wraps a plain flow and transforms each value before wrapping it. */
         fun <T, R> fromFlow(
             flow: Flow<R>,
             transform: suspend (R) -> T

@@ -20,7 +20,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class _responseLiveDataTest {
@@ -37,7 +36,7 @@ class _responseLiveDataTest {
     fun `01 - responseLiveDataOf - value`() = runTest {
         val liveData = responseLiveDataOf("value")
 
-        assertTrue(liveData.data == "value")
+        assertEquals(liveData.data, "value")
         assertEquals(liveData.status, DataResultStatus.SUCCESS)
         assertNull(liveData.error)
     }
@@ -55,7 +54,7 @@ class _responseLiveDataTest {
     fun `03 - mutableResponseLiveDataOf - value`() = runTest {
         val liveData = mutableResponseLiveDataOf("value")
 
-        assertTrue(liveData.data == "value")
+        assertEquals(liveData.data, "value")
         assertEquals(liveData.status, DataResultStatus.SUCCESS)
         assertNull(liveData.error)
     }
@@ -73,7 +72,7 @@ class _responseLiveDataTest {
     fun `05 - swapResponseLiveDataOf - value`() = runTest {
         val liveData = swapResponseLiveDataOf("value")
 
-        assertTrue(liveData.data == "value")
+        assertEquals(liveData.data, "value")
         assertEquals(liveData.status, DataResultStatus.SUCCESS)
         assertNull(liveData.error)
     }

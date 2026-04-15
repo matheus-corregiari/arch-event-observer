@@ -2,12 +2,12 @@
 
 package br.com.arch.toolkit.result
 
-import io.mockk.mockk
 import br.com.arch.toolkit.result.DataResultStatus.ERROR
 import br.com.arch.toolkit.result.DataResultStatus.LOADING
 import br.com.arch.toolkit.result.DataResultStatus.NONE
 import br.com.arch.toolkit.result.DataResultStatus.SUCCESS
 import io.mockk.every
+import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -442,7 +442,10 @@ class ObserveWrapperTest_resultWithTransformer {
     private inline fun testList(
         result: DataResult<List<String>>,
         single: Boolean,
-        crossinline block: suspend (wrapper: ObserveWrapper<List<String>>, DataResult<List<String>>) -> Unit
+        crossinline block: suspend (
+            wrapper: ObserveWrapper<List<String>>,
+            DataResult<List<String>>
+        ) -> Unit
     ) = runTest {
         val wrapper = ObserveWrapper<List<String>>()
         wrapper.scope(this)

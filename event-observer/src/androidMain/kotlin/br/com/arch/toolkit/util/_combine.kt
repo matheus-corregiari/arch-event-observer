@@ -440,7 +440,17 @@ internal suspend inline fun <T, R> LiveData<T>.internalCombine(other: LiveData<R
     val cFlow: Flow<Pair<T?, R?>> = aFlow.combine(bFlow) { a, b -> a to b }
 
     withContext(currentCoroutineContext()) {
-        launch { aFlow.collect { if (other.isInitialized.not()) trySend(it to other.value) else cancel() } }
+        launch {
+            aFlow.collect {
+                if (other.isInitialized.not()) {
+                    trySend(
+                        it to other.value
+                    )
+                } else {
+                    cancel()
+                }
+            }
+        }
         launch { bFlow.collect { if (isInitialized.not()) trySend(value to it) else cancel() } }
         cFlow.collect(::trySend)
     }

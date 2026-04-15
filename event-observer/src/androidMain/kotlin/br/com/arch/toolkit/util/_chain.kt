@@ -222,7 +222,7 @@ fun <T, R> LiveData<T>.chainNotNullWith(
 fun <T, R> LiveData<T>.chainWith(
     context: CoroutineContext,
     other: suspend (T?) -> LiveData<R>,
-    condition: suspend (T?) -> Boolean,
+    condition: suspend (T?) -> Boolean
 ): LiveData<Pair<T?, R?>> =
     liveData(context) { internalChainWith(other, condition).collect(::emit) }
 
@@ -423,7 +423,7 @@ fun <T, R, X> LiveData<T>.chainWith(
 fun <T, R> LiveData<T>.chainNotNullWith(
     context: CoroutineContext,
     other: suspend (T) -> LiveData<R>,
-    condition: suspend (T) -> Boolean,
+    condition: suspend (T) -> Boolean
 ): LiveData<Pair<T, R>> = liveData(context) {
     internalChainNotNullWith(other, condition).collect(::emit)
 }
@@ -534,7 +534,7 @@ fun <T, R, X> LiveData<T>.chainNotNullWith(
 /* region Auxiliary Functions ------------------------------------------------------------------- */
 private suspend inline fun <T, R> LiveData<T>.internalChainNotNullWith(
     noinline other: suspend (T) -> LiveData<R>,
-    noinline condition: suspend (T) -> Boolean,
+    noinline condition: suspend (T) -> Boolean
 ) = internalChainWith(
     other = { data -> data?.let { other(it) } ?: error("Data null in chainNotNullWith") },
     condition = { data -> data?.let { condition(it) } ?: false }
@@ -542,7 +542,7 @@ private suspend inline fun <T, R> LiveData<T>.internalChainNotNullWith(
 
 private suspend inline fun <T, R> LiveData<T>.internalChainWith(
     noinline other: suspend (T?) -> LiveData<R>,
-    noinline condition: suspend (T?) -> Boolean,
+    noinline condition: suspend (T?) -> Boolean
 ) = channelFlow {
     val aFlow = asFlow()
     var bJob: Job? = null

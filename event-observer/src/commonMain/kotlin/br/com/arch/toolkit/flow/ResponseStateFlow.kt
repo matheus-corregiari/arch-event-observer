@@ -16,8 +16,13 @@ open class ResponseStateFlow<T> internal constructor(
     private val innerFlow: StateFlow<DataResult<T>>
 ) : ResponseSharedFlow<T>(innerFlow), StateFlow<DataResult<T>> by innerFlow {
 
+    /** Current status of the latest [DataResult]. */
     val status: DataResultStatus get() = value.status
+
+    /** Current error of the latest [DataResult]. */
     val error: Throwable? get() = value.error
+
+    /** Current payload of the latest [DataResult]. */
     val data: T? get() = value.data
 
     override val replayCache get() = innerFlow.replayCache
@@ -27,14 +32,17 @@ open class ResponseStateFlow<T> internal constructor(
     ) = innerFlow.collect(collector)
 
     companion object {
+        /** Creates a state flow with [DataResultStatus.NONE]. */
         operator fun <T> invoke(): ResponseStateFlow<T> = ResponseStateFlow(
             innerFlow = MutableStateFlow<DataResult<T>>(dataResultNone())
         )
 
+        /** Creates a state flow from a single [DataResult]. */
         operator fun <T> invoke(data: DataResult<T>): ResponseStateFlow<T> = ResponseStateFlow(
             innerFlow = MutableStateFlow<DataResult<T>>(data)
         )
 
+        /** Converts a plain flow into a [ResponseStateFlow]. */
         fun <T> fromFlow(
             flow: Flow<T>,
             started: SharingStarted = SharingStarted.WhileSubscribed(),
@@ -43,6 +51,7 @@ open class ResponseStateFlow<T> internal constructor(
         ): ResponseStateFlow<T> = ResponseFlow.fromFlow(flow)
             .state(started = started, initial = initial)
 
+        /** Converts a flow of [DataResult] values into a [ResponseStateFlow]. */
         fun <T> from(
             flow: Flow<DataResult<T>>,
             started: SharingStarted = SharingStarted.WhileSubscribed(),
@@ -50,6 +59,7 @@ open class ResponseStateFlow<T> internal constructor(
         ): ResponseStateFlow<T> = ResponseFlow.from(flow)
             .state(started = started, initial = initial)
 
+        /** Maps a flow of [DataResult] values and converts it to a state flow. */
         fun <T, R> from(
             flow: Flow<DataResult<R>>,
             transform: (R) -> T,
@@ -59,6 +69,7 @@ open class ResponseStateFlow<T> internal constructor(
         ): ResponseStateFlow<T> = ResponseFlow.from(flow = flow, transform = transform)
             .state(started = started, initial = initial)
 
+        /** Transforms a plain flow and converts it to a state flow. */
         fun <T, R> fromFlow(
             flow: Flow<R>,
             transform: (R) -> T,

@@ -1,36 +1,27 @@
 package br.com.arch.toolkit.result
 
 /**
- * Defines how data presence should be considered when evaluating an event.
- *
- * This allows fine-grained control over whether the event callback should be triggered
- * based on the presence or absence of data in the [DataResult].
- *
- * @see ObserveWrapper
- * @see DataResult
+ * Filter that controls whether an event should react to data presence.
  */
 enum class EventDataStatus {
-    
+
     /**
-     * Executes the event only when the DataResult contains a non-null data payload.
+     * Run only when [DataResult.data] is not `null`.
      */
     WithData,
 
     /**
-     * Executes the event only when the DataResult has a null data payload.
+     * Run only when [DataResult.data] is `null`.
      */
     WithoutData,
 
     /**
-     * Ignores the presence of data and always executes the event if other conditions are met.
+     * Ignore data presence and evaluate the event normally.
      */
     DoesNotMatter;
 
     /**
-     * Evaluates whether this event should be considered based on the current data result.
-     *
-     * @param result The [DataResult] to be evaluated.
-     * @return `true` if the event should be triggered according to the defined data status.
+     * Returns `true` when this filter allows the supplied [DataResult].
      */
     fun considerEvent(result: DataResult<*>) = when (this) {
         WithData -> result.hasData

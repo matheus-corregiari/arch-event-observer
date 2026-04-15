@@ -21,8 +21,7 @@ open class ResponseSharedFlow<T> internal constructor(
     ) = innerFlow.collect(collector)
 
     /**
-     * true -> continue
-     * false -> close
+     * Returns a cold flow that stops when [hotWhile] returns `false`.
      */
     fun cold(hotWhile: suspend (DataResult<T>) -> Boolean = { it.isSuccess.not() }) = ResponseFlow(
         innerFlow = channelFlow<DataResult<T>> {
@@ -42,9 +41,11 @@ open class ResponseSharedFlow<T> internal constructor(
     )
 
     companion object {
+        /** Creates an empty shared response flow. */
         operator fun <T> invoke(): ResponseSharedFlow<T> =
             ResponseSharedFlow(innerFlow = MutableSharedFlow())
 
+        /** Converts a plain flow into a shared response flow. */
         operator fun <T> invoke(
             flow: Flow<T>,
             started: SharingStarted = SharingStarted.WhileSubscribed(),
@@ -54,6 +55,7 @@ open class ResponseSharedFlow<T> internal constructor(
         ): ResponseSharedFlow<T> = ResponseFlow.fromFlow(flow)
             .shared(started = started, replay = replay)
 
+        /** Converts a flow of [DataResult] values into a shared response flow. */
         fun <T> from(
             flow: Flow<DataResult<T>>,
             started: SharingStarted = SharingStarted.WhileSubscribed(),
@@ -63,6 +65,7 @@ open class ResponseSharedFlow<T> internal constructor(
         ): ResponseSharedFlow<T> = ResponseFlow.from(flow)
             .shared(started = started, replay = replay)
 
+        /** Maps a flow of [DataResult] values and converts it to a shared flow. */
         fun <T, R> from(
             flow: Flow<DataResult<R>>,
             started: SharingStarted = SharingStarted.WhileSubscribed(),
@@ -73,6 +76,7 @@ open class ResponseSharedFlow<T> internal constructor(
         ): ResponseSharedFlow<T> = from(flow, transform)
             .shared(started = started, replay = replay)
 
+        /** Transforms a plain flow and converts it to a shared response flow. */
         fun <T> fromFlow(
             flow: Flow<T>,
             started: SharingStarted = SharingStarted.WhileSubscribed(),
@@ -82,6 +86,7 @@ open class ResponseSharedFlow<T> internal constructor(
         ): ResponseSharedFlow<T> = ResponseFlow.fromFlow(flow)
             .shared(started = started, replay = replay)
 
+        /** Transforms a plain flow and converts it to a shared response flow. */
         fun <T, R> fromFlow(
             flow: Flow<R>,
             started: SharingStarted = SharingStarted.WhileSubscribed(),

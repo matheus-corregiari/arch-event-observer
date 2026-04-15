@@ -1,8 +1,11 @@
 package br.com.arch.toolkit.result
 
 /**
- * The possible types of statuses of DataResult
+ * Lifecycle state carried by [DataResult].
  */
 enum class DataResultStatus {
-    NONE, SUCCESS, LOADING, ERROR
+    NONE,
+    SUCCESS,
+    LOADING,
+    ERROR
 }

@@ -34,7 +34,7 @@ class _dataResultTest {
             dataResultError<String>(null) to DataResult<String>(null, null, ERROR),
             dataResultError(null, "data") to DataResult("data", null, ERROR),
             dataResultError<String>(error) to DataResult<String>(null, error, ERROR),
-            dataResultError(error, "data") to DataResult("data", error, ERROR),
+            dataResultError(error, "data") to DataResult("data", error, ERROR)
         ).onEach { (actual, expected) -> assertEquals(expected, actual) }
     }
 }

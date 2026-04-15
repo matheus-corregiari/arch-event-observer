@@ -6,6 +6,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import br.com.arch.toolkit.livedata.MutableResponseLiveData
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -13,6 +14,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.Rule
 import kotlin.test.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class LongTransformTest {
 
     @get:Rule

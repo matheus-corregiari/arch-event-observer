@@ -96,7 +96,7 @@ interface ResponseLiveDataScope<T> {
  */
 private class ResponseLiveDataScopeImpl<T>(
     context: CoroutineContext,
-    private var target: CoroutineResponseLiveData<T>,
+    private var target: CoroutineResponseLiveData<T>
 ) : ResponseLiveDataScope<T> {
 
     private val coroutineContext = context + Dispatchers.Main.immediate

@@ -10,80 +10,40 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/**
- * A custom implementation of ResponseLiveData responsible for replicate a value from another ResponseLiveData
- */
+/** [ResponseLiveData] that mirrors another source and can transform values. */
 class SwapResponseLiveData<T> : ResponseLiveData<T> {
 
     private val sourceLiveData = MediatorLiveData<Any>()
     private val sourceObserver: (Any?) -> Unit = {}
     private var lastSource: ResponseLiveData<*>? = null
 
-    /**
-     * Empty constructor when initializing with a value is not needed
-     *
-     * @return An empty SwapResponseLiveData<T> instance
-     */
+    /** Creates an empty swap LiveData. */
     constructor() : super()
 
-    /**
-     * Constructor for initializing with a value
-     *
-     * @param value The initial value for this SwapResponseLiveData
-     *
-     * @return An instance of SwapResponseLiveData<T> with a default value set
-     */
+    /** Creates a swap LiveData with an initial [DataResult]. */
     constructor(value: DataResult<T>) : super(value)
 
-    /**
-     * @return True if has some DataSource set, false otherwise
-     */
+    /** `true` when a source has been attached. */
     val hasDataSource: Boolean
         get() = lastSource != null
 
-    /**
-     * Flag to set whether we're notifying on every change or only on distinct values
-     */
+    /** Enables or disables duplicate suppression. */
     private var notifyOnlyOnDistinct: Boolean = false
     fun notifyOnlyOnDistinct(notifyOnlyOnDistinct: Boolean) = apply {
         this.notifyOnlyOnDistinct = notifyOnlyOnDistinct
     }
 
-    /**
-     * Changes the actual DataSource
-     *
-     * @param source The ResponseLiveData to replicate the value
-     * @param discardAfterLoading if true, when receives something with status different of LOADING,
-     * post the value and then, set the value to null, default is false
-     *
-     * @see SwapResponseLiveData.swapSource
-     */
+    /** Mirrors [source] and forwards the same [DataResult] values. */
     fun swapSource(source: ResponseLiveData<T>, discardAfterLoading: Boolean = false) =
         executeSwap(source, discardAfterLoading) { it }
 
-    /**
-     * Changes the actual DataSource, with transformation
-     *
-     * @param source The ResponseLiveData to replicate the value
-     * @param transformation Receives the DataResult of the source and change to T value
-     *
-     * @see SwapResponseLiveData.swapSource
-     */
+    /** Mirrors [source] after transforming each emitted [DataResult]. */
     fun <R> swapSource(
         source: ResponseLiveData<R>,
         transformation: (DataResult<R>) -> DataResult<T>
     ) = executeSwap(source, false, transformation)
 
-    /**
-     * Changes the actual DataSource, with transformation
-     *
-     * @param source The ResponseLiveData to replicate the value
-     * @param dataTransformer Receives the data of the source and change to T value
-     * @param errorTransformer Receives the error of the source and change to another Throwable value
-     * @param onErrorReturn Receives the error of the source and change to T value
-     *
-     * @see SwapResponseLiveData.swapSource
-     */
+    /** Mirrors [source] while transforming data and error payloads separately. */
     fun <R> swapSource(
         source: ResponseLiveData<R>,
         dataTransformer: (R) -> T,
@@ -105,9 +65,7 @@ class SwapResponseLiveData<T> : ResponseLiveData<T> {
         newValue.takeIf { value != newValue }
     }
 
-    /**
-     * Removes source
-     */
+    /** Detaches the current source. */
     fun clearSource() {
         lastSource?.let {
             scope.launch(Dispatchers.Main) { sourceLiveData.removeSource(it) }
@@ -115,9 +73,7 @@ class SwapResponseLiveData<T> : ResponseLiveData<T> {
         lastSource = null
     }
 
-    /**
-     * Returns true if does not have data source or if the status is equal to DataResultStatus.ERROR
-     */
+    /** `true` when the current source should be refreshed. */
     fun needsRefresh() = hasDataSource.not() || status == DataResultStatus.ERROR
 
     override fun scope(scope: CoroutineScope) =

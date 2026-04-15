@@ -9,76 +9,31 @@ import br.com.arch.toolkit.livedata.SwapResponseLiveData
 import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.result.DataResultStatus
 
-/**
- * Returns an instance of a ResponseLiveData<T> with the desired value
- *
- * @param value The default value set
- * @param status The default status set
- *
- * @return An instance of ResponseLiveData<T> with a default value set
- */
+/** Creates a [ResponseLiveData] with the supplied value and status. */
 fun <T> responseLiveDataOf(value: T, status: DataResultStatus = DataResultStatus.SUCCESS) =
     ResponseLiveData(DataResult(value, null, status))
 
-/**
- * Returns an instance of a ResponseLiveData<T> with an error
- *
- * @param error The default error set
- *
- * @return An instance of ResponseLiveData<T> with an error set
- */
+/** Creates a [ResponseLiveData] in the error state. */
 fun <T> responseLiveDataOf(error: Throwable) =
     ResponseLiveData<T>(DataResult(null, error, DataResultStatus.ERROR))
 
-/**
- * Returns an instance of a MutableResponseLiveData<T> with the desired value
- *
- * @param value The default value set
- * @param status The default status set
- *
- * @return An instance of MutableResponseLiveData<T> with a default value set
- */
+/** Creates a [MutableResponseLiveData] with the supplied value and status. */
 fun <T> mutableResponseLiveDataOf(value: T, status: DataResultStatus = DataResultStatus.SUCCESS) =
     MutableResponseLiveData(DataResult(value, null, status))
 
-/**
- * Returns an instance of a MutableResponseLiveData<T> with an error
- *
- * @param error The default error set
- *
- * @return An instance of MutableResponseLiveData<T> with an error set
- */
+/** Creates a [MutableResponseLiveData] in the error state. */
 fun <T> mutableResponseLiveDataOf(error: Throwable) =
     MutableResponseLiveData<T>(DataResult(null, error, DataResultStatus.ERROR))
 
-/**
- * Returns an instance of a SwapResponseLiveData<T> with the desired value
- *
- * @param value The default value set
- * @param status The default status set
- *
- * @return An instance of SwapResponseLiveData<T> with a default value set
- */
+/** Creates a [SwapResponseLiveData] with the supplied value and status. */
 fun <T> swapResponseLiveDataOf(value: T, status: DataResultStatus = DataResultStatus.SUCCESS) =
     SwapResponseLiveData(DataResult(value, null, status))
 
-/**
- * Returns an instance of a SwapResponseLiveData<T> with an error
- *
- * @param error The default error set
- *
- * @return An instance of SwapResponseLiveData<T> with an error set
- */
+/** Creates a [SwapResponseLiveData] in the error state. */
 fun <T> swapResponseLiveDataOf(error: Throwable) =
     SwapResponseLiveData<T>(DataResult(null, error, DataResultStatus.ERROR))
 
-/**
- * Transforms a ResponseLiveData<List<T>> into a ResponseLiveData<List<R>>
- *
- * @param transformation Receive the actual non null T value and return the transformed non null R value
- */
+/** Maps a list payload while keeping the LiveData wrapper. */
 fun <T, R> ResponseLiveData<List<T>>.mapList(
     transformation: (T) -> R
-): ResponseLiveData<List<R>> {
-    return map { it.map(transformation) }
-}
+): ResponseLiveData<List<R>> = map { it.map(transformation) }

@@ -2,7 +2,6 @@
 
 package br.com.arch.toolkit.result
 
-import io.mockk.mockk
 import br.com.arch.toolkit.result.DataResultStatus.ERROR
 import br.com.arch.toolkit.result.DataResultStatus.LOADING
 import br.com.arch.toolkit.result.DataResultStatus.NONE
@@ -38,7 +37,7 @@ class DataResultCreationTest {
             dataResultError<String>(null) to DataResult<String>(null, null, ERROR),
             dataResultError(null, "data") to DataResult("data", null, ERROR),
             dataResultError<String>(error) to DataResult<String>(null, error, ERROR),
-            dataResultError(error, "data") to DataResult("data", error, ERROR),
+            dataResultError(error, "data") to DataResult("data", error, ERROR)
         ).onEach { (actual, expected) -> assertEquals(expected, actual) }
     }
 }

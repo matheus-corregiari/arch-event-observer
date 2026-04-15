@@ -2,7 +2,6 @@
 
 package br.com.arch.toolkit.result
 
-import io.mockk.mockk
 import br.com.arch.toolkit.result.DataResultStatus.ERROR
 import br.com.arch.toolkit.result.DataResultStatus.LOADING
 import br.com.arch.toolkit.result.DataResultStatus.NONE

@@ -388,7 +388,9 @@ class ChainTest {
             }
         )
 
-    private fun `LiveData - initialized A B - chainWith - exception condition`(context: CoroutineContext?) =
+    private fun `LiveData - initialized A B - chainWith - exception condition`(
+        context: CoroutineContext?
+    ) =
         executeChainWith(
             context = context,
             liveDataA = MutableLiveData<String>("String"),
@@ -401,7 +403,9 @@ class ChainTest {
             }
         )
 
-    private fun `LiveData - initialized A B - chainWith - exception livedata`(context: CoroutineContext?) =
+    private fun `LiveData - initialized A B - chainWith - exception livedata`(
+        context: CoroutineContext?
+    ) =
         executeChainWith(
             context = context,
             liveDataA = MutableLiveData<String>("String"),
@@ -486,7 +490,13 @@ class ChainTest {
 
         val mockedTransform: suspend (String?, Int?) -> String? = mockk("Transform")
         coEvery { mockedTransform.invoke(any(), any()) } coAnswers {
-            if (transformException) error("") else "${it.invocation.args[0]}|${it.invocation.args[1]}"
+            if (transformException) {
+                error(
+                    ""
+                )
+            } else {
+                "${it.invocation.args[0]}|${it.invocation.args[1]}"
+            }
         }
 
         val mockedObserver: (String?) -> Unit = mockk("Observer")

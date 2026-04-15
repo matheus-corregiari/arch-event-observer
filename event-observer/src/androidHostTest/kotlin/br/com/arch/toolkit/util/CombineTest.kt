@@ -224,7 +224,13 @@ class CombineTest {
         }
         val mockedTransform: suspend (String?, Int?) -> String? = mockk("Transform")
         coEvery { mockedTransform.invoke(any(), any()) } coAnswers {
-            if (transformException) error("") else "${it.invocation.args[0]}|${it.invocation.args[1]}"
+            if (transformException) {
+                error(
+                    ""
+                )
+            } else {
+                "${it.invocation.args[0]}|${it.invocation.args[1]}"
+            }
         }
 
         val liveDataC = liveDataA.combine(

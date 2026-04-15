@@ -17,6 +17,7 @@ internal fun <T, R, X> Flow<DataResult<Pair<T, R>>>.applyTransformation(
     transform: ResponseTransform<T, R, X>
 ) = flowOn(transform.dispatcher).mapNotNull(transform::apply).flowOn(context)
 
+/** Describes how to transform a pair of [DataResult] values. */
 @Experimental
 sealed class ResponseTransform<T, R, X> {
     abstract val dispatcher: CoroutineDispatcher
@@ -47,6 +48,7 @@ sealed class ResponseTransform<T, R, X> {
         OMIT_WHEN_FAIL
     }
 
+    /** Fails by emitting an error [DataResult] when the transform throws. */
     @Experimental
     class StatusFail<T, R, X>(
         override val dispatcher: CoroutineDispatcher = Dispatchers.Default,
@@ -56,6 +58,7 @@ sealed class ResponseTransform<T, R, X> {
         override val onErrorReturn: (suspend (Throwable) -> DataResult<X>)? = null
     }
 
+    /** Omits the output when the transform throws. */
     @Experimental
     class OmitFail<T, R, X>(
         override val dispatcher: CoroutineDispatcher = Dispatchers.Default,
@@ -65,6 +68,7 @@ sealed class ResponseTransform<T, R, X> {
         override val onErrorReturn: (suspend (Throwable) -> DataResult<X>)? = null
     }
 
+    /** Falls back to [onErrorReturn] when the transform throws. */
     @Experimental
     class Fallback<T, R, X>(
         override val dispatcher: CoroutineDispatcher = Dispatchers.Default,
@@ -74,6 +78,7 @@ sealed class ResponseTransform<T, R, X> {
         override val failMode: Mode = Mode.ERROR_STATUS_WHEN_FAIL
     }
 
+    /** Fully customized pair transformation policy. */
     @Experimental
     class Custom<T, R, X>(
         override val dispatcher: CoroutineDispatcher = Dispatchers.Default,

@@ -277,5 +277,4 @@ class ResponseLiveDataTest {
         )
         verify(exactly = 1) { mockOnNext.invoke(123) }
     }
-
 }

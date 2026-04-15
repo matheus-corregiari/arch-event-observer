@@ -50,32 +50,36 @@ sealed class Transform<T, R, X> {
     }
 
     sealed class Nullable<T, R, X> : Transform<T?, R?, X?>() {
+        /** Omits the output when the transform throws. */
         class OmitFail<T, R, X>(
-            override val dispatcher: CoroutineDispatcher= Dispatchers.Default,
+            override val dispatcher: CoroutineDispatcher = Dispatchers.Default,
             override val func: suspend (T?, R?) -> X?
         ) : Nullable<T, R, X>() {
             override val failMode: Mode = Mode.OMIT_WHEN_FAIL
             override val onErrorReturn: (suspend (Throwable) -> X?)? = null
         }
 
+        /** Returns `null` when the transform throws. */
         class NullFail<T, R, X>(
-            override val dispatcher: CoroutineDispatcher= Dispatchers.Default,
+            override val dispatcher: CoroutineDispatcher = Dispatchers.Default,
             override val func: suspend (T?, R?) -> X?
         ) : Nullable<T, R, X>() {
             override val failMode: Mode = Mode.NULL_WHEN_FAIL
             override val onErrorReturn: (suspend (Throwable) -> X?)? = null
         }
 
+        /** Uses a fallback value when the transform throws. */
         class Fallback<T, R, X>(
-            override val dispatcher: CoroutineDispatcher= Dispatchers.Default,
+            override val dispatcher: CoroutineDispatcher = Dispatchers.Default,
             override val func: suspend (T?, R?) -> X?,
             override val onErrorReturn: suspend (Throwable) -> X?
         ) : Nullable<T, R, X>() {
             override val failMode: Mode = Mode.OMIT_WHEN_FAIL
         }
 
+        /** Fully customized nullable transformation policy. */
         class Custom<T, R, X>(
-            override val dispatcher: CoroutineDispatcher= Dispatchers.Default,
+            override val dispatcher: CoroutineDispatcher = Dispatchers.Default,
             override val failMode: Mode,
             override val func: suspend (T?, R?) -> X?,
             override val onErrorReturn: (suspend (Throwable) -> X?)?
@@ -83,6 +87,7 @@ sealed class Transform<T, R, X> {
     }
 
     sealed class NotNull<T, R, X> : Transform<T, R, X>() {
+        /** Omits the output when the transform throws. */
         class OmitFail<T, R, X>(
             override val dispatcher: CoroutineDispatcher = Dispatchers.Default,
             override val func: suspend (T, R) -> X
@@ -91,8 +96,9 @@ sealed class Transform<T, R, X> {
             override val onErrorReturn: (suspend (Throwable) -> X)? = null
         }
 
+        /** Uses a fallback value when the transform throws. */
         class Fallback<T, R, X>(
-            override val dispatcher: CoroutineDispatcher= Dispatchers.Default,
+            override val dispatcher: CoroutineDispatcher = Dispatchers.Default,
             override val func: suspend (T, R) -> X,
             override val onErrorReturn: (suspend (Throwable) -> X)?
         ) : NotNull<T, R, X>() {

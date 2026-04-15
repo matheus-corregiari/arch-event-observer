@@ -25,13 +25,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Custom implementation of LiveData made to help the data handling with needs the interpretation of:
- * - SUCCESS with some data
- * - LOADING without data or error
- * - ERROR   with error
+ * LiveData wrapper that carries [DataResult] values.
  *
- * This model of interpretation was based on Google Architecture Components Example
- * @see <a href="https://github.com/googlesamples/android-architecture-components">Google's github repository</a>
+ * The class exposes convenience views for the current data, status, and error,
+ * plus mapping helpers that keep the same response model.
  */
 open class ResponseLiveData<T> : LiveData<DataResult<T>> {
 
@@ -40,6 +37,7 @@ open class ResponseLiveData<T> : LiveData<DataResult<T>> {
     protected var scope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
         private set
 
+    /** Sets the scope used by observation helpers. */
     open fun scope(scope: CoroutineScope): ResponseLiveData<T> {
         this.scope = scope
         return this
@@ -48,25 +46,26 @@ open class ResponseLiveData<T> : LiveData<DataResult<T>> {
     protected var transformDispatcher: CoroutineDispatcher = Dispatchers.IO
         private set
 
+    /** Sets the dispatcher used for mapping callbacks. */
     open fun transformDispatcher(dispatcher: CoroutineDispatcher): ResponseLiveData<T> {
         transformDispatcher = dispatcher
         return this
     }
 
     /**
-     * @return The actual Error value
+     * Current error value, if any.
      */
     val error: Throwable?
         @Nullable get() = value?.error
 
     /**
-     * @return The actual Status value
+     * Current status value, if any.
      */
     val status: DataResultStatus?
         @Nullable get() = value?.status
 
     /**
-     * @return The actual Data value
+     * Current data value, if any.
      */
     val data: T?
         @Nullable get() = value?.data
@@ -77,30 +76,18 @@ open class ResponseLiveData<T> : LiveData<DataResult<T>> {
     val errorLiveData: LiveData<Throwable> get() = liveData.mapNotNull { it.error }
 
     /**
-     * Empty constructor when initializing with a value is not needed
-     *
-     * @return An empty ResponseLiveData<T> instance
+     * Creates an empty response LiveData.
      */
     constructor() : super()
 
     /**
-     * Constructor for initializing with a value
-     *
-     * @param value The initial value for this ResponseLiveData
-     *
-     * @return An instance of ResponseLiveData<T> with a default value set
+     * Creates a response LiveData with an initial [DataResult].
      */
     constructor(value: DataResult<T>) : super(value)
 
     //region Mappers
     /**
-     * Transforms the actual type from T to R
-     *
-     * @param transformation Receive the actual non null T value and return the transformed non null R value
-     *
-     * @return The ResponseLiveData<R>
-     *
-     * @see ResponseLiveData.onNext
+     * Maps the payload to a new [ResponseLiveData].
      */
     @NonNull
     fun <R> map(@NonNull transformation: ((T) -> R)): ResponseLiveData<R> {
@@ -112,13 +99,7 @@ open class ResponseLiveData<T> : LiveData<DataResult<T>> {
     }
 
     /**
-     * Transforms the Error into another type of Error
-     *
-     * @param transformation Receive the actual non null Error value and return the transformed non null Error value
-     *
-     * @return The ResponseLiveData<T>
-     *
-     * @see ResponseLiveData.onError
+     * Maps the current error to a new [ResponseLiveData].
      */
     @NonNull
     fun mapError(@NonNull transformation: (Throwable) -> Throwable): ResponseLiveData<T> {
@@ -130,20 +111,7 @@ open class ResponseLiveData<T> : LiveData<DataResult<T>> {
     }
 
     /**
-     * Transforms the Error into a T value
-     *
-     * This block will execute the transformation ONLY when the Error is non null and with the
-     * DataResultStatus equals to ERROR
-     *
-     * After this, the DataResult will be transformed into a DataResultStatus.SUCCESS and with
-     * a non null data
-     *
-     * @param onErrorReturn Receive the actual non null Error value and return the transformed
-     * non null T value
-     *
-     * @return The ResponseLiveData<T>
-     *
-     * @see ResponseLiveData.onErrorReturn
+     * Replaces an error with a successful data value.
      */
     @NonNull
     fun onErrorReturn(@NonNull onErrorReturn: ((Throwable) -> T)): ResponseLiveData<T> {
@@ -157,15 +125,7 @@ open class ResponseLiveData<T> : LiveData<DataResult<T>> {
 
     //region Observability
     /**
-     * Execute the function onNext before any observe set after this method be called
-     *
-     * On this method, you cannot change the entire instance of the T value, but you still can change some attributes
-     *
-     * @param onNext Receive the actual non null T value
-     *
-     * @return The ResponseLiveData<T>
-     *
-     * @see ResponseLiveData.map
+     * Runs [onNext] before forwarding the current data value.
      */
     @NonNull
     fun onNext(@NonNull onNext: ((T) -> Unit)): ResponseLiveData<T> = map {
@@ -174,32 +134,16 @@ open class ResponseLiveData<T> : LiveData<DataResult<T>> {
     }
 
     /**
-     * Execute the function onError before any observe set after this method be called
-     *
-     * On this method, you cannot change the entire instance of the Error, but you still can change some attributes
-     *
-     * @param onError Receive the actual non null error value
-     *
-     * @return The ResponseLiveData<T>
-     *
-     * @see ResponseLiveData.mapError
+     * Runs [onError] before forwarding the current error value.
      */
     @NonNull
-    fun onError(@NonNull onError: ((Throwable) -> Unit)): ResponseLiveData<T> {
-        return mapError {
-            onError(it)
-            it
-        }
+    fun onError(@NonNull onError: ((Throwable) -> Unit)): ResponseLiveData<T> = mapError {
+        onError(it)
+        it
     }
 
     /**
-     * Execute the function transformation before any observe set after this method be called
-     *
-     * @param transformation With the entire data DataResult<T> and returns the new DataResult<R> value
-     *
-     * @return The ResponseLiveData<T>
-     *
-     * @see ResponseLiveData.transform
+     * Transforms the full [DataResult] before forwarding it.
      */
     @NonNull
     fun <R> transform(
@@ -214,10 +158,7 @@ open class ResponseLiveData<T> : LiveData<DataResult<T>> {
     //endregion
 
     /**
-     * Creates a ObserveWrapper<T> and observe it after execute the wrapper configuration
-     *
-     * @param owner The desired Owner to observe
-     * @param wrapperConfig The function to configure the wrapper before observe it
+     * Creates an [ObserveWrapper], applies [wrapperConfig], and observes it with [owner].
      */
     @NonNull
     fun observe(
@@ -230,7 +171,7 @@ open class ResponseLiveData<T> : LiveData<DataResult<T>> {
         .attachTo(liveData = this, owner = owner)
 
     /**
-     * @see br.com.arch.toolkit.util.safePostValue
+     * Posts on the main thread when possible, otherwise falls back to [postValue].
      */
     protected open fun safePostValue(value: DataResult<T>?) {
         if (Looper.getMainLooper()?.isCurrentThread == true) {
@@ -241,10 +182,12 @@ open class ResponseLiveData<T> : LiveData<DataResult<T>> {
     }
 
     companion object {
+        /** Creates a response LiveData from a flow of [DataResult] values. */
         fun <T> from(flow: Flow<DataResult<T>>) = responseLiveData {
             flow.collect { emit(it) }
         }
 
+        /** Creates a response LiveData from a plain flow. */
         fun <T> fromFlow(flow: Flow<T>) = responseLiveData {
             flow.collect { emitData(it) }
         }

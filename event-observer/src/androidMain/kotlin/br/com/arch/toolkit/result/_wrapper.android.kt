@@ -26,7 +26,9 @@ internal fun <T> ObserveWrapper<T>.attachTo(
         override fun onChanged(value: DataResult<T>?) {
             val observer = this
             suspendFunc {
-                handleResult(value) { owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) }
+                handleResult(
+                    value
+                ) { owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) }
                 if (eventList.isEmpty()) liveData.removeObserver(observer)
             }
         }

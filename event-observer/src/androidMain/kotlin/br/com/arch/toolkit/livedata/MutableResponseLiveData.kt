@@ -14,173 +14,83 @@ import br.com.arch.toolkit.util.dataResultSuccess
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 
-/**
- * A custom implementation of ResponseLiveData with methods to post new values
- */
+/** Mutable [ResponseLiveData] with direct setters and posting helpers. */
 class MutableResponseLiveData<T> : ResponseLiveData<T> {
 
-    /**
-     * Empty constructor when initializing with a value is not needed
-     *
-     * @return An empty MutableResponseLiveData<T> instance
-     */
+    /** Creates an empty mutable response LiveData. */
     constructor() : super()
 
-    /**
-     * Constructor for initializing with a value
-     *
-     * @param value The initial value for this MutableResponseLiveData
-     *
-     * @return An instance of MutableResponseLiveData<T> with a default value set
-     */
+    /** Creates a mutable response LiveData with an initial [DataResult]. */
     constructor(value: DataResult<T>) : super(value)
 
     // region Post Methods
-    /**
-     * Post a new DataResult with:
-     * - data: received from parameter (Default: null)
-     * - error: null
-     * - status: LOADING
-     *
-     * @param data Value to be posted into the new DataResult
-     */
+    /** Posts a loading result. */
     fun postLoading(@Nullable data: T? = null) {
         postValue(dataResultLoading(data))
     }
 
-    /**
-     * Post a new DataResult with:
-     * - data: received from parameter (Default: null)
-     * - error: received from parameter
-     * - status: LOADING
-     *
-     * @param data Value to be posted into the new DataResult
-     * @param error Value to be posted into the new DataResult
-     */
+    /** Posts an error result. */
     fun postError(@NonNull error: Throwable, @Nullable data: T? = null) {
         postValue(dataResultError(error, data))
     }
 
-    /**
-     * Post a new DataResult with:
-     * - data: received from parameter
-     * - error: null
-     * - status: SUCCESS
-     *
-     * @param data Value to be posted into the new DataResult
-     */
+    /** Posts a success result with data. */
     fun postData(@NonNull data: T) {
         postValue(dataResultSuccess(data))
     }
 
-    /**
-     * Post a new DataResult with:
-     * - data: null
-     * - error: null
-     * - status: SUCCESS
-     */
+    /** Posts a success result without data. */
     fun postSuccess() {
         postValue(dataResultSuccess(null))
     }
 
-    /**
-     * Post a new DataResult with:
-     * - data: null
-     * - error: null
-     * - status: NONE
-     */
+    /** Posts the neutral none state. */
     fun postNone() {
         postValue(dataResultNone())
     }
     // endregion
 
     // region Set methods
-    /**
-     * Set a new DataResult with:
-     * - data: received from parameter
-     * - error: null
-     * - status: LOADING
-     *
-     * @param data Value to be posted into the new DataResult
-     */
+    /** Sets a loading result. */
     fun setLoading(@Nullable data: T? = null) {
         value = dataResultLoading(data)
     }
 
-    /**
-     * Set a new DataResult with:
-     * - data: received from parameter (Default: null)
-     * - error: received from parameter
-     * - status: LOADING
-     *
-     * @param data Value to be posted into the new DataResult
-     * @param error Value to be seted into the new DataResult
-     */
+    /** Sets an error result. */
     fun setError(@NonNull error: Throwable, @Nullable data: T? = null) {
         value = dataResultError(error, data)
     }
 
-    /**
-     * Set a new DataResult with:
-     * - data: received from parameter
-     * - error: null
-     * - status: SUCCESS
-     *
-     * @param data Value to be seted into the new DataResult
-     */
+    /** Sets a success result with data. */
     fun setData(@NonNull data: T) {
         value = dataResultSuccess(data)
     }
 
-    /**
-     * Set a new DataResult with:
-     * - data: null
-     * - error: null
-     * - status: SUCCESS
-     */
+    /** Sets a success result without data. */
     fun setSuccess() {
         value = dataResultSuccess(null)
     }
 
-    /**
-     * Set a new DataResult with:
-     * - data: null
-     * - error: null
-     * - status: NONE
-     */
+    /** Sets the neutral none state. */
     fun setNone() {
         value = dataResultNone()
     }
     // endregion
 
-    /**
-     * @see ResponseLiveData.scope
-     *
-     * To further information about what this method does!
-     */
+    /** Narrows the return type of [ResponseLiveData.scope]. */
     override fun scope(scope: CoroutineScope): MutableResponseLiveData<T> =
         super.scope(scope) as MutableResponseLiveData<T>
 
-    /**
-     * @see ResponseLiveData.transformDispatcher
-     *
-     * To further information about what this method does!
-     */
+    /** Narrows the return type of [ResponseLiveData.transformDispatcher]. */
     override fun transformDispatcher(dispatcher: CoroutineDispatcher): MutableResponseLiveData<T> =
         super.transformDispatcher(dispatcher) as MutableResponseLiveData<T>
 
-    /**
-     * Like Uncle Ben said, with great powers...
-     */
+    /** Exposes the protected setter. */
     public override fun setValue(value: DataResult<T>?) = super.setValue(value)
 
-    /**
-     * Like Uncle Ben said, with great powers...
-     */
+    /** Exposes the protected poster. */
     public override fun postValue(value: DataResult<T>?) = super.postValue(value)
 
-    /**
-     * Like Uncle Ben said, with great powers...
-     */
+    /** Exposes the protected main-thread-safe setter. */
     public override fun safePostValue(value: DataResult<T>?) = super.safePostValue(value)
 }
