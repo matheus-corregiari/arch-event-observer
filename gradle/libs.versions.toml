@@ -6,25 +6,23 @@ jacoco = "0.8.14"
 detekt = "1.23.8"
 
 ## --- Build Config and SDK --- ##
-#noinspection UnusedVersionCatalogEntry
 build-sdk-min = "20"
-#noinspection UnusedVersionCatalogEntry
 build-sdk-compile = "36"
-#noinspection UnusedVersionCatalogEntry
 build-tools = "36.1.0"
 
 ## JetBrains
-jetbrains-kotlin = "2.3.10"
-jetbrains-atomic = "0.31.0"
-jetbrains-dokka = "2.1.0"
-jetbrains-kover = "0.9.7"
+jetbrains-kotlin = "2.3.20"
+jetbrains-atomic = "0.32.1"
+jetbrains-dokka = "2.2.0"
+jetbrains-kover = "0.9.8"
+jetbrains-compose = "1.10.3"
 jetbrains-coroutines = "1.10.2"
 
 ## AndroidX
-androidx-plugin = "9.0.1"
+androidx-plugin = "9.1.1"
 
 ## Tools
-ktlint = "14.0.1"
+ktlint = "14.2.0"
 vanniktech-publish = "0.36.0"
 
 # ------------------------------------------------------------------------------------------------ #
@@ -34,21 +32,22 @@ jetbrains-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.
 jetbrains-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "jetbrains-kotlin" }
 jetbrains-multiplatform = { module = "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin", version.ref = "jetbrains-kotlin" }
 jetbrains-kover = { module = "org.jetbrains.kotlinx:kover-gradle-plugin", version.ref = "jetbrains-kover" }
-jetbrains-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "jetbrains-coroutines" }
+jetbrains-compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "jetbrains-compose" }
+jetbrains-compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "jetbrains-compose" }
+jetbrains-compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "jetbrains-compose" }
+jetbrains-compose-ui-test = { module = "org.jetbrains.compose.ui:ui-test", version.ref = "jetbrains-compose" }
+jetbrains-compose-desktop = { module = "org.jetbrains.compose.desktop:desktop-jvm", version.ref = "jetbrains-compose" }
+jetbrains-compose-ui-test-junit4-desktop = { module = "org.jetbrains.compose.ui:ui-test-junit4-desktop", version.ref = "jetbrains-compose" }
+jetbrains-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "jetbrains-coroutines" }
+jetbrains-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "jetbrains-coroutines" }
 jetbrains-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "jetbrains-kotlin" }
 
 ## Androidx
 androidx-library = { module = "com.android.kotlin.multiplatform.library:com.android.kotlin.multiplatform.library.gradle.plugin", version.ref = "androidx-plugin" }
-androidx-appcompat = { module = "androidx.appcompat:appcompat", version = "1.7.1" }
-androidx-recycler = { module = "androidx.recyclerview:recyclerview", version = "1.4.0" }
-androidx-window = { module = "androidx.window:window", version = "1.5.1" }
-androidx-security = { module = "androidx.security:security-crypto-ktx", version = "1.1.0" }
-androidx-startup = { module = "androidx.startup:startup-runtime", version = "1.2.0" }
-androidx-constraint = { module = "androidx.constraintlayout:constraintlayout", version = "2.2.1" }
+androidx-arch-coreTesting = { module = "androidx.arch.core:core-testing", version = "2.2.0" }
+androidx-compose-lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-compose", version = "2.10.0" }
+androidx-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata", version = "2.10.0" }
 androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime", version = "2.10.0" }
-
-## Arch Toolkit
-arch-lumber = { module = "io.github.matheus-corregiari:arch-lumber", version = "1.0.2" }
 
 ## Tools
 detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
@@ -56,14 +55,14 @@ ktlint = { module = "org.jlleitschuh.gradle.ktlint:org.jlleitschuh.gradle.ktlint
 vanniktech-publish = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "vanniktech-publish" }
 
 ## Test
-junit-test = { module = "junit:junit", version = "4.13.2" }
-robolectric-test = { module = "org.robolectric:robolectric", version = "4.16.1" }
 mockk-test-android = { module = "io.mockk:mockk-android", version = "1.14.9" }
 mockk-test-agent = { module = "io.mockk:mockk", version = "1.14.9" }
 
 # ------------------------------------------------------------------------------------------------ #
 [plugins]
 jetbrains-atomic = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "jetbrains-atomic" }
+jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }
+jetbrains-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "jetbrains-kotlin" }
 
 # ------------------------------------------------------------------------------------------------ #
 [bundles]

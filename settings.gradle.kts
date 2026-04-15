@@ -15,7 +15,7 @@ dependencyResolutionManagement {
 }
 
 include(":event-observer")
-//include(":event-observer-compose")
+include(":event-observer-compose")
 
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"

@@ -13,3 +13,10 @@ updates:
       interval: "monthly"
     rebase-strategy: "disabled"
     open-pull-requests-limit: 1
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    rebase-strategy: "disabled"
+    open-pull-requests-limit: 1

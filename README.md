@@ -1,123 +1,107 @@
-# Arch Android Toolkit
+# Arch Event Observer
 
-A Kotlin-first Android toolkit with APIs designed to fit well in **KMP projects** (Android source set)
-while keeping day-to-day Android development ergonomic.
+Kotlin-first event and result observation for Android and Compose Multiplatform.
 
-[![Maven Central][badge-maven]][link-maven]
+The project is split into two public modules:
+
+- `event-observer` for `DataResult`, `ResponseLiveData`, `ResponseFlow`, and the supporting
+  utilities
+- `event-observer-compose` for `ComposableDataResult` and the Compose-facing observation DSL
+
 [![License][badge-license]](/LICENSE)
 [![Kotlin][badge-kotlin]](https://kotlinlang.org)
 ![Lint][badge-lint]
 ![Test][badge-test]
 [![Coverage][badge-coverage]][link-coverage]
 
----
+## Overview
 
-## ✨ Features
+The library centers on `DataResult<T>` and a small set of wrappers that make loading, success,
+error, and list-state handling consistent across LiveData, Flow, and Compose.
 
-- **State machines** for view and scene orchestration (`StateMachine`, `ViewStateMachine`, `SceneStateMachine`).
-- **Storage abstractions** with in-memory and SharedPreferences implementations.
-- **Delegates for persisted properties** to reduce boilerplate for cached/config values.
-- **Recycler adapter utilities** including generic binders and sticky-header support.
-- **Foldable helpers** to react to hinge/posture changes.
-- **Application context provider** with `ContextProvider`.
+Use `event-observer` when you want:
 
-## 📦 Installation
+- `DataResult` helpers and status handling
+- `ResponseLiveData`, `MutableResponseLiveData`, and `SwapResponseLiveData`
+- `ResponseFlow`, `ResponseStateFlow`, and `ResponseSharedFlow`
+- chaining, mapping, and merge helpers for reactive state
+
+Use `event-observer-compose` when you want:
+
+- `ComposableDataResult` for declarative state rendering
+- `collectAsComposableState()` for `Flow<DataResult<T>>` and `LiveData<DataResult<T>>`
+- Compose observables such as `OnData`, `OnError`, `OnShowLoading`, `OnEmpty`, `OnNotEmpty`,
+  `OnSingle`, and `OnMany`
+
+## Installation
+
+Add the module you need:
 
 ```kotlin
-// build.gradle.kts
-
-// If your project is KMP
-kotlin {
-    sourceSets {
-        androidMain {
-            dependencies {
-                implementation("io.github.matheus-corregiari:arch-android:<latest-version>")
-            }
-        }
-    }
-}
-
-// If your project is only Android
 dependencies {
-    implementation("io.github.matheus-corregiari:arch-android:<latest-version>")
+    implementation("io.github.matheus-corregiari:event-observer:<version>")
+    implementation("io.github.matheus-corregiari:event-observer-compose:<version>")
 }
 ```
 
-## 🛠️ Usage
-
-### 1) Configure storage at startup
+If you are working inside this repository, use project dependencies instead:
 
 ```kotlin
-class App : Application() {
-    override fun onCreate() {
-        super.onCreate()
-
-        Storage.KeyValue.init(this)
-        ContextProvider.init(this)
-    }
+dependencies {
+    implementation(project(":event-observer"))
+    implementation(project(":event-observer-compose"))
 }
 ```
 
-### 2) Build a simple state machine
+## Getting Started
+
+The fastest path is to start with `DataResult` and render it where you need it.
 
 ```kotlin
-val machine = ViewStateMachine()
-machine.setup {
-    state(0) { visibles(viewA); gones(viewB) }
-    state(1) { visibles(viewB); gones(viewA) }
+val result = dataResultSuccess("Hello")
+
+result.unwrap {
+    data { value -> println(value) }
+    error { throwable -> println(throwable.message) }
+    loading { isLoading -> println("loading=$isLoading") }
 }
-
-machine.changeState(0)
 ```
 
-### 3) Persist a typed config value
+For Compose, convert the upstream state into a `ComposableDataResult` and render the blocks you care
+about.
 
 ```kotlin
-val darkMode = ConfigValue(
-    name = "dark_mode",
-    default = false,
-    storage = { Storage.KeyValue.regular }
-)
-
-darkMode.set(true)
-val enabled = darkMode.get()
+myFlow.composable
+    .OnShowLoading { CircularProgressIndicator() }
+    .OnData { value -> Text(value.toString()) }
+    .OnError { error -> Text(error.message ?: "Unknown error") }
+    .Unwrap()
 ```
 
-## 🌍 Platform Support
+## Documentation
 
-| Target      | Support |
-|:------------|:--------|
-| **Android** | ✅      |
+Public docs live in `docs/`:
 
-> This module is Android-focused, but the public API style favors KMP-friendly usage from
-> `androidMain` and shared architecture layers.
+- [Home](docs/index.md)
+- [Getting Started](docs/getting-started.md)
+- [Core Concepts](docs/core-concepts.md)
+- [Recipes](docs/recipes.md)
+- [Changelog](docs/changelog/index.md)
+- [Contributing](docs/contributing.md)
 
-## 🏗️ Built With
+The published MkDocs site is built from the same content and mirrors these pages.
 
-| Tool       | Version  |
-|:-----------|:---------|
-| **Kotlin** | `2.3.10` |
-| **Gradle** | `9.3.1`  |
-| **Java**   | `21`     |
+## Platform Notes
 
-## 🔍 Quality Notes
+- `event-observer` is Android-facing and integrates with LiveData.
+- `event-observer-compose` builds on top of Flow and Compose state.
+- The API is designed to stay predictable in shared KMP-oriented architecture layers.
 
-- KDocs are written in English and optimized for Dokka rendering.
-- `ContextProvider` uses `WeakReference` to reduce Activity leak risk.
-- `ObservableValue` maintains an internal coroutine scope; prefer lifecycle-bounded instances.
+## Contributing
 
-## 🤝 Contributing
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before sending changes.
 
-Contributions are welcome! If you find a bug or have a feature request, please open an issue. If
-you'd like to contribute code, please fork the repository and submit a pull request.
-
-Please read [CONTRIBUTING](CONTRIBUTING.md) for a straightforward, KMP-focused workflow.
-
-## 📚 Documentation
-
-For detailed API information, please refer to the [KDocs](/docs/api/android/index.md).
-
-## 📄 License
+## License
 
 ```text
 Copyright 2025 Matheus Corregiari
@@ -135,12 +119,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-[link-maven]: https://search.maven.org/artifact/io.github.matheus-corregiari/arch-android
-[link-coverage]: https://codecov.io/gh/matheus-corregiari/arch-android
+[link-coverage]: https://codecov.io/gh/matheus-corregiari/arch-event-observer
 
-[badge-kotlin]: https://img.shields.io/badge/kotlin-2.3.10-blue.svg?logo=kotlin
-[badge-maven]: https://img.shields.io/maven-central/v/io.github.matheus-corregiari/arch-android.svg
-[badge-license]: https://img.shields.io/github/license/matheus-corregiari/arch-android
-[badge-coverage]: https://codecov.io/gh/matheus-corregiari/arch-android/graph/badge.svg?token=146UU167K6
-[badge-lint]: https://github.com/matheus-corregiari/arch-android/actions/workflows/lint.yml/badge.svg
-[badge-test]: https://github.com/matheus-corregiari/arch-android/actions/workflows/coverage.yml/badge.svg
+[badge-kotlin]: https://img.shields.io/badge/kotlin-2.3.20-blue.svg?logo=kotlin
+
+[badge-license]: https://img.shields.io/github/license/matheus-corregiari/arch-event-observer
+
+[badge-coverage]: https://codecov.io/gh/matheus-corregiari/arch-event-observer/graph/badge.svg?token=146UU167K6
+
+[badge-lint]: https://github.com/matheus-corregiari/arch-event-observer/actions/workflows/lint.yml/badge.svg
+
+[badge-test]: https://github.com/matheus-corregiari/arch-event-observer/actions/workflows/coverage.yml/badge.svg

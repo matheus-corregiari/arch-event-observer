@@ -18,7 +18,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  assemble_deploy:
+  release:
+    name: Release
     runs-on: ubuntu-latest
 
     permissions:

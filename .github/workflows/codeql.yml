@@ -32,7 +32,7 @@ jobs:
           build-mode: manual
 
       - name: Build JVM / Android targets
-        run: ./gradlew build -x allTests
+        run: ./gradlew build -x allTests -x ktlintCheck
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4

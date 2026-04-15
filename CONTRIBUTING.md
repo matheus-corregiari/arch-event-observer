@@ -1,53 +1,58 @@
-# Contributing to Lumber
+# Contributing to Arch Event Observer
 
-Thanks for taking the time to contribute! This guide keeps the workflow simple and aligned with
-common open-source practices.
+Thanks for taking the time to contribute.
 
 ## Quick Start
 
-1. **Fork & clone** the repo.
-2. **Use a recent JDK** (21+ recommended).
-3. **Build once** to warm up Gradle:
-   ```bash
-   ./gradlew :lumber:assemble
-   ```
+1. Fork and clone the repo.
+2. Use JDK `21`.
+3. Build once to warm up Gradle:
 
-## Repository Layout (KMP focus)
+```bash
+./gradlew build
+```
 
-* `lumber/src/commonMain` → shared API and behavior.
-* `lumber/src/<platform>Main` → platform-specific DebugOak implementations.
-* `lumber/src/commonTest` → cross-platform tests (preferred).
+## Repository Layout
+
+- `event-observer/` -> shared result, flow, and LiveData APIs
+- `event-observer-compose/` -> Compose-facing observation APIs
+- `docs/` -> published MkDocs content
 
 ## Development Workflow
 
-1. Create a branch from `main`.
-2. Make changes with KMP in mind (favor `commonMain` when possible).
-3. Keep KDoc/Javadoc **accurate and consistent** with actual behavior.
-4. Add or update **unit tests** for changes in behavior.
+1. Create a branch from `master`.
+2. Keep changes small and scoped.
+3. Keep public docs, README, and KDoc aligned with shipped behavior.
+4. Add or update tests when behavior changes.
+5. Avoid unrelated refactors.
 
-## Running Tests
+## Local Validation
 
 ```bash
-./gradlew :lumber:allTests
+./gradlew build
+./gradlew allTests
+./gradlew detekt
+./gradlew ktlintCheck
 ```
+
+Use the project wrapper and toolchain settings when validating changes.
 
 ## Documentation Expectations
 
-Keep docs simple and easy to follow:
-
-* Prefer **short code snippets** that work in KMP.
-* Explain **one-shot** behaviors (`tag`, `quiet`, `maxLogLength`, `maxTagLength`) where relevant.
-* Mention **platform differences** when they affect output.
+- Keep examples short, real, and tied to the public API.
+- Explain status handling with `DataResultStatus`, `EventDataStatus`, and `DataResult<T>` when relevant.
+- Mention platform differences when they affect behavior.
+- Update README, public docs under `docs/`, and release notes when public behavior changes.
 
 ## Dependency Hygiene
 
-* Keep libraries updated where possible.
-* If a problem looks complex, propose **more efficient or KMP-friendly alternatives** in the PR
-  description (e.g., smaller runtime, better multiplatform support).
+- Keep direct build and tooling dependencies current when updates are low risk.
+- Prefer stable releases over RC, beta, or alpha unless a prerelease is explicitly required.
+- If an update needs a larger migration, call that out instead of hiding it inside a routine refresh.
 
 ## Pull Request Checklist
 
-* [ ] Tests updated/added and passing.
-* [ ] KDoc/Javadoc updated if behavior or usage changed.
-* [ ] README/docs updated if the public API changed.
-* [ ] Changes verified across KMP targets where possible.
+- [ ] Tests updated or added when behavior changed
+- [ ] Docs updated if behavior or usage changed
+- [ ] README updated if the public API changed
+- [ ] Validation checks passing
