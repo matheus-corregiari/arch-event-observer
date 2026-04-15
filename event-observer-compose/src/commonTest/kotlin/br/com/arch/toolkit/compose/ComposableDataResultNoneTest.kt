@@ -7,13 +7,12 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithTag
 import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.result.DataResultStatus
-import br.com.arch.toolkit.test.PlatformTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.setMain
 import kotlin.test.Test
 
-class ComposableDataResultNoneTest : PlatformTest() {
+class ComposableDataResultNoneTest {
     init {
         Dispatchers.setMain(StandardTestDispatcher())
     }
@@ -55,7 +54,7 @@ class ComposableDataResultNoneTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
-        },
+        }
     )
 
     @Test
@@ -95,7 +94,7 @@ class ComposableDataResultNoneTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
-        },
+        }
     )
 
     @Test
@@ -135,7 +134,7 @@ class ComposableDataResultNoneTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
-        },
+        }
     )
 
     @Test
@@ -175,6 +174,6 @@ class ComposableDataResultNoneTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
-        },
+        }
     )
 }

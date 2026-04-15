@@ -7,7 +7,7 @@ import br.com.arch.toolkit.result.EventDataStatus
 
 internal class StatusObservable<T>(
     private val status: EventDataStatus,
-    private val func: @Composable (DataResultStatus) -> Unit,
+    private val func: @Composable (DataResultStatus) -> Unit
 ) : ComposeObservable<T, Unit>() {
     @Composable
     override fun observe(result: DataResult<T>) = func(result.status)

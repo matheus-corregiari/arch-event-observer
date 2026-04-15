@@ -8,13 +8,12 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
 import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.result.DataResultStatus
-import br.com.arch.toolkit.test.PlatformTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.setMain
 import kotlin.test.Test
 
-class ComposableDataResultMapTest : PlatformTest() {
+class ComposableDataResultMapTest {
     init {
         Dispatchers.setMain(StandardTestDispatcher())
     }
@@ -56,7 +55,7 @@ class ComposableDataResultMapTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
-        },
+        }
     )
 
     @Test
@@ -96,7 +95,7 @@ class ComposableDataResultMapTest : PlatformTest() {
             onNodeWithTag("singleTag").assertTextEquals("(1, Hello Compose)")
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
-        },
+        }
     )
 
     @Test
@@ -104,14 +103,16 @@ class ComposableDataResultMapTest : PlatformTest() {
         result = DataResult(
             mapOf("1" to "Hello Compose", "2" to "Bye Compose"),
             null,
-            DataResultStatus.SUCCESS,
+            DataResultStatus.SUCCESS
         ),
         config = mapConfig,
         assert = {
             // Data
             onNodeWithTag("dataTag1").assertTextEquals("{1=Hello Compose, 2=Bye Compose}")
             onNodeWithTag("dataTag2").assertTextEquals("{1=Hello Compose, 2=Bye Compose} - SUCCESS")
-            onNodeWithTag("dataTag3").assertTextEquals("{1=Hello Compose, 2=Bye Compose} - SUCCESS - null")
+            onNodeWithTag(
+                "dataTag3"
+            ).assertTextEquals("{1=Hello Compose, 2=Bye Compose} - SUCCESS - null")
             // Show Loading
             onNodeWithTag("showLoadingTag1").assertDoesNotExist()
             onNodeWithTag("showLoadingTag2").assertDoesNotExist()
@@ -140,6 +141,6 @@ class ComposableDataResultMapTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertTextEquals("{1=Hello Compose, 2=Bye Compose}")
-        },
+        }
     )
 }

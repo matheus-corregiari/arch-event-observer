@@ -6,7 +6,7 @@ import br.com.arch.toolkit.result.EventDataStatus
 
 internal class ErrorWithThrowableObservable<T>(
     private val status: EventDataStatus,
-    private val func: @Composable (Throwable) -> Unit,
+    private val func: @Composable (Throwable) -> Unit
 ) : ComposeObservable<T, Throwable>() {
     @Composable
     override fun observe(result: DataResult<T>) {

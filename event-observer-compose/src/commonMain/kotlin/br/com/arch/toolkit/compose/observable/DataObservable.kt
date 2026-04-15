@@ -5,7 +5,7 @@ import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.result.DataResultStatus
 
 internal class DataObservable<T>(
-    private val func: @Composable (T, DataResultStatus, Throwable?) -> Unit,
+    private val func: @Composable (T, DataResultStatus, Throwable?) -> Unit
 ) : ComposeObservable<T, DataResult<T>>() {
     @Composable
     override fun observe(result: DataResult<T>) {

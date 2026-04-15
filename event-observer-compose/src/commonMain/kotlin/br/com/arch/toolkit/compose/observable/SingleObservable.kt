@@ -7,7 +7,7 @@ import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.result.DataResultStatus
 
 internal class SingleObservable<T, R>(
-    private val func: @Composable (R, DataResultStatus, Throwable?) -> Unit,
+    private val func: @Composable (R, DataResultStatus, Throwable?) -> Unit
 ) : ComposeObservable<T, R>() {
 
     @Composable

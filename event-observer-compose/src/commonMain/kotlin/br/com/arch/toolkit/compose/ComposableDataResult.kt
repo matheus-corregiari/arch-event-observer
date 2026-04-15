@@ -2,7 +2,7 @@
     "ComposableNaming",
     "MagicNumber",
     "FunctionNaming",
-    "TooManyFunctions",
+    "TooManyFunctions"
 )
 
 package br.com.arch.toolkit.compose
@@ -116,7 +116,7 @@ import kotlin.time.DurationUnit
  */
 @ConsistentCopyVisibility
 data class ComposableDataResult<T> internal constructor(
-    val result: Flow<DataResult<T>>,
+    val result: Flow<DataResult<T>>
 ) {
     private val animationConfig = AnimationConfig()
     private var notComposableBlock: (ObserveWrapper<T>.() -> Unit)? = null
@@ -193,7 +193,7 @@ data class ComposableDataResult<T> internal constructor(
     @Composable
     fun OnSuccess(
         dataStatus: EventDataStatus = DoesNotMatter,
-        func: @Composable () -> Unit,
+        func: @Composable () -> Unit
     ) = apply { observableList.add(SuccessObservable(dataStatus, func)) }
 
     // endregion
@@ -218,7 +218,7 @@ data class ComposableDataResult<T> internal constructor(
     @Composable
     fun OnShowLoading(
         dataStatus: EventDataStatus = DoesNotMatter,
-        func: @Composable () -> Unit,
+        func: @Composable () -> Unit
     ) = apply { observableList.add(ShowLoadingObservable(dataStatus, func)) }
 
     /**
@@ -240,7 +240,7 @@ data class ComposableDataResult<T> internal constructor(
     @Composable
     fun OnHideLoading(
         dataStatus: EventDataStatus = DoesNotMatter,
-        func: @Composable () -> Unit,
+        func: @Composable () -> Unit
     ) = apply { observableList.add(HideLoadingObservable(dataStatus, func)) }
 
     // endregion
@@ -263,7 +263,7 @@ data class ComposableDataResult<T> internal constructor(
     @Composable
     fun OnError(
         dataStatus: EventDataStatus = DoesNotMatter,
-        func: @Composable () -> Unit,
+        func: @Composable () -> Unit
     ) = apply { observableList.add(ErrorObservable(dataStatus, func)) }
 
     /**
@@ -282,7 +282,7 @@ data class ComposableDataResult<T> internal constructor(
     @Composable
     fun OnError(
         dataStatus: EventDataStatus = DoesNotMatter,
-        func: @Composable (Throwable) -> Unit,
+        func: @Composable (Throwable) -> Unit
     ) = apply { observableList.add(ErrorWithThrowableObservable(dataStatus, func)) }
 
     // endregion
@@ -346,20 +346,24 @@ data class ComposableDataResult<T> internal constructor(
     // endregion
 
     // region Result
+    /** Renders [func] with the raw result payload. */
     @Composable
     fun OnResult(func: @Composable (T?) -> Unit) =
         apply { observableList.add(ResultObservable { data, _, _ -> func(data) }) }
 
+    /** Renders [func] with the raw result payload and status. */
     @Composable
     fun OnResult(func: @Composable (T?, DataResultStatus) -> Unit) =
         apply { observableList.add(ResultObservable { data, status, _ -> func(data, status) }) }
 
+    /** Renders [func] with the raw result payload, status, and error. */
     @Composable
     fun OnResult(func: @Composable (T?, DataResultStatus, Throwable?) -> Unit) =
         apply { observableList.add(ResultObservable(func)) }
     // endregion
 
     // region Status
+    /** Renders [func] with the current [DataResultStatus]. */
     @Composable
     fun OnStatus(
         dataStatus: EventDataStatus = DoesNotMatter,
@@ -369,18 +373,7 @@ data class ComposableDataResult<T> internal constructor(
 
     // region List Type
 
-    /**
-     * Renders when the underlying list is empty.
-     *
-     * ---
-     *
-     * ### Example
-     * ```kotlin
-     * comp.OnEmpty {
-     *   Text("No items found")
-     * }
-     * ```
-     */
+    /** Renders [func] when the list-like payload is empty. */
     @Composable
     fun OnEmpty(func: @Composable () -> Unit) =
         apply { observableList.add(EmptyObservable { _, _ -> func() }) }
@@ -393,9 +386,7 @@ data class ComposableDataResult<T> internal constructor(
     fun OnEmpty(func: @Composable (DataResultStatus, Throwable?) -> Unit) =
         apply { observableList.add(EmptyObservable(func)) }
 
-    /**
-     * Renders when the underlying list is not empty.
-     */
+    /** Renders [func] when the list-like payload is not empty. */
     @Composable
     fun OnNotEmpty(func: @Composable (T) -> Unit) =
         apply { observableList.add(NotEmptyObservable { data, _, _ -> func(data) }) }
@@ -408,9 +399,7 @@ data class ComposableDataResult<T> internal constructor(
     fun OnNotEmpty(func: @Composable (T, DataResultStatus, Throwable?) -> Unit) =
         apply { observableList.add(NotEmptyObservable(func)) }
 
-    /**
-     * Renders when the list contains exactly one item.
-     */
+    /** Renders [func] when the list-like payload contains exactly one item. */
     @Composable
     fun <R> OnSingle(func: @Composable (R) -> Unit) =
         apply { observableList.add(SingleObservable<T, R> { data, _, _ -> func(data) }) }
@@ -425,9 +414,7 @@ data class ComposableDataResult<T> internal constructor(
     fun <R> OnSingle(func: @Composable (R, DataResultStatus, Throwable?) -> Unit) =
         apply { observableList.add(SingleObservable(func)) }
 
-    /**
-     * Renders when the list contains more than one item.
-     */
+    /** Renders [func] when the list-like payload contains more than one item. */
     @Composable
     fun OnMany(func: @Composable (T) -> Unit) =
         apply { observableList.add(ManyObservable { data, _, _ -> func(data) }) }
@@ -445,7 +432,7 @@ data class ComposableDataResult<T> internal constructor(
     // region Unwrap
 
     /**
-     * DSL entrypoint to configure multiple observables before collection.
+     * Configures the DSL before collection starts.
      *
      * ---
      *
@@ -471,8 +458,7 @@ data class ComposableDataResult<T> internal constructor(
     }
 
     /**
-     * Starts collecting the underlying [Flow] and dispatches
-     * all configured observables.
+     * Starts collecting the underlying [Flow] and renders all configured observables.
      *
      * ---
      *
@@ -505,7 +491,7 @@ data class ComposableDataResult<T> internal constructor(
                     modifier = animationConfig.animationModifier,
                     enter = animationConfig.enterAnimation,
                     exit = animationConfig.exitAnimation,
-                    content = { observable.observe(resultState) },
+                    content = { observable.observe(resultState) }
                 )
             } else {
                 if (observable.hasVisibleContent(resultState)) observable.observe(resultState)
@@ -563,14 +549,14 @@ data class ComposableDataResult<T> internal constructor(
             animationSpec = tween(
                 durationMillis = defaultEnterDuration.toInt(DurationUnit.MILLISECONDS),
                 // Delays enter to potentially run after a preceding exit animation completes
-                delayMillis = defaultExitDuration.toInt(DurationUnit.MILLISECONDS),
-            ),
+                delayMillis = defaultExitDuration.toInt(DurationUnit.MILLISECONDS)
+            )
         )
         var exitAnimation: ExitTransition =
             fadeOut(
                 animationSpec = tween(
-                    durationMillis = defaultExitDuration.toInt(DurationUnit.MILLISECONDS),
-                ),
+                    durationMillis = defaultExitDuration.toInt(DurationUnit.MILLISECONDS)
+                )
             )
 
         /**

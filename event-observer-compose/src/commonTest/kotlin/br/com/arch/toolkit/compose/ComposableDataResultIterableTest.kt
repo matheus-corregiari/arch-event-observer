@@ -8,13 +8,12 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
 import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.result.DataResultStatus
-import br.com.arch.toolkit.test.PlatformTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.setMain
 import kotlin.test.Test
 
-class ComposableDataResultIterableTest : PlatformTest() {
+class ComposableDataResultIterableTest {
     init {
         Dispatchers.setMain(StandardTestDispatcher())
     }
@@ -56,7 +55,7 @@ class ComposableDataResultIterableTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
-        },
+        }
     )
 
     @Test
@@ -96,7 +95,7 @@ class ComposableDataResultIterableTest : PlatformTest() {
             onNodeWithTag("singleTag").assertTextEquals("Hello Compose")
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
-        },
+        }
     )
 
     @Test
@@ -107,7 +106,9 @@ class ComposableDataResultIterableTest : PlatformTest() {
             // Data
             onNodeWithTag("dataTag1").assertTextEquals("[Hello Compose, Bye Compose]")
             onNodeWithTag("dataTag2").assertTextEquals("[Hello Compose, Bye Compose] - SUCCESS")
-            onNodeWithTag("dataTag3").assertTextEquals("[Hello Compose, Bye Compose] - SUCCESS - null")
+            onNodeWithTag(
+                "dataTag3"
+            ).assertTextEquals("[Hello Compose, Bye Compose] - SUCCESS - null")
             // Show Loading
             onNodeWithTag("showLoadingTag1").assertDoesNotExist()
             onNodeWithTag("showLoadingTag2").assertDoesNotExist()
@@ -136,7 +137,6 @@ class ComposableDataResultIterableTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertTextEquals("[Hello Compose, Bye Compose]")
-        },
+        }
     )
-
 }
