@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions", "FunctionNaming")
+
 package br.com.arch.toolkit.livedata.response
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -12,6 +14,7 @@ import br.com.arch.toolkit.util.dataResultLoading
 import br.com.arch.toolkit.util.dataResultNone
 import br.com.arch.toolkit.util.dataResultSuccess
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -20,6 +23,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MutableResponseLiveDataTest {
 
     @get:Rule

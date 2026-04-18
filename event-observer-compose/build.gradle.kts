@@ -6,6 +6,7 @@ plugins {
     id("arch-publish")
     alias(libs.plugins.jetbrains.atomic)
     alias(libs.plugins.jetbrains.compose.compiler)
+    alias(libs.plugins.jetbrains.compose.kotlin)
 }
 
 kotlin {
@@ -31,7 +32,6 @@ kotlin {
 
         // Test Libraries
         commonTest.dependencies {
-            implementation(libs.jetbrains.kotlin.test)
             implementation(project(":test"))
             implementation(libs.jetbrains.coroutines.test)
             implementation(libs.jetbrains.compose.foundation)
