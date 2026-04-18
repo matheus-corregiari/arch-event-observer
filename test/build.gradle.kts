@@ -16,8 +16,8 @@ kotlin {
             api(libs.jetbrains.kotlin.test)
         }
         androidMain.dependencies {
-            implementation(libs.androidx.compose.testManifest)
-            implementation(libs.androidx.test.junit)
+            api(libs.androidx.compose.testManifest)
+            api(libs.androidx.test.junit)
             api(libs.robolectric.test)
         }
     }
