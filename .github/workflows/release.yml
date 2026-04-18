@@ -18,8 +18,29 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  release:
-    name: Release
+  verify:
+    name: Verify Release Build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup
+        uses: ./.github/actions/setup-gradle
+
+      - name: Version Name
+        uses: ./.github/actions/version-name
+
+      - name: Assemble publishable artifacts
+        run: ./gradlew :event-observer:assemble :event-observer-compose:assemble
+
+  publish-event-observer:
+    name: Publish event-observer
+    needs: verify
     runs-on: ubuntu-latest
 
     permissions:
@@ -50,11 +71,64 @@ jobs:
       - name: Version Name
         uses: ./.github/actions/version-name
 
-      - name: Build
-        run: ./gradlew build
-
       - name: Publish to Maven Central
-        run: ./gradlew publishAndReleaseToMavenCentral
+        run: ./gradlew :event-observer:publishAndReleaseToMavenCentral
 
       - name: Publish to GitHub Packages
-        run: ./gradlew publishAllPublicationsToGithubRepository
+        run: ./gradlew :event-observer:publishAllPublicationsToGithubRepository
+
+  publish-event-observer-compose:
+    name: Publish event-observer-compose
+    needs: verify
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      # Github Packages
+      ORG_GRADLE_PROJECT_GITHUB_ACTOR: ${{ github.actor }}
+      ORG_GRADLE_PROJECT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Maven
+      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+
+      # Signing
+      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGN_KEY }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGN_KEYID }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGN_PASSWORD }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup
+        uses: ./.github/actions/setup-gradle
+
+      - name: Version Name
+        uses: ./.github/actions/version-name
+
+      - name: Publish to Maven Central
+        run: ./gradlew :event-observer-compose:publishAndReleaseToMavenCentral
+
+      - name: Publish to GitHub Packages
+        run: ./gradlew :event-observer-compose:publishAllPublicationsToGithubRepository
+
+  github-release:
+    name: Publish GitHub Release
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+      - publish-event-observer
+      - publish-event-observer-compose
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true

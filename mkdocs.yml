@@ -1,5 +1,5 @@
 site_name: Arch Event Observer
-site_description: Kotlin-first result observation for Android and Compose Multiplatform.
+site_description: Kotlin-first observation toolkit with dedicated base and Compose modules.
 site_url: https://matheus-corregiari.github.io/arch-event-observer/
 repo_url: https://github.com/matheus-corregiari/arch-event-observer
 edit_uri: blob/master/docs/
@@ -33,10 +33,16 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
+  - Modules:
+      - event-observer: modules/event-observer.md
+      - event-observer-compose: modules/event-observer-compose.md
   - Core Concepts: core-concepts.md
   - Usage Recipes: recipes.md
   - Changelog:
       - Overview: changelog/index.md
       - 1.0.0: changelog/1.0.0.md
   - Contributing: contributing.md
-  - API Reference: api/index.html
+  - API Reference:
+      - Overview: api/index.md
+      - event-observer: api/event-observer.md
+      - event-observer-compose: api/event-observer-compose.md

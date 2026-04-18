@@ -26,7 +26,28 @@ jobs:
         uses: ./.github/actions/setup-gradle
 
       - name: Run Detekt
-        run: ./gradlew detekt
+        run: ./gradlew :event-observer:detekt :event-observer-compose:detekt
 
       - name: Run KtLint
-        run: ./gradlew ktlintCheck
+        run: ./gradlew :event-observer:ktlintCheck :event-observer-compose:ktlintCheck
+
+      - name: Upload Detekt reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: detekt-reports
+          path: |
+            event-observer/build/reports/detekt
+            event-observer-compose/build/reports/detekt
+          if-no-files-found: warn
+
+      - name: Upload lint reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-reports
+          path: |
+            event-observer/build/reports/ktlint
+            event-observer-compose/build/reports/ktlint
+            build/reports/lint
+          if-no-files-found: warn

@@ -1,12 +1,19 @@
 ﻿# Getting Started
 
-## Install The Modules
+## Install The Right Module
 
-Use the module you need:
+Start with the base module:
 
 ```kotlin
 dependencies {
     implementation("io.github.matheus-corregiari:event-observer:<version>")
+}
+```
+
+Add the Compose module when your rendering layer is Compose Multiplatform:
+
+```kotlin
+dependencies {
     implementation("io.github.matheus-corregiari:event-observer-compose:<version>")
 }
 ```
@@ -16,9 +23,19 @@ Inside this repository, use project dependencies:
 ```kotlin
 dependencies {
     implementation(project(":event-observer"))
+}
+```
+
+```kotlin
+dependencies {
     implementation(project(":event-observer-compose"))
 }
 ```
+
+See the dedicated module pages for the split:
+
+- [`event-observer`](modules/event-observer.md)
+- [`event-observer-compose`](modules/event-observer-compose.md)
 
 ## Create A Result
 
@@ -51,8 +68,8 @@ userLiveData.observe(this) {
 
 ## Render It In Compose
 
-Wrap a `Flow<DataResult<T>>` or `LiveData<DataResult<T>>` with `composable` and render the states
-you need.
+Add `event-observer-compose`, then wrap a `Flow<DataResult<T>>` or `LiveData<DataResult<T>>` with
+`composable` and render the states you need.
 
 ```kotlin
 myFlow.composable
@@ -64,6 +81,8 @@ myFlow.composable
 
 ## Recommended Next Steps
 
+- Read the module pages to choose the right dependency surface.
 - Read [Core Concepts](core-concepts.md) to understand the state model.
 - Use [Recipes](recipes.md) for common patterns.
+- Check [API Reference](api/index.md) for per-module API docs.
 - Check [Changelog](changelog/index.md) when you need release history.

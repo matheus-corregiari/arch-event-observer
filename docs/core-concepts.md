@@ -72,6 +72,8 @@ Both expose helpers for:
 `ResponseStateFlow<T>` and `ResponseSharedFlow<T>` give you stateful or shared flow behavior when
 you need it.
 
+These APIs live in [`event-observer`](modules/event-observer.md).
+
 ## Compose
 
 `ComposableDataResult<T>` turns a `Flow<DataResult<T>>` into a declarative Compose DSL.
@@ -91,6 +93,8 @@ It renders common blocks such as:
 
 It also supports optional animation configuration and non-Compose side effects through
 `outsideComposable`.
+
+These APIs live in [`event-observer-compose`](modules/event-observer-compose.md).
 
 ## Design Rule
 

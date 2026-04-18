@@ -16,11 +16,20 @@ The repository is split into two public modules:
 - Compose helpers for declarative rendering without manual `when` blocks
 - published docs that stay aligned with the shipped public API
 
+## Choose Your Module
+
+- [`event-observer`](modules/event-observer.md) for the base model, LiveData, and Flow support
+- [`event-observer-compose`](modules/event-observer-compose.md) for Compose rendering on top of the
+  base module
+
 ## Start Here
 
 - [Getting Started](getting-started.md)
+- [event-observer](modules/event-observer.md)
+- [event-observer-compose](modules/event-observer-compose.md)
 - [Core Concepts](core-concepts.md)
 - [Recipes](recipes.md)
+- [API Reference](api/index.md)
 - [Changelog](changelog/index.md)
 - [Contributing](contributing.md)
 

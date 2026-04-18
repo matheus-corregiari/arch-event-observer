@@ -41,6 +41,6 @@ kotlin {
 dokka.dokkaSourceSets.configureEach {
     sourceLink {
         localDirectory.set(projectDir.resolve("src"))
-        remoteUrl("${env("POM_URL")}/tree/master/lumber/src")
+        remoteUrl("${env("POM_URL")}/tree/master/event-observer/src")
     }
 }

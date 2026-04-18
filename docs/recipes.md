@@ -2,7 +2,8 @@
 
 ## Render A Loading Screen
 
-Use the loading callbacks directly from `DataResult` or `ComposableDataResult`.
+Use the loading callbacks directly from `DataResult` or, in the Compose module,
+`ComposableDataResult`.
 
 ```kotlin
 myFlow.composable
@@ -87,3 +88,5 @@ state
 Keep the smallest wrapper that matches the layer you are in. Use `DataResult` for the model,
 `ResponseLiveData` or `ResponseFlow` for transport, and `ComposableDataResult` only where you
 actually render Compose UI.
+
+For module-specific API details, use the [API Reference](api/index.md).

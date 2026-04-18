@@ -24,29 +24,28 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup-gradle
 
-      - name: Tests
-        run: ./gradlew allTests
-
-      - name: Coverage Reports
-        run: ./gradlew :event-observer:koverXmlReport :event-observer:koverHtmlReport :event-observer:koverVerify
+      - name: Tests and merged coverage
+        run: ./gradlew allTests koverXmlReport koverHtmlReport koverVerify
 
       - name: Upload coverage HTML
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: event-observer-kover-html
-          path: event-observer/build/reports/kover/html
+          name: merged-kover-html
+          path: build/reports/kover/html
           if-no-files-found: error
 
       - name: Upload coverage XML
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: event-observer-kover-xml
-          path: event-observer/build/reports/kover/report.xml
+          name: merged-kover-xml
+          path: build/reports/kover/report.xml
           if-no-files-found: error
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: event-observer/build/reports/kover/report.xml
+          files: build/reports/kover/report.xml
           fail_ci_if_error: true
