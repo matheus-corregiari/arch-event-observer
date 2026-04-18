@@ -33,6 +33,7 @@ kotlin {
         // Test Libraries
         commonTest.dependencies {
             implementation(project(":test"))
+            implementation(libs.jetbrains.kotlin.test)
             implementation(libs.jetbrains.coroutines.test)
             implementation(libs.jetbrains.compose.foundation)
             implementation(libs.jetbrains.compose.ui.test)
