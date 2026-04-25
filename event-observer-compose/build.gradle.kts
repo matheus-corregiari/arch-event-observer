@@ -40,6 +40,7 @@ kotlin {
         }
         jvmTest.dependencies {
             implementation(libs.jetbrains.compose.desktop)
+            implementation(compose.desktop.currentOs)
             implementation(libs.jetbrains.compose.ui.test.junit4.desktop)
         }
     }

@@ -264,7 +264,7 @@ class ChainTest {
         )
 
     @Test
-    fun `24 - LiveData - initialized A B - chainWith - transform - exception transform - fallback`() =
+    fun `24 - LiveData - initialized A B - chainWith - exception transform - fallback`() =
         executeChainWithTransform(
             liveDataA = MutableLiveData<String>("String"),
             liveDataB = MutableLiveData<Int>(123),

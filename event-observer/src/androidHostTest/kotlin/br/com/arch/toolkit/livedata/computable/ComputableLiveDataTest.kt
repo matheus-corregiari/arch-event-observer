@@ -49,7 +49,7 @@ class ComputableLiveDataTest {
 
         liveData.observeNotNull(alwaysOnOwner, mockedObserver)
 
-        Thread.sleep(50)
+        Thread.sleep(250)
         verify(exactly = 1) { computeObserver.invoke() }
         verify(exactly = 0) { abortObserver.invoke() }
     }
@@ -66,11 +66,11 @@ class ComputableLiveDataTest {
 
         // Call when become active
         liveData.observeNotNull(alwaysOnOwner, mockedObserver)
-        Thread.sleep(50)
+        Thread.sleep(250)
 
         // Call again if have observers
         liveData.invalidate()
-        Thread.sleep(50)
+        Thread.sleep(250)
 
         verify(exactly = 2) { computeObserver.invoke() }
         verify(exactly = 0) { abortObserver.invoke() }
@@ -88,7 +88,7 @@ class ComputableLiveDataTest {
 
         // Call when become active
         liveData.observeNotNull(alwaysOnOwner, mockedObserver)
-        Thread.sleep(50)
+        Thread.sleep(250)
         verify(exactly = 1) { computeObserver.invoke() }
 
         liveData.removeObservers(alwaysOnOwner)
@@ -117,7 +117,7 @@ class ComputableLiveDataTest {
 
         // Call when become active
         liveData.observeNotNull(alwaysOnOwner, mockedObserver)
-        Thread.sleep(50)
+        Thread.sleep(250)
         verify(exactly = 1) { computeObserver.invoke() }
 
         // Call again if have observers
@@ -143,7 +143,7 @@ class ComputableLiveDataTest {
 
         // Call when become active
         liveData.observeNotNull(alwaysOnOwner, mockedObserver)
-        Thread.sleep(50)
+        Thread.sleep(250)
         verify(exactly = 1) { computeObserver.invoke() }
         assertFalse(liveData.isRunning)
         assertFalse(liveData.hasComputed())
@@ -162,13 +162,13 @@ class ComputableLiveDataTest {
 
         // Call when become active
         liveData.observeSingle(alwaysOnOwner, mockedObserver)
-        Thread.sleep(50)
+        Thread.sleep(250)
         verify(exactly = 1) { computeObserver.invoke() }
         assertFalse(liveData.isRunning)
         assertTrue(liveData.hasComputed())
 
         liveData.observeSingle(alwaysOnOwner, mockedObserver)
-        Thread.sleep(50)
+        Thread.sleep(250)
         verify(exactly = 1) { computeObserver.invoke() }
         verify(exactly = 0) { abortObserver.invoke() }
     }
@@ -202,7 +202,7 @@ class ComputableLiveDataTest {
         verify(exactly = 0) { abortObserver.invoke() }
 
         liveData.observeSingle(alwaysOnOwner, mockedObserver)
-        Thread.sleep(50)
+        Thread.sleep(250)
         verify(exactly = 1) { computeObserver.invoke() }
         assertTrue(liveData.isRunningOrHasComputed)
 

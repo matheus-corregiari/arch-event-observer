@@ -240,7 +240,7 @@ class ChainNotNullTest {
         )
 
     @Test
-    fun `22 - LiveData - initialized A B - chainNotNullWith - transform - exception transform - omit`() =
+    fun `22 - LiveData - initialized A B - chainNotNullWith - exception transform - omit`() =
         executechainNotNullWithTransform(
             liveDataA = MutableLiveData<String>("String"),
             liveDataB = MutableLiveData<Int>(123),
@@ -254,7 +254,7 @@ class ChainNotNullTest {
         )
 
     @Test
-    fun `23 - LiveData - initialized A B - chainNotNullWith - transform - exception transform - fallback`() =
+    fun `23 - LiveData - initialized A B - chainNotNullWith - exception transform - fallback`() =
         executechainNotNullWithTransform(
             liveDataA = MutableLiveData<String>("String"),
             liveDataB = MutableLiveData<Int>(123),

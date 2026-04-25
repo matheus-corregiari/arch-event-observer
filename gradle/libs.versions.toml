@@ -59,6 +59,7 @@ robolectric-test = { module = "org.robolectric:robolectric", version = "4.16.1" 
 
 ## Test
 mockk-test-android = { module = "io.mockk:mockk-android", version = "1.14.9" }
+mockk-test-agent = { module = "io.mockk:mockk", version = "1.14.9" }
 
 # ------------------------------------------------------------------------------------------------ #
 [plugins]
