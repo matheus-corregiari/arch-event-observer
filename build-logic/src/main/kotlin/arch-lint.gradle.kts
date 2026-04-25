@@ -15,7 +15,7 @@ extensions.configure<DetektExtension> {
     buildUponDefaultConfig = true
     autoCorrect = true
     allRules = false
-    config.setFrom("$rootDir/tools/detekt.yml")
+    config.setFrom("$rootDir/tools/detekt-config.yml")
     baseline = file("$rootDir/tools/detekt-baseline.xml")
 }
 extensions.configure<KtlintExtension> {

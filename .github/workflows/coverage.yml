@@ -25,14 +25,16 @@ jobs:
         uses: ./.github/actions/setup-gradle
 
       - name: Tests and merged coverage
-        run: ./gradlew allTests koverXmlReport koverHtmlReport koverVerify
+        run: ./gradlew ciCoverage
 
       - name: Upload coverage HTML
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: merged-kover-html
-          path: build/reports/kover/html
+          path: |
+            build/reports/kover/html
+            **/build/reports/kover/html
           if-no-files-found: error
 
       - name: Upload coverage XML
@@ -40,7 +42,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: merged-kover-xml
-          path: build/reports/kover/report.xml
+          path: |
+            build/reports/kover/report.xml
+            **/build/reports/kover/report.xml
           if-no-files-found: error
 
       - name: Upload coverage reports to Codecov

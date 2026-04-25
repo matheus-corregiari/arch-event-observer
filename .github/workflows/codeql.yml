@@ -32,7 +32,7 @@ jobs:
           build-mode: manual
 
       - name: Build public modules
-        run: ./gradlew :event-observer:build :event-observer-compose:build -x allTests -x ktlintCheck -x detekt
+        run: ./gradlew ciBuild
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
