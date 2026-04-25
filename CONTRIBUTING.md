@@ -29,10 +29,12 @@ Thanks for taking the time to contribute.
 ## Local Validation
 
 ```bash
-./gradlew build
-./gradlew allTests
-./gradlew detekt
-./gradlew ktlintCheck
+./gradlew ciBuild
+./gradlew ciLint
+./gradlew ciTest
+./gradlew ciCoverage
+./gradlew ciDocs
+python -m mkdocs build --strict
 ```
 
 Use the project wrapper and toolchain settings when validating changes.

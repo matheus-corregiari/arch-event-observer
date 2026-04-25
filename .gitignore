@@ -9,10 +9,12 @@
 /local.properties
 /docs/api/*
 !/docs/api/*.md
-/docs/contributing.md
 /site/
 .DS_Store
 /captures
 .externalNativeBuild
 # Added by code-review-graph
 .code-review-graph/
+AGENTS.md
+.specify/
+.agents/
