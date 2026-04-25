@@ -43,9 +43,6 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.jetbrains.compose.ui.test.junit4.desktop)
         }
-        webTest.dependencies {
-            implementation("org.jetbrains.compose.components:components-resources:1.10.3")
-        }
     }
 }
 
