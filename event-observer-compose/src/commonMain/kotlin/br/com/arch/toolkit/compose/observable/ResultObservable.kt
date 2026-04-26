@@ -8,7 +8,7 @@ internal class ResultObservable<T>(
     private val func: @Composable (T?, DataResultStatus, Throwable?) -> Unit
 ) : ComposeObservable<T, DataResult<T>>() {
     @Composable
-    override fun observe(result: DataResult<T>) {
+    override fun Content(result: DataResult<T>) {
         val (data, error, status) = result
         func(data, status, error)
     }

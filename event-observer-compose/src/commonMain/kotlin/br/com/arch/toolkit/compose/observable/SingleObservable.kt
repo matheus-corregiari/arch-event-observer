@@ -11,7 +11,7 @@ internal class SingleObservable<T, R>(
 ) : ComposeObservable<T, R>() {
 
     @Composable
-    override fun observe(result: DataResult<T>) {
+    override fun Content(result: DataResult<T>) {
         val (data, error, status) = result
         val item = when (data) {
             is Collection<*> -> data.firstOrNull()
@@ -23,5 +23,6 @@ internal class SingleObservable<T, R>(
         func(item, status, error)
     }
 
-    override fun hasVisibleContent(result: DataResult<T>) = result.hasData && result.hasOneItem
+    override fun hasVisibleContent(result: DataResult<T>) =
+        result.hasData && result.hasOneItem && result.isNone.not()
 }

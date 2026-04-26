@@ -4,6 +4,7 @@
 package br.com.arch.toolkit.compose
 
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
 import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.result.DataResultStatus
@@ -55,6 +56,12 @@ class ComposableDataResultNoneTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
+            // Result
+            onNodeWithTag("resultTag").assertTextEquals("Hello Compose")
+            // Status
+            onNodeWithTag("statusTag").assertTextEquals("NONE")
+            // None
+            onNodeWithTag("noneTag").assertTextEquals("none")
         }
     )
 
@@ -95,6 +102,12 @@ class ComposableDataResultNoneTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
+            // Result
+            onNodeWithTag("resultTag").assertTextEquals("null")
+            // Status
+            onNodeWithTag("statusTag").assertTextEquals("NONE")
+            // None
+            onNodeWithTag("noneTag").assertTextEquals("none")
         }
     )
 
@@ -135,6 +148,12 @@ class ComposableDataResultNoneTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
+            // Result
+            onNodeWithTag("resultTag").assertTextEquals("Hello Compose")
+            // Status
+            onNodeWithTag("statusTag").assertTextEquals("NONE")
+            // None
+            onNodeWithTag("noneTag").assertTextEquals("none")
         }
     )
 
@@ -175,6 +194,12 @@ class ComposableDataResultNoneTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
+            // Result
+            onNodeWithTag("resultTag").assertTextEquals("null")
+            // Status
+            onNodeWithTag("statusTag").assertTextEquals("NONE")
+            // None
+            onNodeWithTag("noneTag").assertTextEquals("none")
         }
     )
 }

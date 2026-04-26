@@ -6,7 +6,7 @@ Start with the base module:
 
 ```kotlin
 dependencies {
-    implementation("io.github.matheus-corregiari:event-observer:<version>")
+    implementation("io.github.matheus-corregiari:arch-event-observer:<version>")
 }
 ```
 
@@ -14,21 +14,7 @@ Add the Compose module when your rendering layer is Compose Multiplatform:
 
 ```kotlin
 dependencies {
-    implementation("io.github.matheus-corregiari:event-observer-compose:<version>")
-}
-```
-
-Inside this repository, use project dependencies:
-
-```kotlin
-dependencies {
-    implementation(project(":event-observer"))
-}
-```
-
-```kotlin
-dependencies {
-    implementation(project(":event-observer-compose"))
+    implementation("io.github.matheus-corregiari:arch-event-observer-compose:<version>")
 }
 ```
 
@@ -72,11 +58,11 @@ Add `event-observer-compose`, then wrap a `Flow<DataResult<T>>` or `LiveData<Dat
 `composable` and render the states you need.
 
 ```kotlin
-myFlow.composable
-    .OnShowLoading { CircularProgressIndicator() }
-    .OnData { value -> Text(value.toString()) }
-    .OnError { error -> Text(error.message ?: "Unknown error") }
-    .Unwrap()
+myFlow.composable.Unwrap {
+    OnShowLoading { CircularProgressIndicator() }
+    OnData { value -> Text(value.toString()) }
+    OnError { error -> Text(error.message ?: "Unknown error") }
+}
 ```
 
 ## Recommended Next Steps

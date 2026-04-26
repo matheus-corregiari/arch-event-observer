@@ -56,6 +56,12 @@ class ComposableDataResultIterableTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
+            // Result
+            onNodeWithTag("resultTag").assertTextEquals("[]")
+            // Status
+            onNodeWithTag("statusTag").assertTextEquals("SUCCESS")
+            // None
+            onNodeWithTag("noneTag").assertDoesNotExist()
         }
     )
 
@@ -96,6 +102,12 @@ class ComposableDataResultIterableTest : PlatformTest() {
             onNodeWithTag("singleTag").assertTextEquals("Hello Compose")
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
+            // Result
+            onNodeWithTag("resultTag").assertTextEquals("[Hello Compose]")
+            // Status
+            onNodeWithTag("statusTag").assertTextEquals("SUCCESS")
+            // None
+            onNodeWithTag("noneTag").assertDoesNotExist()
         }
     )
 
@@ -138,6 +150,12 @@ class ComposableDataResultIterableTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertTextEquals("[Hello Compose, Bye Compose]")
+            // Result
+            onNodeWithTag("resultTag").assertTextEquals("[Hello Compose, Bye Compose]")
+            // Status
+            onNodeWithTag("statusTag").assertTextEquals("SUCCESS")
+            // None
+            onNodeWithTag("noneTag").assertDoesNotExist()
         }
     )
 }

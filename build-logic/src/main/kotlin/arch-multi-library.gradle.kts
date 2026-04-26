@@ -31,7 +31,7 @@ extensions.configure<KotlinMultiplatformExtension> {
     }
 
     android {
-        namespace = "br.com.arch.toolkit.${formatName}"
+        namespace = "br.com.arch.toolkit.$formatName"
         testNamespace = "test.$namespace"
         androidResources { enable = false }
         withHostTest {
@@ -46,8 +46,8 @@ extensions.configure<KotlinMultiplatformExtension> {
             absolutePaths = false
             warningsAsErrors = false
 
-            htmlOutput = File("$rootDir/build/reports/lint/html/${formatName}-lint.html")
-            xmlOutput = File("$rootDir/build/reports/lint/xml/${formatName}-lint.xml")
+            htmlOutput = File("$rootDir/build/reports/lint/html/$formatName-lint.html")
+            xmlOutput = File("$rootDir/build/reports/lint/xml/$formatName-lint.xml")
         }
         testCoverage { jacocoVersion = libraries.version("jacoco") }
         optimization.consumerKeepRules.file("consumer-proguard-rules.pro")
@@ -64,13 +64,13 @@ extensions.configure<KotlinMultiplatformExtension> {
     // iOS Targets
     val exportName = project.name.split("-").joinToString(
         separator = "",
-        transform = String::capitalizeFirstChar,
+        transform = String::capitalizeFirstChar
     )
-    val exportId = "br.com.arch.toolkit.${formatName}"
+    val exportId = "br.com.arch.toolkit.$formatName"
     listOf(
         iosArm64(),
         iosX64(),
-        iosSimulatorArm64(),
+        iosSimulatorArm64()
     ).forEach { target ->
         target.binaries.framework {
             baseName = "${exportName}Kit"

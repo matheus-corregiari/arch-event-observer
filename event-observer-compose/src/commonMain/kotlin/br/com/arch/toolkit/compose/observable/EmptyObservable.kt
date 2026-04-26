@@ -8,10 +8,11 @@ internal class EmptyObservable<T>(
     private val func: @Composable (DataResultStatus, Throwable?) -> Unit
 ) : ComposeObservable<T, Unit>() {
     @Composable
-    override fun observe(result: DataResult<T>) {
+    override fun Content(result: DataResult<T>) {
         val (_, error, status) = result
         func(status, error)
     }
 
-    override fun hasVisibleContent(result: DataResult<T>) = result.hasData && result.isEmpty
+    override fun hasVisibleContent(result: DataResult<T>) =
+        result.hasData && result.isEmpty && result.isNone.not()
 }

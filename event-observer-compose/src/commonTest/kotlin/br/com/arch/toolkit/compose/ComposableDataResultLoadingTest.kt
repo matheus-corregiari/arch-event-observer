@@ -56,6 +56,12 @@ class ComposableDataResultLoadingTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
+            // Result
+            onNodeWithTag("resultTag").assertTextEquals("Hello Compose")
+            // Status
+            onNodeWithTag("statusTag").assertTextEquals("LOADING")
+            // None
+            onNodeWithTag("noneTag").assertDoesNotExist()
         }
     )
 
@@ -96,6 +102,12 @@ class ComposableDataResultLoadingTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
+            // Result
+            onNodeWithTag("resultTag").assertTextEquals("null")
+            // Status
+            onNodeWithTag("statusTag").assertTextEquals("LOADING")
+            // None
+            onNodeWithTag("noneTag").assertDoesNotExist()
         }
     )
 
@@ -136,6 +148,12 @@ class ComposableDataResultLoadingTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
+            // Result
+            onNodeWithTag("resultTag").assertTextEquals("Hello Compose")
+            // Status
+            onNodeWithTag("statusTag").assertTextEquals("LOADING")
+            // None
+            onNodeWithTag("noneTag").assertDoesNotExist()
         }
     )
 
@@ -176,6 +194,12 @@ class ComposableDataResultLoadingTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
+            // Result
+            onNodeWithTag("resultTag").assertTextEquals("null")
+            // Status
+            onNodeWithTag("statusTag").assertTextEquals("LOADING")
+            // None
+            onNodeWithTag("noneTag").assertDoesNotExist()
         }
     )
 }

@@ -16,8 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
  *
  * ### Behavior
  * - Converts the current [DataResult] into a [MutableStateFlow].
- * - Exposes declarative Compose callbacks like [ComposableDataResult.OnData],
- *   [ComposableDataResult.OnError], and [ComposableDataResult.OnShowLoading].
+ * - Exposes declarative Compose callbacks via [ComposableDataResult.Unwrap].
  * - Useful for cases where you already have a `DataResult` and want to render
  *   its state in a Composable tree.
  *
@@ -25,9 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
  *
  * ### Example
  * ```kotlin
- * val comp = myDataResult.composable
- *
- * comp.Unwrap {
+ * myDataResult.composable.Unwrap {
  *     OnShowLoading { CircularProgressIndicator() }
  *     OnData { data -> Text("Data: $data") }
  *     OnError { error -> Text("Error: ${error.message}") }
@@ -51,19 +48,17 @@ val <T> DataResult<T>.composable: ComposableDataResult<T> get() = MutableStateFl
  * ### Behavior
  * - Reactively listens to the upstream [Flow].
  * - Converts each [DataResult] emission into a Compose-friendly wrapper.
- * - Allows chaining declarative UI blocks (`OnData`, `OnError`, etc.).
+ * - Allows defining declarative UI blocks inside [ComposableDataResult.Unwrap].
  *
  * ---
  *
  * ### Example
  * ```kotlin
- * val compFlow = myFlow.composable
- *
- * compFlow
- *   .OnShowLoading { CircularProgressIndicator() }
- *   .OnData { Text("Loaded: $it") }
- *   .OnError { t -> Text("Error: ${t.message}") }
- *   .Unwrap()
+ * myFlow.composable.Unwrap {
+ *   OnShowLoading { CircularProgressIndicator() }
+ *   OnData { Text("Loaded: $it") }
+ *   OnError { t -> Text("Error: ${t.message}") }
+ * }
  * ```
  *
  * @receiver A [Flow] of [DataResult] (commonly a [ResponseFlow]).
@@ -91,11 +86,11 @@ val <T> Flow<DataResult<T>>.composable: ComposableDataResult<T> get() = Composab
  * ```kotlin
  * val compState by myFlow.collectAsComposableState()
  *
- * compState
- *   .OnShowLoading { CircularProgressIndicator() }
- *   .OnData { user -> Text("Hello ${user.name}") }
- *   .OnError { e -> Text("Oops: ${e.message}") }
- *   .Unwrap()
+ * compState.Unwrap {
+ *   OnShowLoading { CircularProgressIndicator() }
+ *   OnData { user -> Text("Hello ${user.name}") }
+ *   OnError { e -> Text("Oops: ${e.message}") }
+ * }
  * ```
  *
  * @receiver The [Flow] of [DataResult] to collect.

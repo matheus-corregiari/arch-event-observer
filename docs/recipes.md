@@ -6,19 +6,19 @@ Use the loading callbacks directly from `DataResult` or, in the Compose module,
 `ComposableDataResult`.
 
 ```kotlin
-myFlow.composable
-    .OnShowLoading { CircularProgressIndicator() }
-    .OnHideLoading { Text("Done") }
-    .Unwrap()
+myFlow.composable.Unwrap {
+    OnShowLoading { CircularProgressIndicator() }
+    OnHideLoading { Text("Done") }
+}
 ```
 
 ## Show Data Or Error
 
 ```kotlin
-myFlow.composable
-    .OnData { value -> Text(value.toString()) }
-    .OnError { error -> Text(error.message ?: "Unknown error") }
-    .Unwrap()
+myFlow.composable.Unwrap {
+    OnData { value -> Text(value.toString()) }
+    OnError { error -> Text(error.message ?: "Unknown error") }
+}
 ```
 
 ## React To List States
@@ -26,12 +26,12 @@ myFlow.composable
 Use the list-aware callbacks when the payload is a collection, map, or sequence.
 
 ```kotlin
-itemsFlow.composable
-    .OnEmpty { Text("No items") }
-    .OnNotEmpty { items -> Text("Items: ${items.size}") }
-    .OnSingle { item -> Text("One item: $item") }
-    .OnMany { items -> Text("Many items: ${items.size}") }
-    .Unwrap()
+itemsFlow.composable.Unwrap {
+    OnEmpty { Text("No items") }
+    OnNotEmpty { items -> Text("Items: ${items.size}") }
+    OnSingle { item -> Text("One item: $item") }
+    OnMany { items -> Text("Many items: ${items.size}") }
+}
 ```
 
 ## Convert A Coroutine Pipeline To LiveData
@@ -76,11 +76,40 @@ Use `combineNotNull` when both sides must have data, and `chainWith` when the se
 ## Wrap A Plain Result Into Compose
 
 ```kotlin
-val state = dataResultSuccess("Ready").composable
+dataResultSuccess("Ready").composable.Unwrap {
+    OnData { data -> Text(data) }
+}
+```
 
-state
-    .OnData { Text(it) }
-    .Unwrap()
+## Custom Animations in Compose
+
+By default, state transitions in Compose are animated with a fade. You can customize this per-call:
+
+```kotlin
+myFlow.composable
+    .animation {
+        enabled = true
+        enterAnimation = slideInVertically() + fadeIn()
+        exitAnimation = slideOutVertically() + fadeOut()
+    }
+    .Unwrap {
+        OnData { data -> Text(data) }
+    }
+```
+
+## Side Effects with Compose Observers
+
+If you need to log errors or trigger analytics while using the Compose DSL, use `outsideComposable`:
+
+```kotlin
+myFlow.composable
+    .outsideComposable {
+        error { t -> Analytics.logError(t) }
+        data { d -> Analytics.logView(d) }
+    }
+    .Unwrap {
+        OnData { data -> Text(data) }
+    }
 ```
 
 ## Practical Rule

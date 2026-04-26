@@ -56,6 +56,12 @@ class ComposableDataResultMapTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
+            // Result
+            onNodeWithTag("resultTag").assertTextEquals("{}")
+            // Status
+            onNodeWithTag("statusTag").assertTextEquals("SUCCESS")
+            // None
+            onNodeWithTag("noneTag").assertDoesNotExist()
         }
     )
 
@@ -96,6 +102,12 @@ class ComposableDataResultMapTest : PlatformTest() {
             onNodeWithTag("singleTag").assertTextEquals("(1, Hello Compose)")
             // Many
             onNodeWithTag("manyTag").assertDoesNotExist()
+            // Result
+            onNodeWithTag("resultTag").assertTextEquals("{1=Hello Compose}")
+            // Status
+            onNodeWithTag("statusTag").assertTextEquals("SUCCESS")
+            // None
+            onNodeWithTag("noneTag").assertDoesNotExist()
         }
     )
 
@@ -142,6 +154,12 @@ class ComposableDataResultMapTest : PlatformTest() {
             onNodeWithTag("singleTag").assertDoesNotExist()
             // Many
             onNodeWithTag("manyTag").assertTextEquals("{1=Hello Compose, 2=Bye Compose}")
+            // Result
+            onNodeWithTag("resultTag").assertTextEquals("{1=Hello Compose, 2=Bye Compose}")
+            // Status
+            onNodeWithTag("statusTag").assertTextEquals("SUCCESS")
+            // None
+            onNodeWithTag("noneTag").assertDoesNotExist()
         }
     )
 }

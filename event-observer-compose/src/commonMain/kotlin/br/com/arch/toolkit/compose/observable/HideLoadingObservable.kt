@@ -9,8 +9,8 @@ internal class HideLoadingObservable<T>(
     private val func: @Composable () -> Unit
 ) : ComposeObservable<T, Unit>() {
     @Composable
-    override fun observe(result: DataResult<T>) = func()
+    override fun Content(result: DataResult<T>) = func()
 
     override fun hasVisibleContent(result: DataResult<T>) =
-        result.isLoading.not() && status.considerEvent(result)
+        result.isLoading.not() && status.considerEvent(result) && result.isNone.not()
 }

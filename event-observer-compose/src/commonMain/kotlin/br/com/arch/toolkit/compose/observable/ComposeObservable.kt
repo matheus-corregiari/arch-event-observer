@@ -36,6 +36,6 @@ internal sealed class ComposeObservable<T, R> {
      * ```
      */
     @Composable
-    @Suppress("ComposableNaming")
-    abstract fun observe(result: DataResult<T>)
+    @Suppress("FunctionNaming")
+    abstract fun Content(result: DataResult<T>)
 }

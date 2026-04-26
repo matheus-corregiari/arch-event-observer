@@ -9,8 +9,8 @@ internal class ErrorObservable<T>(
     private val func: @Composable () -> Unit
 ) : ComposeObservable<T, Unit>() {
     @Composable
-    override fun observe(result: DataResult<T>) = func()
+    override fun Content(result: DataResult<T>) = func()
 
     override fun hasVisibleContent(result: DataResult<T>) =
-        result.isError && status.considerEvent(result)
+        result.isError && status.considerEvent(result) && result.isNone.not()
 }
