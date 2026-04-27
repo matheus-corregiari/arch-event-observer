@@ -7,7 +7,7 @@ wrappers that move `DataResult<T>` through Android and coroutine layers.
 
 ```kotlin
 dependencies {
-    implementation("io.github.matheus-corregiari:arch-event-observer:<version>")
+    implementation("io.github.matheus-corregiari:event-observer:<version>")
 }
 ```
 

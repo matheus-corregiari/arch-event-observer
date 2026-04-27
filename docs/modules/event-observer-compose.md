@@ -7,7 +7,7 @@ declarative rendering DSL to handle the states of a `DataResult` or `ResponseFlo
 
 ```kotlin
 dependencies {
-    implementation("io.github.matheus-corregiari:arch-event-observer-compose:<version>")
+    implementation("io.github.matheus-corregiari:event-observer-compose:<version>")
 }
 ```
 

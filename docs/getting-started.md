@@ -6,7 +6,7 @@ Start with the base module:
 
 ```kotlin
 dependencies {
-    implementation("io.github.matheus-corregiari:arch-event-observer:<version>")
+    implementation("io.github.matheus-corregiari:event-observer:<version>")
 }
 ```
 
@@ -14,7 +14,7 @@ Add the Compose module when your rendering layer is Compose Multiplatform:
 
 ```kotlin
 dependencies {
-    implementation("io.github.matheus-corregiari:arch-event-observer-compose:<version>")
+    implementation("io.github.matheus-corregiari:event-observer-compose:<version>")
 }
 ```
 

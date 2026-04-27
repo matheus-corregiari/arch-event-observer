@@ -40,13 +40,13 @@ Pick the module that matches your layer:
 
 ```kotlin
 dependencies {
-    implementation("io.github.matheus-corregiari:arch-event-observer:<version>")
+    implementation("io.github.matheus-corregiari:event-observer:<version>")
 }
 ```
 
 ```kotlin
 dependencies {
-    implementation("io.github.matheus-corregiari:arch-event-observer-compose:<version>")
+    implementation("io.github.matheus-corregiari:event-observer-compose:<version>")
 }
 ```
 
