@@ -19,44 +19,44 @@ val syncContributingDocs by tasks.registering(Copy::class) {
 }
 
 val ciLint by tasks.registering {
-    group = "verification"
+    group = "CI"
     description = "Runs lint checks for all modules that expose lint tasks."
 }
 
 val ciDocs by tasks.registering {
-    group = "documentation"
+    group = "CI"
     description = "Generates API documentation inputs for the MkDocs site."
     dependsOn(syncContributingDocs)
 }
 
 val ciBuild by tasks.registering {
-    group = "build"
+    group = "CI"
     description = "Assembles all publishable modules."
 }
 
 val ciTest by tasks.registering {
-    group = "verification"
+    group = "CI"
     description = "Runs all supported test tasks."
 }
 
 val ciCoverage by tasks.registering {
-    group = "verification"
+    group = "CI"
     description = "Runs tests and verifies merged coverage."
     dependsOn(ciTest, "koverXmlReport", "koverHtmlReport", "koverVerify")
 }
 
 val ciPublishMavenCentral by tasks.registering {
-    group = "publishing"
+    group = "CI"
     description = "Publishes all publishable modules to Maven Central."
 }
 
 val ciPublishGithubPackages by tasks.registering {
-    group = "publishing"
+    group = "CI"
     description = "Publishes all publishable modules to GitHub Packages."
 }
 
 val ciPublishLocal by tasks.registering {
-    group = "publishing"
+    group = "CI"
     description = "Publishes all publishable modules to the local Maven repository."
 }
 
@@ -87,9 +87,15 @@ gradle.projectsEvaluated {
         dependsOn(publishableProjects.mapNotNull { it.taskPath("publishAndReleaseToMavenCentral") })
     }
     ciPublishGithubPackages.configure {
-        dependsOn(publishableProjects.mapNotNull { it.taskPath("publishAllPublicationsToGithubRepository") })
+        dependsOn(
+            publishableProjects.mapNotNull {
+                it.taskPath("publishAllPublicationsToGithubRepository")
+            }
+        )
     }
     ciPublishLocal.configure {
-        dependsOn(publishableProjects.mapNotNull { it.taskPath("publishToMavenLocal") })
+        dependsOn(
+            publishableProjects.mapNotNull { it.taskPath("publishToMavenLocal") }
+        )
     }
 }
