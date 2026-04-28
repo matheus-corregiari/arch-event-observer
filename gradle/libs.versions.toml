@@ -6,7 +6,7 @@ jacoco = "0.8.14"
 detekt = "1.23.8"
 
 ## --- Build Config and SDK --- ##
-build-sdk-min = "20"
+build-sdk-min = "23"
 build-sdk-compile = "37"
 build-tools = "37.0.0"
 

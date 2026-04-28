@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.Flow
  */
 open class ResponseLiveData<T> : LiveData<DataResult<T>> {
 
-    private var mergeLock = Object()
+    private var mergeLock = Any()
 
     protected var scope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
         private set
@@ -86,6 +86,7 @@ open class ResponseLiveData<T> : LiveData<DataResult<T>> {
     constructor(value: DataResult<T>) : super(value)
 
     //region Mappers
+
     /**
      * Maps the payload to a new [ResponseLiveData].
      */
@@ -124,6 +125,7 @@ open class ResponseLiveData<T> : LiveData<DataResult<T>> {
     //endregion
 
     //region Observability
+
     /**
      * Runs [onNext] before forwarding the current data value.
      */
