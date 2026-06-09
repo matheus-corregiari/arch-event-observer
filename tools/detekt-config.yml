@@ -34,10 +34,14 @@ complexity:
     allowedDepth: 4
   LargeClass:
     active: true
+    excludes:
+      - '**/*Test/**'
+      - '**/test/**'
     allowedLines: 600
   TooManyFunctions:
     active: true
     excludes:
+      - '**/*Test/**'
       - '**/test/**'
       - '**/androidTest/**'
       - '**/commonTest/**'
@@ -53,9 +57,15 @@ complexity:
     allowedFunctionsPerEnum: 11
 
 naming:
+  ClassNaming:
+    active: true
+    excludes:
+      - '**/*Test/**'
+      - '**/test/**'
   FunctionNaming:
     active: true
     excludes:
+      - '**/*Test/**'
       - '**/test/**'
       - '**/androidTest/**'
       - '**/commonTest/**'
@@ -75,6 +85,7 @@ potential-bugs:
   UnsafeCallOnNullableType:
     active: true
     excludes:
+      - '**/*Test/**'
       - '**/test/**'
       - '**/androidTest/**'
       - '**/commonTest/**'
@@ -97,6 +108,7 @@ style:
   MagicNumber:
     active: true
     excludes:
+      - '**/*Test/**'
       - '**/test/**'
       - '**/androidTest/**'
       - '**/commonTest/**'
@@ -124,3 +136,10 @@ style:
     excludeRawStrings: true
   NewLineAtEndOfFile:
     active: true
+
+exceptions:
+  ThrowingExceptionsWithoutMessageOrCause:
+    active: true
+    excludes:
+      - '**/*Test/**'
+      - '**/test/**'
