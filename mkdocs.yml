@@ -40,7 +40,8 @@ nav:
   - Usage Recipes: recipes.md
   - Changelog:
       - Overview: changelog/index.md
-      - 1.0.0: changelog/1.0.0.md
+      - 2.0.1: changelog/2.0.1.md
+      - 2.0.0: changelog/2.0.0.md
   - Contributing: contributing.md
   - API Reference:
       - Overview: api/index.md

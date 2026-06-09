@@ -103,33 +103,29 @@ class SwapResponseLiveData<T> : ResponseLiveData<T> {
         lastSource = source
         scope.launch(Dispatchers.Main) {
             sourceLiveData.addSource(source) { data ->
-                onChanged(data, discardAfterLoading, transformation)
+                scope.launch {
+                    withContext(transformDispatcher) {
+                        transformation.runCatching { data?.let(::invoke) }
+                    }.onFailure {
+                        val error = DataResultTransformationException(
+                            "Error performing swapSource, please check your transformations",
+                            it
+                        )
+
+                        val result = DataResult<T>(null, error, DataResultStatus.ERROR)
+                        if (value == result && notifyOnlyOnDistinct) return@onFailure
+
+                        safePostValue(result)
+                    }.getOrNull().let {
+                        if (value == it && notifyOnlyOnDistinct) return@let
+                        safePostValue(it)
+
+                        if (it?.status != DataResultStatus.LOADING && discardAfterLoading) {
+                            value = null
+                        }
+                    }
+                }
             }
-        }
-    }
-
-    private fun <R> onChanged(
-        data: DataResult<R>?,
-        discardAfterLoading: Boolean,
-        transformation: (DataResult<R>) -> DataResult<T>?
-    ) = scope.launch {
-        withContext(transformDispatcher) {
-            transformation.runCatching { data?.let(::invoke) }
-        }.onFailure {
-            val error = DataResultTransformationException(
-                "Error performing swapSource, please check your transformations",
-                it
-            )
-
-            val result = DataResult<T>(null, error, DataResultStatus.ERROR)
-            if (value == result && notifyOnlyOnDistinct) return@onFailure
-
-            safePostValue(result)
-        }.getOrNull().let {
-            if (value == it && notifyOnlyOnDistinct) return@let
-            safePostValue(it)
-
-            if (it?.status != DataResultStatus.LOADING && discardAfterLoading) value = null
         }
     }
 }

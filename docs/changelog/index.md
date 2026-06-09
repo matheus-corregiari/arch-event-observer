@@ -1,18 +1,10 @@
-﻿# Changelog
+# Changelog
 
-This page lists the published releases for Arch Event Observer.
+This page lists releases backed by Git tags.
 
 ## Releases
 
-| Version           | Release date | Notes                  |
-|-------------------|--------------|------------------------|
-| [1.0.0](1.0.0.md) | 2025-02-20   | Initial public release |
-
-## Release Notes
-
-The first release established the two-module layout:
-
-- `event-observer`
-- `event-observer-compose`
-
-Future releases will be added here as separate pages under `docs/changelog/`.
+| Version           | Release date | Notes                              |
+|-------------------|--------------|------------------------------------|
+| [2.0.1](2.0.1.md) | 2026-04-27   | Android compatibility and metadata |
+| [2.0.0](2.0.0.md) | 2026-04-27   | First tagged release               |

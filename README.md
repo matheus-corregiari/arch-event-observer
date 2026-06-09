@@ -10,6 +10,7 @@ The project is split into two public modules:
 
 [![License][badge-license]](/LICENSE)
 [![Kotlin][badge-kotlin]](https://kotlinlang.org)
+[![Latest release][badge-release]][link-release]
 ![Lint][badge-lint]
 ![Test][badge-test]
 [![Coverage][badge-coverage]][link-coverage]
@@ -140,8 +141,10 @@ limitations under the License.
 ```
 
 [link-coverage]: https://codecov.io/gh/matheus-corregiari/arch-event-observer
+[link-release]: https://github.com/matheus-corregiari/arch-event-observer/releases/latest
 
-[badge-kotlin]: https://img.shields.io/badge/kotlin-2.3.20-blue.svg?logo=kotlin
+[badge-kotlin]: https://img.shields.io/badge/kotlin-2.4.0-blue.svg?logo=kotlin
+[badge-release]: https://img.shields.io/github/v/release/matheus-corregiari/arch-event-observer
 
 [badge-license]: https://img.shields.io/github/license/matheus-corregiari/arch-event-observer
 

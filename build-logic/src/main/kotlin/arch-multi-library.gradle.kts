@@ -50,7 +50,9 @@ extensions.configure<KotlinMultiplatformExtension> {
             xmlOutput = File("$rootDir/build/reports/lint/xml/$formatName-lint.xml")
         }
         testCoverage { jacocoVersion = libraries.version("jacoco") }
-        optimization.consumerKeepRules.file("consumer-proguard-rules.pro")
+        project.file("consumer-proguard-rules.pro")
+            .takeIf(File::exists)
+            ?.let(optimization.consumerKeepRules::file)
     }
     jvm { }
     wasmJs {
