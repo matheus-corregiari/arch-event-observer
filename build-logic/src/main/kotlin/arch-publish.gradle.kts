@@ -1,3 +1,9 @@
+/**
+ * Configures publication for publishable modules.
+ *
+ * The plugin wires Maven Central, GitHub Packages, local publication, POM metadata, source jars,
+ * Dokka-backed javadocs, and signing behavior used by release workflows.
+ */
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinMultiplatform
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
