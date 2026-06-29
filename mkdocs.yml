@@ -38,6 +38,7 @@ nav:
       - event-observer-compose: modules/event-observer-compose.md
   - Core Concepts: core-concepts.md
   - Usage Recipes: recipes.md
+  - Ecosystem: ecosystem.md
   - Changelog:
       - Overview: changelog/index.md
       - 2.0.1: changelog/2.0.1.md
