@@ -15,7 +15,7 @@ jetbrains-kotlin = "2.4.0"
 jetbrains-atomic = "0.33.0"
 jetbrains-dokka = "2.2.0"
 jetbrains-kover = "0.9.8"
-jetbrains-compose = "1.10.3"
+jetbrains-compose = "1.11.1"
 jetbrains-coroutines = "1.11.0"
 
 ## AndroidX
