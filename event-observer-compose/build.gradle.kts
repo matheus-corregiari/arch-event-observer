@@ -1,3 +1,5 @@
+@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+
 plugins {
     id("arch-multi-library")
     id("arch-lint")
@@ -14,6 +16,16 @@ kotlin {
         compileSdk = versionInt(libs.versions.build.sdk.compile)
         minSdk = versionInt(libs.versions.build.sdk.min)
         buildToolsVersion = versionString(libs.versions.build.tools)
+    }
+
+    js {
+        binaries.executable()
+        binaries.executable(compilations["test"])
+    }
+
+    wasmJs {
+        binaries.executable()
+        binaries.executable(compilations["test"])
     }
 
     sourceSets {
@@ -44,6 +56,22 @@ kotlin {
             implementation(libs.jetbrains.compose.ui.test.junit4.desktop)
         }
     }
+}
+
+tasks.named("jsBrowserProductionLibraryDistribution") {
+    dependsOn("jsProductionExecutableCompileSync")
+}
+
+tasks.named("jsBrowserProductionWebpack") {
+    dependsOn("jsProductionLibraryCompileSync")
+}
+
+tasks.named("wasmJsBrowserProductionLibraryDistribution") {
+    dependsOn("wasmJsProductionExecutableCompileSync")
+}
+
+tasks.named("wasmJsBrowserProductionWebpack") {
+    dependsOn("wasmJsProductionLibraryCompileSync")
 }
 
 dokka.dokkaSourceSets.configureEach {

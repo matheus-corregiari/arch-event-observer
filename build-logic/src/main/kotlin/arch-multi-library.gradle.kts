@@ -74,7 +74,6 @@ extensions.configure<KotlinMultiplatformExtension> {
     val exportId = "br.com.arch.toolkit.$formatName"
     listOf(
         iosArm64(),
-        iosX64(),
         iosSimulatorArm64()
     ).forEach { target ->
         target.binaries.framework {

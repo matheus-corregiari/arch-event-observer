@@ -11,11 +11,11 @@ build-sdk-compile = "37"
 build-tools = "37.0.0"
 
 ## JetBrains
-jetbrains-kotlin = "2.4.10"
+jetbrains-kotlin = "2.3.21"
 jetbrains-atomic = "0.33.0"
 jetbrains-dokka = "2.2.0"
 jetbrains-kover = "0.9.9"
-jetbrains-compose = "1.10.3"
+jetbrains-compose = "1.12.0"
 jetbrains-coroutines = "1.11.0"
 
 ## AndroidX
