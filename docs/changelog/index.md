@@ -4,6 +4,8 @@ This page lists releases backed by Git tags.
 
 ## Releases
 
+- [Unreleased](unreleased.md)
+
 | Version           | Release date | Notes                              |
 |-------------------|--------------|------------------------------------|
 | [2.0.1](2.0.1.md) | 2026-04-27   | Android compatibility and metadata |

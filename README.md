@@ -15,6 +15,15 @@ The project is split into two public modules:
 ![Test][badge-test]
 [![Coverage][badge-coverage]][link-coverage]
 
+## Requirements
+
+- Kotlin `2.4.10`
+- Gradle wrapper `9.7.1`
+- JDK `21` via the Gradle toolchain
+- Android `minSdk 23` and `compileSdk 37`
+- Compose Multiplatform `1.10.3` for the retained `iosX64` target
+- Use the project wrapper instead of a local Gradle install
+
 ## Overview
 
 The library centers on `DataResult<T>` and a small set of wrappers that keep loading, success,
