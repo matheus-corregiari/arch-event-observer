@@ -46,3 +46,15 @@ dokka.dokkaSourceSets.configureEach {
         remoteUrl("${env("POM_URL")}/tree/master/event-observer/src")
     }
 }
+
+kover {
+    reports {
+        filters {
+            excludes {
+                classes("androidx.lifecycle.**")
+                classes("br.com.arch.toolkit.exception.**")
+                classes("br.com.arch.toolkit.util.ResponseTransform*")
+            }
+        }
+    }
+}

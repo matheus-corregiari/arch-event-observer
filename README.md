@@ -21,7 +21,7 @@ The project is split into two public modules:
 - Gradle wrapper `9.7.1`
 - JDK `21` via the Gradle toolchain
 - Android `minSdk 23` and `compileSdk 37`
-- Compose Multiplatform `1.10.3` for the retained `iosX64` target
+- Compose Multiplatform `1.10.3` with the current iOS target matrix
 - Use the project wrapper instead of a local Gradle install
 
 ## Overview
