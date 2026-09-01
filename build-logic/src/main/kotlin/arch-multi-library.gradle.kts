@@ -1,4 +1,5 @@
 @file:Suppress("UnstableApiUsage", "OPT_IN_USAGE")
+@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
 /**
  * Configures a Kotlin Multiplatform Android library module.
@@ -81,5 +82,31 @@ extensions.configure<KotlinMultiplatformExtension> {
             isStatic = true
             freeCompilerArgs += listOf("-bundle-id", exportId)
         }
+    }
+}
+
+pluginManager.withPlugin("org.jetbrains.compose") {
+    extensions.configure<KotlinMultiplatformExtension> {
+        js {
+            binaries.executable()
+            binaries.executable(compilations["test"])
+        }
+        wasmJs {
+            binaries.executable()
+            binaries.executable(compilations["test"])
+        }
+    }
+
+    tasks.named("jsBrowserProductionLibraryDistribution") {
+        dependsOn("jsProductionExecutableCompileSync")
+    }
+    tasks.named("jsBrowserProductionWebpack") {
+        dependsOn("jsProductionLibraryCompileSync")
+    }
+    tasks.named("wasmJsBrowserProductionLibraryDistribution") {
+        dependsOn("wasmJsProductionExecutableCompileSync")
+    }
+    tasks.named("wasmJsBrowserProductionWebpack") {
+        dependsOn("wasmJsProductionLibraryCompileSync")
     }
 }

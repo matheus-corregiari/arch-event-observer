@@ -12,6 +12,16 @@ plugins {
     id("org.jetbrains.kotlinx.kover")
     jacoco
 }
+
+kover {
+    reports {
+        filters {
+            excludes {
+                classes("**.BuildConfig", "**.R", "**.R$*")
+            }
+        }
+    }
+}
 extensions.configure(JacocoPluginExtension::class) {
     toolVersion = libraries.version("jacoco")
 }

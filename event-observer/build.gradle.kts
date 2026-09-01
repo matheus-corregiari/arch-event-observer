@@ -26,6 +26,10 @@ kotlin {
         }
 
         // Test Libraries
+        commonTest.dependencies {
+            implementation(libs.jetbrains.coroutines.test)
+            implementation(libs.jetbrains.kotlin.test)
+        }
         javaTest.dependencies {
             implementation(libs.jetbrains.coroutines.test)
             implementation(libs.jetbrains.kotlin.test)
@@ -44,17 +48,5 @@ dokka.dokkaSourceSets.configureEach {
     sourceLink {
         localDirectory.set(projectDir.resolve("src"))
         remoteUrl("${env("POM_URL")}/tree/master/event-observer/src")
-    }
-}
-
-kover {
-    reports {
-        filters {
-            excludes {
-                classes("androidx.lifecycle.**")
-                classes("br.com.arch.toolkit.exception.**")
-                classes("br.com.arch.toolkit.util.ResponseTransform*")
-            }
-        }
     }
 }
