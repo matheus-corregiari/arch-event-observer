@@ -152,7 +152,7 @@ limitations under the License.
 [link-coverage]: https://codecov.io/gh/matheus-corregiari/arch-event-observer
 [link-release]: https://github.com/matheus-corregiari/arch-event-observer/releases/latest
 
-[badge-kotlin]: https://img.shields.io/badge/kotlin-2.4.0-blue.svg?logo=kotlin
+[badge-kotlin]: https://img.shields.io/badge/kotlin-2.3.21-blue.svg?logo=kotlin
 [badge-release]: https://img.shields.io/github/v/release/matheus-corregiari/arch-event-observer
 
 [badge-license]: https://img.shields.io/github/license/matheus-corregiari/arch-event-observer
