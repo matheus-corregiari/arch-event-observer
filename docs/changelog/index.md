@@ -4,7 +4,7 @@ This page lists releases backed by Git tags.
 
 ## Releases
 
-- [Unreleased](unreleased.md)
+- [2.1.0 (Unreleased)](2.1.0.md)
 
 | Version           | Release date | Notes                              |
 |-------------------|--------------|------------------------------------|

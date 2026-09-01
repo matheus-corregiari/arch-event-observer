@@ -41,7 +41,7 @@ nav:
   - Ecosystem: ecosystem.md
   - Changelog:
       - Overview: changelog/index.md
-      - Unreleased: changelog/unreleased.md
+      - 2.1.0: changelog/2.1.0.md
       - 2.0.1: changelog/2.0.1.md
       - 2.0.0: changelog/2.0.0.md
   - Contributing: contributing.md
