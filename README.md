@@ -17,7 +17,7 @@ The project is split into two public modules:
 
 ## Requirements
 
-- Kotlin `2.4.10`
+- Kotlin `2.3.21`
 - Gradle wrapper `9.7.1`
 - JDK `21` via the Gradle toolchain
 - Android `minSdk 23` and `compileSdk 37`
