@@ -26,16 +26,6 @@ Thanks for taking the time to contribute.
 4. Add or update tests when behavior changes.
 5. Avoid unrelated refactors.
 
-## Branching and Releases
-
-- Target `master` for all pull requests.
-- Use `feature/*`, `fix/*`, `bugfix/*`, `config/*`, `docs/*`, `chore/*`, or `dependabot/*` for normal work.
-- Use `release/x.y.0[-rcN]` for major or minor releases.
-- Use `hotfix/x.y.z[-rcN]` for patch releases, where `z >= 1`.
-- Do not open mergeback pull requests. The repository does not use a long-lived `develop` branch.
-- Release and hotfix merges into `master` are the only automatic publication trigger.
-- The release workflow derives the tag from the branch name, publishes artifacts, creates the tag, and creates the GitHub Release.
-
 ## Local Validation
 
 ```bash

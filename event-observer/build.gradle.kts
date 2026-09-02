@@ -26,12 +26,18 @@ kotlin {
         }
 
         // Test Libraries
+        commonTest.dependencies {
+            implementation(libs.jetbrains.coroutines.test)
+            implementation(libs.jetbrains.kotlin.test)
+        }
         javaTest.dependencies {
             implementation(libs.jetbrains.coroutines.test)
             implementation(libs.jetbrains.kotlin.test)
             implementation(libs.mockk.test.agent)
         }
         androidHostTest.dependencies {
+            implementation(libs.jetbrains.coroutines.test)
+            implementation(libs.jetbrains.kotlin.test)
             implementation(libs.mockk.test.android)
             implementation(libs.androidx.arch.coreTesting)
         }

@@ -15,6 +15,15 @@ The project is split into two public modules:
 ![Test][badge-test]
 [![Coverage][badge-coverage]][link-coverage]
 
+## Requirements
+
+- Kotlin `2.3.21`
+- Gradle wrapper `9.7.1`
+- JDK `21` via the Gradle toolchain
+- Android `minSdk 23` and `compileSdk 37`
+- Compose Multiplatform `1.12.0` with iOS ARM targets
+- Use the project wrapper instead of a local Gradle install
+
 ## Overview
 
 The library centers on `DataResult<T>` and a small set of wrappers that keep loading, success,
@@ -143,7 +152,7 @@ limitations under the License.
 [link-coverage]: https://codecov.io/gh/matheus-corregiari/arch-event-observer
 [link-release]: https://github.com/matheus-corregiari/arch-event-observer/releases/latest
 
-[badge-kotlin]: https://img.shields.io/badge/kotlin-2.4.0-blue.svg?logo=kotlin
+[badge-kotlin]: https://img.shields.io/badge/kotlin-2.3.21-blue.svg?logo=kotlin
 [badge-release]: https://img.shields.io/github/v/release/matheus-corregiari/arch-event-observer
 
 [badge-license]: https://img.shields.io/github/license/matheus-corregiari/arch-event-observer

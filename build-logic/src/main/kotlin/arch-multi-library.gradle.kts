@@ -1,4 +1,5 @@
 @file:Suppress("UnstableApiUsage", "OPT_IN_USAGE")
+@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
 /**
  * Configures a Kotlin Multiplatform Android library module.
@@ -7,7 +8,6 @@
  * framework, and source jar defaults shared by publishable library modules.
  */
 import com.android.build.api.variant.impl.capitalizeFirstChar
-import com.android.build.api.withAndroid
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 plugins {
@@ -27,7 +27,7 @@ extensions.configure<KotlinMultiplatformExtension> {
         common {
             group("java") {
                 withJvm()
-                withAndroid()
+                withAndroidTarget()
             }
             group("kotlin") {
                 withJs()
@@ -52,8 +52,6 @@ extensions.configure<KotlinMultiplatformExtension> {
             absolutePaths = false
             warningsAsErrors = false
 
-            htmlOutput = File("$rootDir/build/reports/lint/html/$formatName-lint.html")
-            xmlOutput = File("$rootDir/build/reports/lint/xml/$formatName-lint.xml")
         }
         testCoverage { jacocoVersion = libraries.version("jacoco") }
         project.file("consumer-proguard-rules.pro")
@@ -65,7 +63,7 @@ extensions.configure<KotlinMultiplatformExtension> {
         browser { testTask { enabled = false } }
         binaries.library()
     }
-    js(IR) {
+    js {
         browser { testTask { enabled = false } }
         binaries.library()
     }
@@ -77,7 +75,6 @@ extensions.configure<KotlinMultiplatformExtension> {
     val exportId = "br.com.arch.toolkit.$formatName"
     listOf(
         iosArm64(),
-        iosX64(),
         iosSimulatorArm64()
     ).forEach { target ->
         target.binaries.framework {
@@ -85,5 +82,31 @@ extensions.configure<KotlinMultiplatformExtension> {
             isStatic = true
             freeCompilerArgs += listOf("-bundle-id", exportId)
         }
+    }
+}
+
+pluginManager.withPlugin("org.jetbrains.compose") {
+    extensions.configure<KotlinMultiplatformExtension> {
+        js {
+            binaries.executable()
+            binaries.executable(compilations["test"])
+        }
+        wasmJs {
+            binaries.executable()
+            binaries.executable(compilations["test"])
+        }
+    }
+
+    tasks.named("jsBrowserProductionLibraryDistribution") {
+        dependsOn("jsProductionExecutableCompileSync")
+    }
+    tasks.named("jsBrowserProductionWebpack") {
+        dependsOn("jsProductionLibraryCompileSync")
+    }
+    tasks.named("wasmJsBrowserProductionLibraryDistribution") {
+        dependsOn("wasmJsProductionExecutableCompileSync")
+    }
+    tasks.named("wasmJsBrowserProductionWebpack") {
+        dependsOn("wasmJsProductionLibraryCompileSync")
     }
 }
