@@ -2,9 +2,9 @@ name: Lint
 
 on:
   push:
-    branches: [ "master", "release/**", "hotfix/**" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "master", "release/**", "hotfix/**" ]
+    branches: [ "master" ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,7 +21,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-
       - name: Setup
         uses: ./.github/actions/setup-gradle
 
