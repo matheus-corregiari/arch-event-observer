@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       release_branch:
-        description: Release branch name, such as hotfix/2.1.1
+        description: Release branch name, such as release/2.0.0-rc16
         required: true
         type: string
       commit_sha:
@@ -28,7 +28,6 @@ concurrency:
 
 permissions:
   contents: write
-  packages: write
 
 jobs:
   release:
@@ -103,17 +102,6 @@ jobs:
         with:
           token: ${{ steps.release-app-token.outputs.token }}
           tag_name: ${{ steps.version.outputs.version }}
-          name: Arch Event Observer ${{ steps.version.outputs.version }}
+          name: Arch Toolkit ${{ steps.version.outputs.version }}
           prerelease: ${{ steps.version.outputs.prerelease }}
           generate_release_notes: true
-
-      - name: Publish to GitHub Packages
-        continue-on-error: true
-        timeout-minutes: 20
-        env:
-          ORG_GRADLE_PROJECT_GITHUB_ACTOR: ${{ github.actor }}
-          ORG_GRADLE_PROJECT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGN_KEY }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGN_KEYID }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGN_PASSWORD }}
-        run: ./gradlew ciPublishGithubPackages
