@@ -1,6 +1,10 @@
 # Changelog
 
-This page lists releases backed by Git tags.
+Release notes and planned versions. Publication is confirmed by the release tag.
+
+## Planned
+
+- [2.2.0](2.2.0.md)
 
 ## Releases
 
