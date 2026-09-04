@@ -17,17 +17,19 @@ fun <T> scenario(
     result: DataResult<T>,
     config: ObserveComposableWrapper<T>.() -> Unit,
     assert: ComposeUiTest.() -> Unit
-) = runComposeUiTest {
-    setContent {
-        Column {
-            result.composable
-                .animation { enabled = false }
-                .outsideComposable { /* See ObserveWrapper Tests */ }
-                .Unwrap(owner = null, config = config)
+) = withGraphicsReady {
+    runComposeUiTest {
+        setContent {
+            Column {
+                result.composable
+                    .animation { enabled = false }
+                    .outsideComposable { /* See ObserveWrapper Tests */ }
+                    .Unwrap(owner = null, config = config)
+            }
         }
+        runOnIdle { assert.invoke(this) }
+        waitForIdle()
     }
-    runOnIdle { assert.invoke(this) }
-    waitForIdle()
 }
 
 val stringConfig: ObserveComposableWrapper<String>.() -> Unit = { createConfig<String, String>() }

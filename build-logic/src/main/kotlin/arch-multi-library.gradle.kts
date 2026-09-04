@@ -60,11 +60,11 @@ extensions.configure<KotlinMultiplatformExtension> {
     }
     jvm { }
     wasmJs {
-        browser { testTask { enabled = false } }
+        browser { testTask { useKarma { useChromeHeadless() } } }
         binaries.library()
     }
     js {
-        browser { testTask { enabled = false } }
+        browser { testTask { useKarma { useChromeHeadless() } } }
         binaries.library()
     }
     // iOS Targets

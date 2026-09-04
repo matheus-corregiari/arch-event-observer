@@ -30,7 +30,6 @@ extensions.configure(DokkaExtension::class) {
     moduleName.set(project.name.capitalized())
     moduleVersion.set(project.versionName)
     basePublicationsDirectory.set(file("$rootDir/docs/api/${project.name}"))
-    dokkaPublications.getByName("html").enabled.set(false)
 
     dokkaSourceSets.configureEach {
         reportUndocumented.set(true)
