@@ -27,7 +27,7 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup-gradle
 
-      - name: Generate module API docs
+      - name: Generate API docs
         run: ./gradlew ciDocs
 
       - name: Setup Python
@@ -47,7 +47,7 @@ jobs:
         with:
           name: docs-site
           path: site
-          if-no-files-found: warn
+          if-no-files-found: error
 
       - name: Configure Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -64,6 +64,10 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: build
     runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
 
     environment:
       name: github-pages
