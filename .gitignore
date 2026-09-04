@@ -19,3 +19,8 @@
 AGENTS.md
 .specify/
 .agents/
+.github/scripts/__pycache__/
+
+!/kotlin-js-store/
+/kotlin-js-store/*
+!/kotlin-js-store/yarn.lock
