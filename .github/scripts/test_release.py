@@ -67,7 +67,8 @@ class ReleasePolicyTest(unittest.TestCase):
     def test_publication_ignores_non_gate_job_failure(self):
         run = {"id": 1, "head_branch": "master", "status": "in_progress", "conclusion": None}
         required = {"Release Policy", "Coverage Gate", "Static Analysis", "Docs Gate",
-                    "CodeQL", "CI Gate", "Create Release Tag"}
+                    "CodeQL (actions)", "CodeQL (java-kotlin)", "CodeQL (python)",
+                    "CodeQL Policy", "CI Gate", "Create Release Tag"}
         jobs = [{"name": name, "conclusion": "success"} for name in required]
         jobs.append({"name": "Deploy Docs", "conclusion": "failure"})
         with patch.dict("os.environ", {"GITHUB_REPOSITORY": "owner/repo"}), \
@@ -79,11 +80,40 @@ class ReleasePolicyTest(unittest.TestCase):
         run = {"id": 1, "head_branch": "master", "status": "in_progress", "conclusion": None}
         with patch.dict("os.environ", {"GITHUB_REPOSITORY": "owner/repo"}), \
                 patch("release.api", return_value={"workflow_runs": [run]}), \
-                patch("release.pages", return_value=[{"name": "CodeQL", "conclusion": "failure"}]), \
+                patch("release.pages", return_value=[{"name": "CodeQL (java-kotlin)", "conclusion": "failure"}]), \
                 patch("release.time.sleep") as sleep:
             with self.assertRaisesRegex(ValueError, "CodeQL"):
                 release.approved("sha")
             sleep.assert_not_called()
+
+    def test_publication_waits_for_every_matrix_gate_and_tag(self):
+        names = {"Release Policy", "Coverage Gate", "Static Analysis", "Docs Gate",
+                 "CodeQL (actions)", "CodeQL (java-kotlin)", "CodeQL (python)",
+                 "CodeQL Policy", "CI Gate", "Create Release Tag"}
+        run = {"id": 1, "head_branch": "master"}
+        for missing in names:
+            with self.subTest(missing=missing):
+                jobs = [{"name": name, "conclusion": "success"} for name in names - {missing}]
+                with patch.dict("os.environ", {"GITHUB_REPOSITORY": "owner/repo"}), \
+                        patch("release.api", return_value={"workflow_runs": [run]}), \
+                        patch("release.pages", return_value=jobs), \
+                        patch("release.time.sleep"):
+                    with self.assertRaisesRegex(ValueError, "Timed out"):
+                        release.approved("sha")
+
+    def test_publication_waits_for_pending_tag_then_succeeds(self):
+        names = {"Release Policy", "Coverage Gate", "Static Analysis", "Docs Gate",
+                 "CodeQL (actions)", "CodeQL (java-kotlin)", "CodeQL (python)",
+                 "CodeQL Policy", "CI Gate", "Create Release Tag"}
+        finished = [{"name": name, "conclusion": "success"} for name in names]
+        pending = [dict(job, conclusion=None) if job["name"] == "Create Release Tag" else job
+                   for job in finished]
+        with patch.dict("os.environ", {"GITHUB_REPOSITORY": "owner/repo"}), \
+                patch("release.api", return_value={"workflow_runs": [{"id": 1, "head_branch": "master"}]}), \
+                patch("release.pages", side_effect=[pending, finished]), \
+                patch("release.time.sleep") as sleep:
+            release.approved("sha")
+            sleep.assert_called_once_with(10)
 
     def test_release_requires_unique_merged_pr(self):
         with patch.dict("os.environ", {"GITHUB_REPOSITORY": "owner/repo"}), \
