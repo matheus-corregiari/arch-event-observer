@@ -159,6 +159,6 @@ limitations under the License.
 
 [badge-coverage]: https://codecov.io/gh/matheus-corregiari/arch-event-observer/graph/badge.svg?token=146UU167K6
 
-[badge-lint]: https://github.com/matheus-corregiari/arch-event-observer/actions/workflows/lint.yml/badge.svg
+[badge-lint]: https://github.com/matheus-corregiari/arch-event-observer/actions/workflows/ci.yml/badge.svg
 
-[badge-test]: https://github.com/matheus-corregiari/arch-event-observer/actions/workflows/coverage.yml/badge.svg
+[badge-test]: https://github.com/matheus-corregiari/arch-event-observer/actions/workflows/ci.yml/badge.svg

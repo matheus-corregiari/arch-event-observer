@@ -29,11 +29,9 @@ Thanks for taking the time to contribute.
 ## Local Validation
 
 ```bash
-./gradlew ciBuild
-./gradlew ciLint
-./gradlew ciTest
-./gradlew ciCoverage
-./gradlew ciDocs
+./gradlew ciBuild ciCoverage
+./gradlew ciLint ciDocs
+python -m pip install -r .github/requirements-docs.txt
 python -m mkdocs build --strict
 ```
 
@@ -58,3 +56,12 @@ Use the project wrapper and toolchain settings when validating changes.
 - [ ] Docs updated if behavior or usage changed
 - [ ] README updated if the public API changed
 - [ ] Validation checks passing
+
+## Branching and Releases
+
+Any work branch can target another development branch. PRs to `master` must use
+`release/X.Y.Z` (next major/minor) or `hotfix/X.Y.Z` (next patch), optionally with `-rcN`.
+CI rejects duplicate or historical remote versions. The validated master commit receives an
+annotated tag; that tag triggers package publication.
+
+See the [CI and release guide](docs/ci.md) for required checks, runner conventions and recovery.

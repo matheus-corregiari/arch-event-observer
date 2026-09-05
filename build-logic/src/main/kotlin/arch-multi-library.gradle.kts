@@ -60,11 +60,11 @@ extensions.configure<KotlinMultiplatformExtension> {
     }
     jvm { }
     wasmJs {
-        browser { testTask { enabled = false } }
+        browser { testTask { useKarma { useChromeHeadless() } } }
         binaries.library()
     }
     js {
-        browser { testTask { enabled = false } }
+        browser { testTask { useKarma { useChromeHeadless() } } }
         binaries.library()
     }
     // iOS Targets
@@ -72,7 +72,6 @@ extensions.configure<KotlinMultiplatformExtension> {
         separator = "",
         transform = String::capitalizeFirstChar
     )
-    val exportId = "br.com.arch.toolkit.$formatName"
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -80,7 +79,6 @@ extensions.configure<KotlinMultiplatformExtension> {
         target.binaries.framework {
             baseName = "${exportName}Kit"
             isStatic = true
-            freeCompilerArgs += listOf("-bundle-id", exportId)
         }
     }
 }
