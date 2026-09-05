@@ -122,7 +122,9 @@ def approved(sha):
         if runs:
             run = max(runs, key=lambda entry: entry["id"])
             jobs = pages(f"repos/{repository}/actions/runs/{run['id']}/jobs", "jobs")
-            required = {"Release Policy", "Coverage Gate", "Static Analysis", "Docs Gate", "CodeQL", "CI Gate", "Create Release Tag"}
+            required = {"Release Policy", "Coverage Gate", "Static Analysis", "Docs Gate",
+                        "CodeQL (actions)", "CodeQL (java-kotlin)", "CodeQL (python)",
+                        "CodeQL Policy", "CI Gate", "Create Release Tag"}
             conclusions = {job["name"]: job["conclusion"] for job in jobs if job["name"] in required}
             failed = sorted(name for name, conclusion in conclusions.items()
                             if conclusion in ("failure", "cancelled", "timed_out", "action_required", "skipped"))
