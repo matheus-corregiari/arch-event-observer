@@ -104,18 +104,18 @@ sealed class ViewModelState<T : Any>(
         private val transient = MutableStateFlow(
             get()?.let(::dataResultSuccess) ?: dataResultNone<T>()
         )
-        private val results: StateFlow<DataResult<T>> = ResultState(data, transient)
+        private val results = ResultState(data, transient)
 
         /** One stable stream across all executions, including after each producer completes. */
         fun flow(): StateFlow<DataResult<T>> = results
 
-        override fun set(value: T?) {
+        override fun set(value: T?) = results.update {
             super.set(value)
             transient.value = value?.let(::dataResultSuccess) ?: dataResultNone()
         }
 
         /** Results without payload keep the last saved data; use invalidate to explicitly clear. */
-        fun set(value: DataResult<T>) {
+        fun set(value: DataResult<T>) = results.update {
             value.data?.let { super.set(it) }
             transient.value = value.copy(data = get())
         }
