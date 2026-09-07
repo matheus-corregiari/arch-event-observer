@@ -1,11 +1,14 @@
+import dev.detekt.gradle.Detekt
+import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
+
 plugins {
     id("arch-multi-library")
     id("arch-lint")
     id("arch-documentation")
     id("arch-optimize")
     id("arch-publish")
-    id("kotlin-parcelize")
-    kotlin("plugin.serialization") version "2.4.10"
+
+    alias(libs.plugins.jetbrains.serialization)
 }
 
 kotlin {
@@ -17,16 +20,40 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":event-observer"))
-            api("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.11.0")
-            api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
-            implementation(libs.jetbrains.coroutines.core)
-            implementation("io.github.matheus-corregiari:arch-lumber:1.4.0")
-            implementation("io.insert-koin:koin-core:4.2.2")
+            api(libs.androidx.lifecycle.savedstate)
+            api(libs.jetbrains.serialization.json)
+            api(libs.jetbrains.coroutines.core)
         }
         commonTest.dependencies {
             implementation(libs.jetbrains.kotlin.test)
             implementation(libs.jetbrains.coroutines.test)
         }
+        androidHostTest.dependencies {
+            implementation(libs.robolectric.test)
+        }
     }
 }
 
+// The generic detekt task does not discover KMP sources automatically.
+tasks.named<Detekt>("detekt") {
+    setSource(fileTree("src/commonMain") { include("**/*.kt") })
+}
+
+kover {
+    reports {
+        total {
+            verify {
+                rule("State line coverage") { minBound(90, CoverageUnit.LINE) }
+                rule("State instruction coverage") { minBound(85, CoverageUnit.INSTRUCTION) }
+                rule("State branch coverage") { minBound(80, CoverageUnit.BRANCH) }
+            }
+        }
+    }
+}
+
+dokka.dokkaSourceSets.configureEach {
+    sourceLink {
+        localDirectory.set(projectDir.resolve("src"))
+        remoteUrl("${env("POM_URL")}/tree/master/event-observer-state/src")
+    }
+}
