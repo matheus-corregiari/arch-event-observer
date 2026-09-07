@@ -36,11 +36,14 @@ nav:
   - Modules:
       - event-observer: modules/event-observer.md
       - event-observer-compose: modules/event-observer-compose.md
+      - event-observer-state: modules/event-observer-state.md
+  - State Migration: migration-state.md
   - Core Concepts: core-concepts.md
   - Usage Recipes: recipes.md
   - Ecosystem: ecosystem.md
   - Changelog:
       - Overview: changelog/index.md
+      - "2.3.0": changelog/2.3.0.md
       - "2.2.1": changelog/2.2.1.md
       - "2.2.0": changelog/2.2.0.md
       - "2.1.2": changelog/2.1.2.md
@@ -54,3 +57,4 @@ nav:
       - Overview: api/index.md
       - event-observer: api/event-observer.md
       - event-observer-compose: api/event-observer-compose.md
+      - event-observer-state: api/event-observer-state.md

@@ -2,11 +2,12 @@
 
 Kotlin-first event and result observation for Android and Compose Multiplatform.
 
-The project is split into two public modules:
+The project is split into three public modules:
 
 - `event-observer` for `DataResult`, `ResponseLiveData`, `ResponseFlow`, and the supporting
   utilities
 - `event-observer-compose` for `ComposableDataResult` and the Compose-facing observation DSL
+- `event-observer-state` for serializable SavedStateHandle state, repository operations and projections
 
 [![License][badge-license]](/LICENSE)
 [![Kotlin][badge-kotlin]](https://kotlinlang.org)
@@ -162,3 +163,8 @@ limitations under the License.
 [badge-lint]: https://github.com/matheus-corregiari/arch-event-observer/actions/workflows/ci.yml/badge.svg
 
 [badge-test]: https://github.com/matheus-corregiari/arch-event-observer/actions/workflows/ci.yml/badge.svg
+
+
+## Saved screen state
+
+See [event-observer-state](docs/modules/event-observer-state.md) for one-shot requests, refresh, filters, continuous streams and transformations. Existing Toolkit consumers should follow the [migration guide](docs/migration-state.md).

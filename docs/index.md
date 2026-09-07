@@ -1,4 +1,4 @@
-﻿# Arch Event Observer
+# Arch Event Observer
 
 Arch Event Observer is a Kotlin-first event and result observation toolkit for Android and Compose
 Multiplatform.
@@ -56,3 +56,7 @@ myFlow.composable.Unwrap {
 
 This project keeps the API focused on observation and rendering. It does not try to replace your
 repository, state holder, or UI architecture.
+
+## Saved screen state
+
+[event-observer-state](modules/event-observer-state.md) connects repository operations to restorable View state. See the [Toolkit migration guide](migration-state.md).
