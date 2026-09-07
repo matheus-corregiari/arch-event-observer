@@ -21,3 +21,5 @@ include(":test")
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
+include(":event-observer-state")
+
