@@ -18,10 +18,24 @@ dependencies {
 }
 ```
 
+For saved Repository-to-ViewModel state in `commonMain`, add:
+
+```kotlin
+kotlin {
+    sourceSets.commonMain.dependencies {
+        implementation("io.github.matheus-corregiari:event-observer-state:<version>")
+    }
+}
+```
+
+Use `saveState` for plain values or `saveResponseState` for results. See the
+[state guide](modules/event-observer-state.md) for a complete ViewModel example and serialization setup.
+
 See the dedicated module pages for the split:
 
 - [`event-observer`](modules/event-observer.md)
 - [`event-observer-compose`](modules/event-observer-compose.md)
+- [`event-observer-state`](modules/event-observer-state.md)
 
 ## Create A Result
 

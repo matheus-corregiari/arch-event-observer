@@ -32,6 +32,10 @@ extensions.configure(DokkaExtension::class) {
     basePublicationsDirectory.set(file("$rootDir/docs/api/${project.name}"))
 
     dokkaSourceSets.configureEach {
+        sourceLink {
+            localDirectory.set(projectDir.resolve("src"))
+            remoteUrl("${env("POM_URL")}/tree/master/${project.name}/src")
+        }
         reportUndocumented.set(true)
         skipDeprecated.set(true)
         skipEmptyPackages.set(true)

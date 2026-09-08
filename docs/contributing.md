@@ -16,6 +16,7 @@ Thanks for taking the time to contribute.
 
 - `event-observer/` -> shared result, flow, and LiveData APIs
 - `event-observer-compose/` -> Compose-facing observation APIs
+- `event-observer-state/` -> SavedStateHandle state and repository operations
 - `docs/` -> published MkDocs content
 
 ## Development Workflow
