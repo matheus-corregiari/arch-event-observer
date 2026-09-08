@@ -37,6 +37,7 @@ nav:
       - event-observer: modules/event-observer.md
       - event-observer-compose: modules/event-observer-compose.md
       - event-observer-state: modules/event-observer-state.md
+  - State Performance: state-performance.md
   - State Migration: migration-state.md
   - Core Concepts: core-concepts.md
   - Usage Recipes: recipes.md

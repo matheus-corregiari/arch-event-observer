@@ -160,6 +160,7 @@ Public docs live in `docs/`:
 - [event-observer-compose](docs/modules/event-observer-compose.md)
 - [event-observer-state](docs/modules/event-observer-state.md)
 - [State migration](docs/migration-state.md)
+- [State performance and responsiveness](docs/state-performance.md)
 - [Core Concepts](docs/core-concepts.md)
 - [Recipes](docs/recipes.md)
 - [Changelog](docs/changelog/index.md)

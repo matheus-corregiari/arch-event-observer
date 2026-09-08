@@ -38,7 +38,11 @@ class UsersViewModel(handle: SavedStateHandle) : ViewModel() {
 
 Observe `users.flow()` in the View. Finishing a source keeps the last value; connecting again replaces
 its previous operation. Use `saveResponseState` and `load` for `Flow<DataResult<T>>`. Use `bindMapped`
-or `loadMapped` to save a transformed payload, and `select` for smaller states without duplicate storage.
+or `loadMapped` to save a transformed payload, and `select` for cheap smaller states without duplicate storage.
+For expensive direct updates use `setAsync`; for expensive projections use `selectAsync`. Operations
+prepare data on `Dispatchers.Default` and commit on the owner scope. Capture UI inputs before starting
+worker callbacks. See [performance tests and limits](../docs/state-performance.md), particularly for
+browser targets and large saved-state payloads.
 
 Objects, typed lists and typed maps are supported. Complex values need `@Serializable` or a supplied
 serializer. The implementation is entirely in `commonMain`; use the main thread and a handle supplied

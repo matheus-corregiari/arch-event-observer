@@ -33,6 +33,18 @@ notice; there is **no Maven relocation** and no automatic dependency or import r
   `loadReducing` for result flows. Use `select` for smaller states derived from one saved model.
 - Clearing uses a saved JSON null rather than removing the key. Do not remove an active key directly.
 
+## Worker execution
+
+Producers, mappers, reducers and codecs now run on `workerDispatcher`, defaulting to
+`Dispatchers.Default`. Capture saved values on the owner thread before starting a producer.
+Callbacks handling plain operation errors still run on the owner scope. Custom serializers must
+support worker use and immutable snapshots; do not mutate submitted or observed objects in place.
+Tests can inject a dispatcher tied to their coroutine test scheduler through delegates or constructors.
+
+`setAsync` prepares a direct write asynchronously. `selectAsync` retains the last completed projection.
+Synchronous setters and projections remain available for small, cheap operations. See
+[performance limits](state-performance.md).
+
 ## Existing saved snapshots
 
 The old native/shadow representation is not decoded by this module. Choose a new key (for example

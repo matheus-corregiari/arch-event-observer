@@ -20,6 +20,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import br.com.arch.toolkit.eventObserver.state.saveResponseState
 import br.com.arch.toolkit.eventObserver.state.saveState
+import kotlinx.coroutines.Job
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -29,8 +30,9 @@ class UsersViewModel(handle: SavedStateHandle) : ViewModel() {
     val users by handle.saveResponseState<List<User>>()
     val filter by handle.saveState<String>(default = "")
 
-    fun refresh(repository: UsersRepository) = users.load {
-        repository.users(filter.get().orEmpty()) // Flow<DataResult<List<User>>>
+    fun refresh(repository: UsersRepository): Job {
+        val query = filter.get().orEmpty() // Read saved state on the owner thread.
+        return users.load { repository.users(query) } // Flow<DataResult<List<User>>>
     }
 
     fun changeFilter(value: String, repository: UsersRepository) {
@@ -130,11 +132,25 @@ fields is required. A separate editable filter or selection can have its own sav
 - Run access and operations on the main thread with a main-thread scope. Replace collections
   instead of mutating them in place. Projections must be pure and inexpensive.
 
+## Expensive work
+
+`bind`/`load` and their mapping/reduction variants run producers, transformations and JSON preparation
+on `workerDispatcher` (default `Dispatchers.Default`). Each emission commits on the owner scope before
+the producer proceeds. Capture filters and other saved values **before** entering a producer lambda;
+worker code must not access the UI or `SavedStateHandle`.
+
+Use `state.setAsync(largeValue)` for a direct expensive write. It returns a `Job` and follows the same
+latest-operation rule. Use `state.selectAsync(initialValue = emptyList<Row>()) { ... }` for an expensive
+projection; reads reuse the last completed result. `set`, property assignments, constructors/restoration,
+and `select` remain synchronous. Do not use them for unbounded work on the UI thread.
+
+See [performance tests and limits](../state-performance.md), including JS/Wasm event-loop constraints.
+
 ## Shared code and tests
 
 All production code lives in `commonMain`. Repository binding, serialization, restoration snapshots,
 refresh, filters, cancellation and projection tests live in `commonTest` and run on every test target.
-A separate Android integration test verifies `SavedStateRegistry` and a real `Bundle`/`Parcel` round
+JVM-only responsiveness tests use real executors to detect UI starvation. A separate Android integration test verifies `SavedStateRegistry` and a real `Bundle`/`Parcel` round
 trip; those Android APIs cannot run in `commonTest`.
 
 See the [compiled usage examples](https://github.com/matheus-corregiari/arch-event-observer/blob/master/event-observer-state/src/commonTest/kotlin/br/com/arch/toolkit/eventObserver/state/UsageTest.kt).
