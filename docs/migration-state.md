@@ -4,13 +4,13 @@
 The new artifact is published with the Event Observer release. The old artifact only carries a POM
 notice; there is **no Maven relocation** and no automatic dependency or import rewrite.
 
-| Before | After |
-|---|---|
+| Before                                                 | After                                                     |
+| ------------------------------------------------------ | --------------------------------------------------------- |
 | `io.github.matheus-corregiari:state-handle:2.0.0-rc17` | `io.github.matheus-corregiari:event-observer-state:2.3.0` |
-| `br.com.arch.toolkit.stateHandle` | `br.com.arch.toolkit.eventObserver.state` |
-| Koin-provided `Json` | Default `Json`, or an explicit argument |
-| Native value with JSON shadow fallback | One JSON value per key |
-| `SavableObject` / Parcelable / Serializable markers | `@Serializable` or explicit `KSerializer<T>` |
+| `br.com.arch.toolkit.stateHandle`                      | `br.com.arch.toolkit.eventObserver.state`                 |
+| Koin-provided `Json`                                   | Default `Json`, or an explicit argument                   |
+| Native value with JSON shadow fallback                 | One JSON value per key                                    |
+| `SavableObject` / Parcelable / Serializable markers    | `@Serializable` or explicit `KSerializer<T>`              |
 
 ## API changes
 

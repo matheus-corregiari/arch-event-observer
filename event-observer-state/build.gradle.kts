@@ -12,11 +12,6 @@ plugins {
 }
 
 kotlin {
-    android {
-        compileSdk = versionInt(libs.versions.build.sdk.compile)
-        minSdk = versionInt(libs.versions.build.sdk.min)
-        buildToolsVersion = versionString(libs.versions.build.tools)
-    }
     sourceSets {
         commonMain.dependencies {
             api(project(":event-observer"))
@@ -48,12 +43,5 @@ kover {
                 rule("State branch coverage") { minBound(80, CoverageUnit.BRANCH) }
             }
         }
-    }
-}
-
-dokka.dokkaSourceSets.configureEach {
-    sourceLink {
-        localDirectory.set(projectDir.resolve("src"))
-        remoteUrl("${env("POM_URL")}/tree/master/event-observer-state/src")
     }
 }

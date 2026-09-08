@@ -1,6 +1,6 @@
 # Changelog
 
-Release notes and planned versions. Publication is confirmed by the release tag.
+Release notes. Publication is confirmed by the release tag.
 
 ## Planned
 

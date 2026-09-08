@@ -10,11 +10,6 @@ plugins {
 }
 
 kotlin {
-    android {
-        compileSdk = versionInt(libs.versions.build.sdk.compile)
-        minSdk = versionInt(libs.versions.build.sdk.min)
-        buildToolsVersion = versionString(libs.versions.build.tools)
-    }
 
     sourceSets {
         // Libraries
@@ -43,12 +38,5 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.jetbrains.compose.ui.test.junit4.desktop)
         }
-    }
-}
-
-dokka.dokkaSourceSets.configureEach {
-    sourceLink {
-        localDirectory.set(projectDir.resolve("src"))
-        remoteUrl("${env("POM_URL")}/tree/master/event-observer-compose/src")
     }
 }

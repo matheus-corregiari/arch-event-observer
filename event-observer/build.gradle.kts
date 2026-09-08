@@ -8,13 +8,6 @@ plugins {
 }
 
 kotlin {
-
-    android {
-        compileSdk = versionInt(libs.versions.build.sdk.compile)
-        minSdk = versionInt(libs.versions.build.sdk.min)
-        buildToolsVersion = versionString(libs.versions.build.tools)
-    }
-
     sourceSets {
         // Libraries
         commonMain.dependencies {
@@ -41,12 +34,5 @@ kotlin {
             implementation(libs.mockk.test.android)
             implementation(libs.androidx.arch.coreTesting)
         }
-    }
-}
-
-dokka.dokkaSourceSets.configureEach {
-    sourceLink {
-        localDirectory.set(projectDir.resolve("src"))
-        remoteUrl("${env("POM_URL")}/tree/master/event-observer/src")
     }
 }
