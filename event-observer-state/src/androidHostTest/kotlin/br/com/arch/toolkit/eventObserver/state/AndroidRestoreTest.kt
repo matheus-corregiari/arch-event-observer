@@ -21,13 +21,6 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import br.com.arch.toolkit.util.dataResultError
 import br.com.arch.toolkit.util.dataResultSuccess
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.builtins.MapSerializer
-import kotlinx.serialization.builtins.serializer
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -84,30 +77,11 @@ class AndroidRestoreTest {
     }
 
     private class Model(handle: SavedStateHandle) : ViewModel() {
-        private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-        val screen = ViewModelState.Regular("screen", Screen.serializer(), handle, scope)
-        val profiles = ViewModelState.Regular(
-            "profiles",
-            ListSerializer(Profile.serializer()),
-            handle,
-            scope
-        )
-        val map = ViewModelState.Regular(
-            "map",
-            MapSerializer(String.serializer(), Profile.serializer()),
-            handle,
-            scope
-        )
-        val response = ViewModelState.Result("response", Screen.serializer(), handle, scope)
-        val cleared = ViewModelState.Regular(
-            "cleared",
-            Int.serializer(),
-            handle,
-            scope,
-            default = 99
-        )
-
-        override fun onCleared() = scope.cancel()
+        val screen by handle.saveState<Screen>()
+        val profiles by handle.saveState<List<Profile>>()
+        val map by handle.saveState<Map<String, Profile>>()
+        val response by handle.saveResponseState<Screen>()
+        val cleared by handle.saveState<Int>(default = 99)
     }
 
     private class Owner(restored: Bundle?) : SavedStateRegistryOwner, ViewModelStoreOwner {

@@ -45,6 +45,12 @@ Use `event-observer-compose` when you want:
   `OnSingle`, and `OnMany`
 - a Compose-first API on top of `event-observer`
 
+Use `event-observer-state` when you want:
+
+- shared Repository-to-ViewModel state backed by `SavedStateHandle`
+- objects, lists and maps, with or without `DataResult`
+- refresh, filters, continuous streams and derived UI state
+
 ## Installation
 
 Pick the module that matches your layer:
@@ -63,6 +69,19 @@ dependencies {
 
 `event-observer-compose` builds on top of `event-observer`, so use both only when you need
 Compose rendering on top of the base result model.
+
+For saved state in shared code:
+
+```kotlin
+kotlin {
+    sourceSets.commonMain.dependencies {
+        implementation("io.github.matheus-corregiari:event-observer-state:<version>")
+    }
+}
+```
+
+Apply the Kotlin serialization plugin in the module declaring your `@Serializable` models.
+The state artifact includes the base result API; add the Compose artifact for its rendering DSL.
 
 ## Module Guide
 
@@ -106,6 +125,31 @@ myFlow.composable
     .Unwrap()
 ```
 
+For saved state, declare a shared ViewModel and start a new operation on refresh:
+
+```kotlin
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import br.com.arch.toolkit.eventObserver.state.saveResponseState
+import br.com.arch.toolkit.result.DataResult
+import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class User(val name: String)
+
+class UsersViewModel(handle: SavedStateHandle) : ViewModel() {
+    val users by handle.saveResponseState<List<User>>()
+    val count = users.select { it?.size ?: 0 }
+
+    fun refresh(source: () -> Flow<DataResult<List<User>>>) = users.load { source() }
+}
+```
+
+Observe `users.flow()` from the View. Its last payload survives completed requests and is restored
+through the handle's owner. See the [state guide](docs/modules/event-observer-state.md) for filters,
+plain values, mapping and platform restoration limits.
+
 ## Documentation
 
 Public docs live in `docs/`:
@@ -114,6 +158,8 @@ Public docs live in `docs/`:
 - [Getting Started](docs/getting-started.md)
 - [event-observer](docs/modules/event-observer.md)
 - [event-observer-compose](docs/modules/event-observer-compose.md)
+- [event-observer-state](docs/modules/event-observer-state.md)
+- [State migration](docs/migration-state.md)
 - [Core Concepts](docs/core-concepts.md)
 - [Recipes](docs/recipes.md)
 - [Changelog](docs/changelog/index.md)

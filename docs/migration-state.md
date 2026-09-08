@@ -25,8 +25,9 @@ notice; there is **no Maven relocation** and no automatic dependency or import r
 - `load` always starts another operation and returns `Job`. The old `evaluate` argument is removed;
   use `if (state.get() == null) state.load { ... }` for explicit reuse.
 - `set(value, distinct)` remains available; observed state is also distinct.
-- `.required` and `.default` remain read-only delegate fallbacks and now agree with their observed
-  flows. Import them from `StateValue.Companion`. Use `default = value` for persisted initialization
+- `.required` and `.default` remain delegate fallbacks applied on reads and now agree with their observed
+  flows. Assignments still persist the assigned value. Import them from `StateValue.Companion`.
+  Use `default = value` for persisted initialization
   or `select { it ?: fallback }` for a derived fallback. Nullable states can still be cleared.
 - Use `bind`, `bindMapped` and `bindReducing` for plain flows; use `load`, `loadMapped` and
   `loadReducing` for result flows. Use `select` for smaller states derived from one saved model.

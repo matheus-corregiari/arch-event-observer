@@ -31,8 +31,10 @@ class StateValue<T : Any>(
         default
     ).also { stored = it }
 
+    /** Reads the payload saved under the resolved property key. */
     override fun getValue(thisRef: Any?, property: KProperty<*>): T? = state().flow.value
 
+    /** Serializes the assignment before replacing the saved payload. */
     override fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) = state().set(value)
 
     /** Current value; defaults only initialize absent keys. */
@@ -44,7 +46,7 @@ class StateValue<T : Any>(
     /** Stable, read-through observable state. Do not call SavedStateHandle.remove on its key. */
     fun flow(): StateFlow<T?> = state().flow
 
-    /** Read-only fallbacks do not persist another value or require a separate key. */
+    /** Read fallbacks do not persist another value; assignments still update the saved property. */
     companion object {
         /** Supplies a non-null fallback on reads and observation, without writing it to the handle. */
         fun <T : Any> StateValue<T>.required(default: () -> T): FallbackValue<T, T> =
@@ -56,7 +58,15 @@ class StateValue<T : Any>(
     }
 }
 
-/** Creates a serializable value; complex models require a generated or explicit [serializer]. */
+/**
+ * Creates a saved property for use in common code, with no ViewModel requirement.
+ *
+ * [key] defaults to the delegated property name. Supply it explicitly when using [StateValue.get],
+ * [StateValue.set] or [StateValue.flow] without a delegated property.
+ * [default] initializes an absent entry only; saved null stays null.
+ * Complex models require a generated or explicit [serializer], using the supplied [json].
+ * Access on the main thread. Encoding failures preserve the previous saved value.
+ */
 inline fun <reified T : Any> SavedStateHandle.value(
     key: String = "",
     default: T? = null,

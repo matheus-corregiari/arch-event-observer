@@ -4,10 +4,13 @@ Typed screen state connecting repository operations to the View through `SavedSt
 The state outlives individual requests; the handle's owner controls restoration.
 
 ```kotlin
-implementation("io.github.matheus-corregiari:event-observer-state:2.3.0")
+kotlin {
+    sourceSets.commonMain.dependencies {
+        implementation("io.github.matheus-corregiari:event-observer-state:2.3.0")
+    }
+}
 ```
 
-This is a release candidate change; these coordinates are available only after the release is published.
 The module supports Android (API 23+), JVM, iOS ARM64/simulator ARM64, JS and WasmJS.
 
 ## Minimal ViewModel
@@ -57,8 +60,8 @@ serializer and main-thread scope. The delegates simply supply the property key a
 No Koin setup is required.
 
 For property syntax, `var query by handle.value<String>()` infers the key from the property name.
-`StateValue.Companion.required` and `default` provide read-only fallbacks for property reads and
-their flows; they do not persist the fallback. `default = value` initializes an absent saved entry.
+`StateValue.Companion.required` and `default` provide fallbacks for property reads and
+their flows; they do not persist the fallback. Assignments still save the assigned value. `default = value` initializes an absent saved entry.
 
 ## Transform a repository payload
 
@@ -92,9 +95,11 @@ Persist a serializable screen model when fields must update together:
 @Serializable
 data class Screen(val users: List<User>, val total: Int)
 
-val screen by handle.saveState<Screen>()
-val names = screen.select { it?.users.orEmpty() }
-val total = screen.select { it?.total ?: 0 }
+class ScreenViewModel(handle: SavedStateHandle) : ViewModel() {
+    val screen by handle.saveState<Screen>()
+    val users = screen.select { it?.users.orEmpty() }
+    val total = screen.select { it?.total ?: 0 }
+}
 ```
 
 Map one repository response into `Screen` with `bindMapped`, or use `saveResponseState<Screen>()`
@@ -124,6 +129,15 @@ fields is required. A separate editable filter or selection can have its own sav
   `Success`, while saved null becomes `None`. Throwable and in-progress work are not persisted.
 - Run access and operations on the main thread with a main-thread scope. Replace collections
   instead of mutating them in place. Projections must be pure and inexpensive.
+
+## Shared code and tests
+
+All production code lives in `commonMain`. Repository binding, serialization, restoration snapshots,
+refresh, filters, cancellation and projection tests live in `commonTest` and run on every test target.
+A separate Android integration test verifies `SavedStateRegistry` and a real `Bundle`/`Parcel` round
+trip; those Android APIs cannot run in `commonTest`.
+
+See the [compiled usage examples](https://github.com/matheus-corregiari/arch-event-observer/blob/master/event-observer-state/src/commonTest/kotlin/br/com/arch/toolkit/eventObserver/state/UsageTest.kt).
 
 ## Platform boundaries
 

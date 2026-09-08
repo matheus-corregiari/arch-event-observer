@@ -106,8 +106,7 @@ class StoredStateTest {
         val observed = mutableListOf<Int>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             count.collect {
-                observed +=
-                    it
+                observed += it
             }
         }
         state.set(listOf(1))
@@ -169,8 +168,7 @@ class StoredStateTest {
         val state = handle.value<Map<Profile, Profile>>(
             "map",
             json = Json {
-                allowStructuredMapKeys =
-                    true
+                allowStructuredMapKeys = true
             }
         )
         state.set(values)
@@ -181,8 +179,7 @@ class StoredStateTest {
             restored.value<Map<Profile, Profile>>(
                 "map",
                 json = Json {
-                    allowStructuredMapKeys =
-                        true
+                    allowStructuredMapKeys = true
                 }
             ).get()
         )

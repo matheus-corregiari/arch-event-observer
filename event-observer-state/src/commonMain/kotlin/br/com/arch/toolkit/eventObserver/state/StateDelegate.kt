@@ -15,13 +15,21 @@ class StateDelegate<S>(
 ) : ReadOnlyProperty<ViewModel, S> {
     private var holder: Lazy<S>? = null
 
+    /** Creates the holder on first access and returns that same holder on subsequent reads. */
     override fun getValue(thisRef: ViewModel, property: KProperty<*>): S {
         val current = holder ?: lazy { create(thisRef, property.name) }.also { holder = it }
         return current.value
     }
 }
 
-/** Plain saved state. Default only applies when the handle has no value for the resolved key. */
+/**
+ * Creates plain saved state as a ViewModel property, for example `val users by handle.saveState<List<User>>()`.
+ *
+ * [name] defaults to the property name. [default] initializes only an absent saved entry.
+ * [serializer] and [json] encode the payload; complex models require a serializable type.
+ * The holder uses [viewModelScope]; access it on the main thread.
+ * Use [ViewModelState.Regular.bind] for flows or [ViewModelState.set] for direct values.
+ */
 inline fun <reified T : Any> SavedStateHandle.saveState(
     name: String = "",
     default: T? = null,
@@ -29,9 +37,7 @@ inline fun <reified T : Any> SavedStateHandle.saveState(
     serializer: KSerializer<T> = serializer<T>()
 ): StateDelegate<ViewModelState.Regular<T>> = StateDelegate { model, property ->
     ViewModelState.Regular(
-        name.ifBlank {
-            property
-        },
+        name.ifBlank { property },
         serializer,
         this,
         model.viewModelScope,
@@ -40,7 +46,14 @@ inline fun <reified T : Any> SavedStateHandle.saveState(
     )
 }
 
-/** Result state. Restores payload as Success; defaults are payloads, never transient statuses. */
+/**
+ * Creates result state as a ViewModel property, for example `val users by handle.saveResponseState<List<User>>()`.
+ *
+ * [name] defaults to the property name. [default] is a payload and initializes only an absent entry.
+ * [serializer] and [json] encode only the payload. Restored data becomes Success; errors and loading
+ * are transient. The holder uses [viewModelScope]; access it on the main thread.
+ * Each [ViewModelState.Result.load] replaces the preceding operation, while keeping the same state flow.
+ */
 inline fun <reified T : Any> SavedStateHandle.saveResponseState(
     name: String = "",
     default: T? = null,
@@ -48,9 +61,7 @@ inline fun <reified T : Any> SavedStateHandle.saveResponseState(
     serializer: KSerializer<T> = serializer<T>()
 ): StateDelegate<ViewModelState.Result<T>> = StateDelegate { model, property ->
     ViewModelState.Result(
-        name.ifBlank {
-            property
-        },
+        name.ifBlank { property },
         serializer,
         this,
         model.viewModelScope,

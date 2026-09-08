@@ -46,8 +46,7 @@ class OperationsTest {
         val observed = mutableListOf<Int?>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             state.flow().collect {
-                observed +=
-                    it
+                observed += it
             }
         }
         val first = state.bind(flowOf(1))
@@ -71,10 +70,11 @@ class OperationsTest {
 
     @Test
     fun mappingReductionAndCompoundProjections() = runTest {
+        val handle = SavedStateHandle()
         val state = ViewModelState.Regular(
             "screen",
             Screen.serializer(),
-            SavedStateHandle(),
+            handle,
             backgroundScope
         )
         state.bindMapped(
@@ -89,14 +89,14 @@ class OperationsTest {
         }.join()
         assertEquals(3, count.value)
         assertEquals(3, users.value.size)
-        val encoded = SavedStateHandle()
+        val restoredHandle = SavedStateHandle(mapOf("screen" to handle.get<String>("screen")))
         val restored = ViewModelState.Regular(
             "screen",
             Screen.serializer(),
-            encoded,
+            restoredHandle,
             backgroundScope
         )
-        restored.set(state.get())
+        assertEquals(state.get(), restored.get())
         assertEquals(3, restored.select { it!!.users.size }.value)
     }
 
@@ -152,8 +152,7 @@ class OperationsTest {
         )
         var errorReported = false
         val job = state.bind(flow { throw CancellationException("stop") }, onError = {
-            errorReported =
-                true
+            errorReported = true
         })
         job.join()
         assertTrue(job.isCancelled)
@@ -177,7 +176,7 @@ class OperationsTest {
             assertEquals(2, state.get())
             assertFalse(retry!!.isCompleted)
             state.cancel()
-            assertTrue(retry!!.isCancelled)
+            assertTrue(retry.isCancelled)
         } finally {
             scope.cancel()
         }
@@ -310,8 +309,7 @@ class OperationsTest {
         val observed = mutableListOf<DataResult<Int>>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             state.flow().collect {
-                observed +=
-                    it
+                observed += it
             }
         }
         runCurrent()
@@ -330,8 +328,7 @@ class OperationsTest {
         val late = mutableListOf<DataResult<Int>>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             state.flow().collect {
-                late +=
-                    it
+                late += it
             }
         }
         runCurrent()
