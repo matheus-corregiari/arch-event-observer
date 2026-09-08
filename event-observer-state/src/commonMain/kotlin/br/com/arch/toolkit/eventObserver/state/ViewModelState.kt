@@ -5,11 +5,16 @@ import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.util.dataResultError
 import br.com.arch.toolkit.util.dataResultNone
 import br.com.arch.toolkit.util.dataResultSuccess
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
@@ -26,7 +31,9 @@ sealed class ViewModelState<T : Any>(
     /** Scope controlling operations, usually viewModelScope. */
     val scope: CoroutineScope,
     json: Json,
-    default: T?
+    default: T?,
+    /** Dispatcher for repository work, transformations and serialization. */
+    val workerDispatcher: CoroutineDispatcher
 ) {
     private val stored = StoredState(stateHandle, name, serializer, json, default)
     internal val operation = StateOperation(scope)
@@ -37,7 +44,10 @@ sealed class ViewModelState<T : Any>(
     /** Reads the restored or latest saved payload. */
     fun get(): T? = data.value
 
-    /** Encodes before writing. Throws to the caller if encoding fails, preserving the prior state. */
+    /**
+     * Synchronous write for small values. Throws on codec failure, preserving the prior state.
+     * Prefer [setAsync] for expensive payloads; this method runs on the calling thread.
+     */
     open fun set(value: T?) = stored.set(value)
 
     /** Compatibility overload: skips encoding equal values when [distinct] is true. */
@@ -45,14 +55,35 @@ sealed class ViewModelState<T : Any>(
         if (!distinct || value != get()) set(value)
     }
 
+    /**
+     * Prepares a detached saved snapshot on [workerDispatcher], then commits on the owner scope.
+     * Replaces the active operation. Prefer this to synchronous [set] for expensive payloads.
+     * Plain failures propagate to the scope; result holders expose an Error with the old payload.
+     */
+    fun setAsync(value: T?): Job = operation.start(::onFailure) { checkCurrent ->
+        val prepared = withContext(workerDispatcher) { prepare(value) }
+        checkCurrent()
+        commit(prepared)
+    }
+
+    internal fun prepare(value: T?): PreparedState<T> = stored.prepare(value)
+
+    internal open fun commit(prepared: PreparedState<T>) = stored.commit(prepared)
+
+    internal open fun onFailure(failure: Throwable): Unit = throw failure
+
     /** Clears the payload without disconnecting observers. */
     fun invalidate() = set(null)
 
     /** Stops the active operation without clearing state or completing its observers. */
     fun cancel() = operation.cancel()
 
-    /** Derives a smaller state without another persisted copy. */
+    /** Synchronous projection for cheap work. Use [selectAsync] for expensive computations. */
     fun <R> select(transform: (T?) -> R): StateFlow<R> = data.select(transform)
+
+    /** Computes an expensive derived state asynchronously; reads reuse its last completed value. */
+    fun <R> selectAsync(initialValue: R, transform: suspend (T?) -> R): StateFlow<R> =
+        data.selectAsync(scope, initialValue, workerDispatcher, transform)
 
     /** Plain values from one-shot or continuous sources. */
     class Regular<T : Any>(
@@ -61,8 +92,9 @@ sealed class ViewModelState<T : Any>(
         stateHandle: SavedStateHandle,
         scope: CoroutineScope,
         json: Json = Json,
-        default: T? = null
-    ) : ViewModelState<T>(name, serializer, stateHandle, scope, json, default) {
+        default: T? = null,
+        workerDispatcher: CoroutineDispatcher = Dispatchers.Default
+    ) : ViewModelState<T>(name, serializer, stateHandle, scope, json, default, workerDispatcher) {
         /** Stable state; completing a bound flow leaves its last value here. */
         fun flow(): StateFlow<T?> = data
 
@@ -83,11 +115,21 @@ sealed class ViewModelState<T : Any>(
             onError: (Throwable) -> Unit = { throw it },
             reduce: suspend (T?, A) -> T
         ): Job = operation.start(onError) { checkCurrent ->
-            source.collect { value ->
-                checkCurrent()
-                val next = reduce(get(), value)
-                checkCurrent()
-                set(next)
+            val ownerContext = currentCoroutineContext().minusKey(Job)
+            withContext(workerDispatcher) {
+                source.collect { value ->
+                    val current = withContext(ownerContext) {
+                        checkCurrent()
+                        get()
+                    }
+                    val next = reduce(current, value)
+                    currentCoroutineContext().ensureActive()
+                    val prepared = prepare(next)
+                    withContext(ownerContext) {
+                        checkCurrent()
+                        commit(prepared)
+                    }
+                }
             }
         }
     }
@@ -99,8 +141,9 @@ sealed class ViewModelState<T : Any>(
         stateHandle: SavedStateHandle,
         scope: CoroutineScope,
         json: Json = Json,
-        default: T? = null
-    ) : ViewModelState<T>(name, serializer, stateHandle, scope, json, default) {
+        default: T? = null,
+        workerDispatcher: CoroutineDispatcher = Dispatchers.Default
+    ) : ViewModelState<T>(name, serializer, stateHandle, scope, json, default, workerDispatcher) {
         private val transient = MutableStateFlow(
             get()?.let(::dataResultSuccess) ?: dataResultNone<T>()
         )
@@ -115,6 +158,15 @@ sealed class ViewModelState<T : Any>(
         override fun set(value: T?, distinct: Boolean) = results.update {
             if (!distinct || value != get()) super.set(value)
             transient.value = value?.let(::dataResultSuccess) ?: dataResultNone()
+        }
+
+        internal override fun commit(prepared: PreparedState<T>) = results.update {
+            super.commit(prepared)
+            transient.value = prepared.value?.let(::dataResultSuccess) ?: dataResultNone()
+        }
+
+        internal override fun onFailure(failure: Throwable) {
+            transient.value = dataResultError(failure, get())
         }
 
         /** Results without payload keep the last saved data; use invalidate to explicitly clear. */
@@ -136,14 +188,28 @@ sealed class ViewModelState<T : Any>(
         fun <A> loadReducing(
             reduce: suspend (T?, A) -> T,
             func: suspend () -> Flow<DataResult<A>>
-        ): Job = operation.start({ transient.value = dataResultError(it, get()) }) { checkCurrent ->
-            val source = func()
-            checkCurrent()
-            source.collect { result ->
-                checkCurrent()
-                val next = result.data?.let { reduce(get(), it) }
-                checkCurrent()
-                set(DataResult(next, result.error, result.status))
+        ): Job = operation.start(::onFailure) { checkCurrent ->
+            val ownerContext = currentCoroutineContext().minusKey(Job)
+            withContext(workerDispatcher) {
+                val source = func()
+                source.collect { result ->
+                    val current = withContext(ownerContext) {
+                        checkCurrent()
+                        get()
+                    }
+                    val prepared = result.data?.let { payload ->
+                        val next = reduce(current, payload)
+                        currentCoroutineContext().ensureActive()
+                        prepare(next)
+                    }
+                    withContext(ownerContext) {
+                        checkCurrent()
+                        results.update {
+                            prepared?.let { super.commit(it) }
+                            transient.value = DataResult(get(), result.error, result.status)
+                        }
+                    }
+                }
             }
         }
     }

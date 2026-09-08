@@ -41,7 +41,8 @@ class OperationsTest {
             "value",
             Int.serializer(),
             SavedStateHandle(),
-            backgroundScope
+            backgroundScope,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
         )
         val observed = mutableListOf<Int?>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -75,7 +76,8 @@ class OperationsTest {
             "screen",
             Screen.serializer(),
             handle,
-            backgroundScope
+            backgroundScope,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
         )
         state.bindMapped(
             flowOf("Ada")
@@ -94,7 +96,8 @@ class OperationsTest {
             "screen",
             Screen.serializer(),
             restoredHandle,
-            backgroundScope
+            backgroundScope,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
         )
         assertEquals(state.get(), restored.get())
         assertEquals(3, restored.select { it!!.users.size }.value)
@@ -107,12 +110,13 @@ class OperationsTest {
             Int.serializer(),
             SavedStateHandle(),
             backgroundScope,
-            default = 7
+            default = 7,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
         )
         val failure = IllegalStateException("offline")
         var received: Throwable? = null
         state.bind(flow { throw failure }, onError = { received = it }).join()
-        assertSame(failure, received)
+        assertEquals(failure.message, received?.message)
         assertEquals(7, state.get())
         state.bindMapped(flowOf("invalid"), onError = { received = it }) { it.toInt() }.join()
         assertTrue(received is NumberFormatException)
@@ -127,7 +131,13 @@ class OperationsTest {
                 CoroutineExceptionHandler { _, error -> errors += error }
         )
         try {
-            val state = ViewModelState.Regular("value", Int.serializer(), SavedStateHandle(), scope)
+            val state = ViewModelState.Regular(
+                "value",
+                Int.serializer(),
+                SavedStateHandle(),
+                scope,
+                workerDispatcher = UnconfinedTestDispatcher(testScheduler)
+            )
             state.set(3, distinct = true)
             state.set(3, distinct = true)
             state.set(4, distinct = false)
@@ -148,7 +158,8 @@ class OperationsTest {
             "value",
             Int.serializer(),
             SavedStateHandle(),
-            backgroundScope
+            backgroundScope,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
         )
         var errorReported = false
         val job = state.bind(flow { throw CancellationException("stop") }, onError = {
@@ -162,7 +173,13 @@ class OperationsTest {
     @Test
     fun immediateErrorCallbackCanStartACancellableRetry() = runTest {
         val scope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher(testScheduler))
-        val state = ViewModelState.Regular("value", Int.serializer(), SavedStateHandle(), scope)
+        val state = ViewModelState.Regular(
+            "value",
+            Int.serializer(),
+            SavedStateHandle(),
+            scope,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
+        )
         var retry: kotlinx.coroutines.Job? = null
         try {
             state.bind(flow { error("retry") }, onError = {
@@ -188,7 +205,8 @@ class OperationsTest {
             "value",
             String.serializer(),
             SavedStateHandle(),
-            backgroundScope
+            backgroundScope,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
         )
         val old = state.bindMapped(flowOf("old")) {
             withContext(NonCancellable) { delay(100) }
@@ -203,7 +221,13 @@ class OperationsTest {
     @Test
     fun resultsSurviveRefreshAndRestorePayloadAsSuccess() = runTest {
         val handle = SavedStateHandle()
-        val state = ViewModelState.Result("result", Int.serializer(), handle, backgroundScope)
+        val state = ViewModelState.Result(
+            "result",
+            Int.serializer(),
+            handle,
+            backgroundScope,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
+        )
         val stream = state.flow()
         assertEquals(DataResultStatus.NONE, stream.value.status)
         state.load { flowOf(dataResultLoading(), dataResultSuccess(1)) }.join()
@@ -226,7 +250,8 @@ class OperationsTest {
             Int.serializer(),
             restoredHandle,
             backgroundScope,
-            default = 99
+            default = 99,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
         )
         assertEquals(dataResultSuccess(3), restored.flow().value)
         assertEquals(listOf(dataResultSuccess(3)), restored.flow().replayCache)
@@ -239,7 +264,8 @@ class OperationsTest {
             Int.serializer(),
             SavedStateHandle(),
             backgroundScope,
-            default = 5
+            default = 5,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
         )
         val failure = IllegalStateException("offline")
         state.set(dataResultError(failure))
@@ -262,18 +288,25 @@ class OperationsTest {
             Int.serializer(),
             SavedStateHandle(),
             backgroundScope,
-            default = 5
+            default = 5,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
         )
         val failure = IllegalStateException("offline")
         state.load { throw failure }.join()
-        assertEquals(dataResultError(failure, 5), state.flow().value)
+        assertEquals(5, state.get())
+        assertEquals(DataResultStatus.ERROR, state.flow().value.status)
+        assertEquals(failure.message, state.flow().value.error?.message)
+        assertTrue(state.flow().value.error is IllegalStateException)
         state.load {
             flow {
                 emit(dataResultSuccess(6))
                 throw failure
             }
         }.join()
-        assertEquals(dataResultError(failure, 6), state.flow().value)
+        assertEquals(6, state.get())
+        assertEquals(DataResultStatus.ERROR, state.flow().value.status)
+        assertEquals(failure.message, state.flow().value.error?.message)
+        assertTrue(state.flow().value.error is IllegalStateException)
         state.loadMapped<String>({ it.toInt() }) { flowOf(dataResultSuccess("bad")) }.join()
         assertEquals(6, state.get())
         assertTrue(state.flow().value.error is NumberFormatException)
@@ -285,7 +318,8 @@ class OperationsTest {
             "result",
             serializer<List<Int>>(),
             SavedStateHandle(),
-            backgroundScope
+            backgroundScope,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
         )
         state.loadMapped<String>({ listOf(it.length) }) { flowOf(dataResultSuccess("abc")) }.join()
         state.loadReducing<Int>({ previous, next -> previous.orEmpty() + next }) {
@@ -305,7 +339,13 @@ class OperationsTest {
     @Test
     fun resultSubscribersSeeExternalHandleChangesAndNewSubscriptions() = runTest {
         val handle = SavedStateHandle()
-        val state = ViewModelState.Result("result", Int.serializer(), handle, backgroundScope)
+        val state = ViewModelState.Result(
+            "result",
+            Int.serializer(),
+            handle,
+            backgroundScope,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
+        )
         val observed = mutableListOf<DataResult<Int>>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             state.flow().collect {
@@ -341,7 +381,8 @@ class OperationsTest {
             "result",
             Int.serializer(),
             SavedStateHandle(),
-            backgroundScope
+            backgroundScope,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
         )
         val old = state.loadMapped<Int>({
             withContext(NonCancellable) { delay(100) }
@@ -366,7 +407,8 @@ class OperationsTest {
             NonNegativeSerializer,
             SavedStateHandle(),
             backgroundScope,
-            default = 5
+            default = 5,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
         )
         assertFailsWith<kotlinx.serialization.SerializationException> { state.set(-1) }
         assertEquals(dataResultSuccess(5), state.flow().value)

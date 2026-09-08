@@ -25,6 +25,8 @@ internal class SelectedState<A, B>(
     }
 }
 
+internal data class PreparedState<T>(val encoded: String, val value: T?)
+
 internal class StoredState<T : Any>(
     private val handle: SavedStateHandle,
     private val key: String,
@@ -33,6 +35,7 @@ internal class StoredState<T : Any>(
     default: T?
 ) {
     private val nullableSerializer = serializer.nullable
+    private var cached: PreparedState<T>? = null
 
     init {
         require(key.isNotBlank()) { "State key must not be blank" }
@@ -43,13 +46,29 @@ internal class StoredState<T : Any>(
 
     val flow: StateFlow<T?> = SelectedState(handle.getStateFlow<String?>(key, null), ::decode)
 
-    fun set(value: T?) {
+    fun set(value: T?) = commit(prepare(value))
+
+    // No handle access: encoding and the detached read snapshot can be prepared on a worker.
+    fun prepare(value: T?): PreparedState<T> {
         val encoded = json.encodeToString(nullableSerializer, value)
-        handle[key] = encoded
+        return PreparedState(encoded, json.decodeFromString(nullableSerializer, encoded))
     }
 
-    private fun decode(encoded: String?): T? = encoded?.let {
-        json.decodeFromString(nullableSerializer, it)
+    fun commit(prepared: PreparedState<T>) {
+        cached = prepared
+        handle[key] = prepared.encoded
+    }
+
+    private fun decode(encoded: String?): T? {
+        if (encoded == null) return null
+        val current = cached
+        return if (current != null && current.encoded === encoded) {
+            current.value
+        } else {
+            json.decodeFromString(nullableSerializer, encoded).also {
+                cached = PreparedState(encoded, it)
+            }
+        }
     }
 }
 

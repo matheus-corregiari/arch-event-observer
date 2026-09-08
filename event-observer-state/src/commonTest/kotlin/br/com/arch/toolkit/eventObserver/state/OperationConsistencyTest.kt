@@ -30,7 +30,8 @@ class OperationConsistencyTest {
             "result",
             Int.serializer(),
             SavedStateHandle(),
-            backgroundScope
+            backgroundScope,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
         )
         state.set(1)
         val statuses = listOf(
@@ -56,7 +57,8 @@ class OperationConsistencyTest {
             "result",
             Int.serializer(),
             SavedStateHandle(),
-            backgroundScope
+            backgroundScope,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
         )
         val observed = mutableListOf<DataResult<Int>>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -75,7 +77,13 @@ class OperationConsistencyTest {
     @Test
     fun replacementStartedByCompletionHandlerIsTheLatestOperation() = runTest {
         val scope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher(testScheduler))
-        val state = ViewModelState.Regular("value", Int.serializer(), SavedStateHandle(), scope)
+        val state = ViewModelState.Regular(
+            "value",
+            Int.serializer(),
+            SavedStateHandle(),
+            scope,
+            workerDispatcher = UnconfinedTestDispatcher(testScheduler)
+        )
         var latest: Job? = null
         try {
             val first = state.bind(flow { awaitCancellation() })

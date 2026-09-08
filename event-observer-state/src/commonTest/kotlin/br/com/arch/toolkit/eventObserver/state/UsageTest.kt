@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStore
 import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.util.dataResultSuccess
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
@@ -21,10 +23,17 @@ import kotlin.test.assertTrue
 /** Compilable repository/ViewModel examples for the documented public API. */
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class UsageTest {
-    private class PlainModel(handle: SavedStateHandle, scope: CoroutineScope) : ViewModel(scope) {
-        val users by handle.saveState<List<Profile>>(default = emptyList())
+    private class PlainModel(
+        handle: SavedStateHandle,
+        scope: CoroutineScope,
+        dispatcher: CoroutineDispatcher
+    ) : ViewModel(scope) {
+        val users by handle.saveState<List<Profile>>(
+            default = emptyList(),
+            workerDispatcher = dispatcher
+        )
         val count = users.select { it?.size ?: 0 }
-        val screen by handle.saveState<Screen>()
+        val screen by handle.saveState<Screen>(workerDispatcher = dispatcher)
         val names = screen.select { it?.users.orEmpty().map(Profile::name) }
         val total = screen.select { it?.counts?.get("total") ?: 0 }
 
@@ -37,7 +46,8 @@ class UsageTest {
 
     @Test
     fun plainReadmeExampleSupportsDirectValuesAndRepositoryFlows() = runTest {
-        val model = PlainModel(SavedStateHandle(), backgroundScope)
+        val model =
+            PlainModel(SavedStateHandle(), backgroundScope, UnconfinedTestDispatcher(testScheduler))
         assertEquals(emptyList(), model.users.get())
         model.replace(listOf(Profile("Ada")))
         assertEquals(1, model.count.value)
@@ -49,24 +59,30 @@ class UsageTest {
     @Test
     fun oneMappedResponseRestoresMultipleDerivedStates() = runTest {
         val handle = SavedStateHandle()
-        val model = PlainModel(handle, backgroundScope)
+        val model = PlainModel(handle, backgroundScope, UnconfinedTestDispatcher(testScheduler))
         model.connectNames(flowOf(listOf("Ada", "Lin"))).join()
         assertEquals(listOf("Ada", "Lin"), model.names.value)
         assertEquals(2, model.total.value)
 
         val restoredHandle = SavedStateHandle(mapOf("screen" to handle.get<String>("screen")))
-        val restored = PlainModel(restoredHandle, backgroundScope)
+        val restored =
+            PlainModel(restoredHandle, backgroundScope, UnconfinedTestDispatcher(testScheduler))
         assertEquals(model.names.value, restored.names.value)
         assertEquals(model.total.value, restored.total.value)
     }
 
-    private class UsersModel(handle: SavedStateHandle, scope: CoroutineScope) : ViewModel(scope) {
-        val users by handle.saveResponseState<List<Profile>>()
-        val filter by handle.saveState<String>(default = "")
+    private class UsersModel(
+        handle: SavedStateHandle,
+        scope: CoroutineScope,
+        dispatcher: CoroutineDispatcher
+    ) : ViewModel(scope) {
+        val users by handle.saveResponseState<List<Profile>>(workerDispatcher = dispatcher)
+        val filter by handle.saveState<String>(default = "", workerDispatcher = dispatcher)
         val count = users.select { it?.size ?: 0 }
 
-        fun refresh(repository: (String) -> Flow<DataResult<List<Profile>>>) = users.load {
-            repository(filter.get().orEmpty())
+        fun refresh(repository: (String) -> Flow<DataResult<List<Profile>>>): Job {
+            val query = filter.get().orEmpty()
+            return users.load { repository(query) }
         }
 
         fun changeFilter(value: String, repository: (String) -> Flow<DataResult<List<Profile>>>) {
@@ -78,7 +94,7 @@ class UsageTest {
     @Test
     fun refreshFiltersAndDisposalUseTheSamePublicApi() = runTest {
         val scope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher(testScheduler))
-        val model = UsersModel(SavedStateHandle(), scope)
+        val model = UsersModel(SavedStateHandle(), scope, UnconfinedTestDispatcher(testScheduler))
         val store = ViewModelStore().apply { put("users", model) }
         try {
             val requests = mutableListOf<String>()

@@ -3,6 +3,8 @@ package br.com.arch.toolkit.eventObserver.state
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
@@ -27,14 +29,16 @@ class StateDelegate<S>(
  *
  * [name] defaults to the property name. [default] initializes only an absent saved entry.
  * [serializer] and [json] encode the payload; complex models require a serializable type.
- * The holder uses [viewModelScope]; access it on the main thread.
+ * The holder uses [viewModelScope]; access it on the main thread. Producers, transformations and
+ * codec preparation use [workerDispatcher]. Capture saved/UI inputs before starting an operation.
  * Use [ViewModelState.Regular.bind] for flows or [ViewModelState.set] for direct values.
  */
 inline fun <reified T : Any> SavedStateHandle.saveState(
     name: String = "",
     default: T? = null,
     json: Json = Json,
-    serializer: KSerializer<T> = serializer<T>()
+    serializer: KSerializer<T> = serializer<T>(),
+    workerDispatcher: CoroutineDispatcher = Dispatchers.Default
 ): StateDelegate<ViewModelState.Regular<T>> = StateDelegate { model, property ->
     ViewModelState.Regular(
         name.ifBlank { property },
@@ -42,7 +46,8 @@ inline fun <reified T : Any> SavedStateHandle.saveState(
         this,
         model.viewModelScope,
         json,
-        default
+        default,
+        workerDispatcher
     )
 }
 
@@ -51,14 +56,16 @@ inline fun <reified T : Any> SavedStateHandle.saveState(
  *
  * [name] defaults to the property name. [default] is a payload and initializes only an absent entry.
  * [serializer] and [json] encode only the payload. Restored data becomes Success; errors and loading
- * are transient. The holder uses [viewModelScope]; access it on the main thread.
+ * are transient. The holder uses [viewModelScope]; access it on the main thread. Worker callbacks
+ * and codecs use [workerDispatcher] and must not access the UI or handle.
  * Each [ViewModelState.Result.load] replaces the preceding operation, while keeping the same state flow.
  */
 inline fun <reified T : Any> SavedStateHandle.saveResponseState(
     name: String = "",
     default: T? = null,
     json: Json = Json,
-    serializer: KSerializer<T> = serializer<T>()
+    serializer: KSerializer<T> = serializer<T>(),
+    workerDispatcher: CoroutineDispatcher = Dispatchers.Default
 ): StateDelegate<ViewModelState.Result<T>> = StateDelegate { model, property ->
     ViewModelState.Result(
         name.ifBlank { property },
@@ -66,6 +73,7 @@ inline fun <reified T : Any> SavedStateHandle.saveResponseState(
         this,
         model.viewModelScope,
         json,
-        default
+        default,
+        workerDispatcher
     )
 }
