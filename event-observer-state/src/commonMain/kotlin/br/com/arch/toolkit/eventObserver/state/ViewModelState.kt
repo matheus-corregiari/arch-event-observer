@@ -41,7 +41,7 @@ sealed class ViewModelState<T : Any>(
     open fun set(value: T?) = stored.set(value)
 
     /** Compatibility overload: skips encoding equal values when [distinct] is true. */
-    fun set(value: T?, distinct: Boolean) {
+    open fun set(value: T?, distinct: Boolean) {
         if (!distinct || value != get()) set(value)
     }
 
@@ -109,8 +109,11 @@ sealed class ViewModelState<T : Any>(
         /** One stable stream across all executions, including after each producer completes. */
         fun flow(): StateFlow<DataResult<T>> = results
 
-        override fun set(value: T?) = results.update {
-            super.set(value)
+        override fun set(value: T?) = set(value, distinct = false)
+
+        /** Skips equal payload encoding while still resetting transient status. */
+        override fun set(value: T?, distinct: Boolean) = results.update {
+            if (!distinct || value != get()) super.set(value)
             transient.value = value?.let(::dataResultSuccess) ?: dataResultNone()
         }
 
