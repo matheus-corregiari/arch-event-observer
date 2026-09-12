@@ -18,7 +18,7 @@ The project is split into three public modules:
 
 ## Requirements
 
-- Kotlin `2.4.10`
+- Kotlin `2.4.20`
 - Gradle wrapper `9.7.1`
 - JDK `21` via the Gradle toolchain
 - Android `minSdk 23` and `compileSdk 37`
@@ -200,7 +200,7 @@ limitations under the License.
 [link-coverage]: https://codecov.io/gh/matheus-corregiari/arch-event-observer
 [link-release]: https://github.com/matheus-corregiari/arch-event-observer/releases/latest
 
-[badge-kotlin]: https://img.shields.io/badge/kotlin-2.4.10-blue.svg?logo=kotlin
+[badge-kotlin]: https://img.shields.io/badge/kotlin-2.4.20-blue.svg?logo=kotlin
 [badge-release]: https://img.shields.io/github/v/release/matheus-corregiari/arch-event-observer
 
 [badge-license]: https://img.shields.io/github/license/matheus-corregiari/arch-event-observer
@@ -215,3 +215,8 @@ limitations under the License.
 ## Saved screen state
 
 See [event-observer-state](docs/modules/event-observer-state.md) for one-shot requests, refresh, filters, continuous streams and transformations. Existing Toolkit consumers should follow the [migration guide](docs/migration-state.md).
+
+## Next release: 2.3.1
+
+See [release notes](RELEASE_NOTES.md), [dependency versions](docs/dependencies.md) and
+[coverage configuration](docs/ci.md#coverage-and-codecov). This release is a candidate until tagged and published.
