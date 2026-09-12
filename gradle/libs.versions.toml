@@ -2,7 +2,7 @@
 [versions]
 ## --- Plugins and more general stuff --- ##
 #noinspection UnusedVersionCatalogEntry
-jacoco = "0.8.14"
+jacoco = "0.8.15"
 detekt = "2.0.0-alpha.6"
 
 ## --- Build Config and SDK --- ##
@@ -11,7 +11,7 @@ build-sdk-compile = "37"
 build-tools = "37.0.0"
 
 ## JetBrains
-jetbrains-kotlin = "2.4.10"
+jetbrains-kotlin = "2.4.20"
 jetbrains-atomic = "0.33.0"
 jetbrains-dokka = "2.2.0"
 jetbrains-kover = "0.9.9"
@@ -51,14 +51,14 @@ androidx-compose-lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-co
 androidx-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata", version = "2.11.0" }
 androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime", version = "2.11.0" }
 androidx-lifecycle-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version = "2.11.0" }
-androidx-compose-testManifest = { module = "androidx.compose.ui:ui-test-manifest", version = "1.12.0" }
+androidx-compose-testManifest = { module = "androidx.compose.ui:ui-test-manifest", version = "1.12.1" }
 androidx-test-junit = { module = "androidx.test.ext:junit-ktx", version = "1.3.0" }
 
 ## Tools
 detekt = { module = "dev.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 ktlint = { module = "org.jlleitschuh.gradle.ktlint:org.jlleitschuh.gradle.ktlint.gradle.plugin", version.ref = "ktlint" }
 vanniktech-publish = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "vanniktech-publish" }
-robolectric-test = { module = "org.robolectric:robolectric", version = "4.16.1" }
+robolectric-test = { module = "org.robolectric:robolectric", version = "4.17" }
 
 ## Test
 mockk-test-android = { module = "io.mockk:mockk-android", version = "1.14.11" }
