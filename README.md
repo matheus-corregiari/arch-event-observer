@@ -218,5 +218,5 @@ See [event-observer-state](docs/modules/event-observer-state.md) for one-shot re
 
 ## Next release: 2.3.1
 
-See [release notes](RELEASE_NOTES.md), [dependency versions](docs/dependencies.md) and
+See [release notes](docs/changelog/2.3.1.md), [dependency versions](docs/dependencies.md) and
 [coverage configuration](docs/ci.md#coverage-and-codecov). This release is a candidate until tagged and published.

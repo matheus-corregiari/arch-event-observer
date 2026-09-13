@@ -9,7 +9,7 @@ import org.jetbrains.dokka.gradle.DokkaExtension
 
 plugins {
     id("org.jetbrains.dokka")
-    id("org.jetbrains.kotlinx.kover")
+    id("arch-coverage")
     jacoco
 }
 
