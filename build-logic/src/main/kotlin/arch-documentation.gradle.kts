@@ -9,19 +9,10 @@ import org.jetbrains.dokka.gradle.DokkaExtension
 
 plugins {
     id("org.jetbrains.dokka")
-    id("org.jetbrains.kotlinx.kover")
+    id("arch-coverage")
     jacoco
 }
 
-kover {
-    reports {
-        filters {
-            excludes {
-                classes("**.BuildConfig", "**.R", "**.R$*")
-            }
-        }
-    }
-}
 extensions.configure(JacocoPluginExtension::class) {
     toolVersion = libraries.version("jacoco")
 }
