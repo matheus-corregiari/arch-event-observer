@@ -48,5 +48,5 @@ Robolectric 4.17 Android tests require `--add-opens=java.base/jdk.internal.acces
 on JDK 21. This option is scoped to test JVMs, following the
 [Robolectric setup guide](https://robolectric.org/getting-started/).
 
-Android SDK setup uses [`android-actions/setup-android@v4`](https://github.com/android-actions/setup-android/releases/tag/v4.0.1)
-with Node 24 and command-line tools 20.0.
+Android SDK setup uses [`android-actions/setup-android@v4`](https://github.com/android-actions/setup-android/tree/v4)
+with Node 24 and the maintained command-line tools provided by the action.
