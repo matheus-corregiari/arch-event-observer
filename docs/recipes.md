@@ -83,18 +83,24 @@ dataResultSuccess("Ready").composable.Unwrap {
 
 ## Custom Animations in Compose
 
-By default, state transitions in Compose are animated with a fade. You can customize this per-call:
+Animations are handled via the `contentTransform` property in `AnimationConfig`.
+- If `contentTransform` is `null`, animations are disabled, and the content is rendered directly.
+- If `contentTransform` is non-null, it uses `AnimatedContent` for smooth transitions.
 
 ```kotlin
 myFlow.composable
     .animation {
-        enabled = true
-        enterAnimation = slideInVertically() + fadeIn()
-        exitAnimation = slideOutVertically() + fadeOut()
+        contentTransform = slideInVertically() + fadeIn() togetherWith (slideOutVertically() + fadeOut())
     }
-    .Unwrap {
+    .Unwrap(modifier = Modifier.padding(16.dp)) {
         OnData { data -> Text(data) }
     }
+```
+
+To disable animations globally:
+
+```kotlin
+ComposableDataResult.AnimationConfig.defaultContentTransform = null
 ```
 
 ## Side Effects with Compose Observers

@@ -1,6 +1,6 @@
 # Dependencies
 
-Audited against Maven Central, Google Maven and the Gradle Plugin Portal on 2026-09-16 for `2.3.1`.
+Audited against Maven Central, Google Maven and the Gradle Plugin Portal on 2026-09-19 for `2.3.1`.
 Runtime dependencies and AGP use stable releases. Detekt retains its existing alpha line.
 Gradle **9.7.1**, JDK **21**, Kover **0.9.9**, MkDocs Material **9.7.7**.
 
@@ -23,7 +23,7 @@ The patches in sibling repositories can be adopted after their artifacts are pub
 | `jetbrains-coroutines-test` | `1.11.0` | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-test/maven-metadata.xml) |
 | `jetbrains-kotlin-test` | `2.4.20` | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-test/maven-metadata.xml) |
 | `jetbrains-serialization-json` | `1.11.0` | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-serialization-json/maven-metadata.xml) |
-| `androidx-library` | `9.4.0` | [Metadata](https://dl.google.com/dl/android/maven2/com/android/kotlin/multiplatform/library/com.android.kotlin.multiplatform.library.gradle.plugin/maven-metadata.xml) |
+| `androidx-library` | `9.4.1` | [Metadata](https://dl.google.com/dl/android/maven2/com/android/kotlin/multiplatform/library/com.android.kotlin.multiplatform.library.gradle.plugin/maven-metadata.xml) |
 | `androidx-arch-coreTesting` | `2.2.0` | [Metadata](https://dl.google.com/dl/android/maven2/androidx/arch/core/core-testing/maven-metadata.xml) |
 | `androidx-compose-lifecycle` | `2.11.0` | [Metadata](https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-runtime-compose/maven-metadata.xml) |
 | `androidx-lifecycle-livedata` | `2.11.0` | [Metadata](https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-livedata/maven-metadata.xml) |

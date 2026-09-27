@@ -19,6 +19,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.coroutineContext
+import kotlin.reflect.KClass
 
 /**
  * Fluent observer DSL for [DataResult].
@@ -135,7 +136,8 @@ class ObserveWrapper<T> internal constructor() {
             ErrorEvent(
                 wrapper = WrapObserver<Throwable, Any>(emptyObserver = observer),
                 single = single,
-                dataStatus = dataStatus
+                dataStatus = dataStatus,
+                errorClass = null
             )
         )
         return this
@@ -153,7 +155,8 @@ class ObserveWrapper<T> internal constructor() {
             ErrorEvent(
                 wrapper = WrapObserver<Throwable, Any>(observer = observer),
                 single = single,
-                dataStatus = dataStatus
+                dataStatus = dataStatus,
+                errorClass = null
             )
         )
         return this
@@ -175,7 +178,72 @@ class ObserveWrapper<T> internal constructor() {
                     transformerObserver = observer
                 ),
                 single = single,
-                dataStatus = dataStatus
+                dataStatus = dataStatus,
+                errorClass = null
+            )
+        )
+        return this
+    }
+
+    /**
+     * Runs [observer] when the result is in [DataResultStatus.ERROR] and [DataResult.error] is an instance of [clazz].
+     */
+    fun <E : Throwable> error(
+        clazz: KClass<E>,
+        single: Boolean = false,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        observer: suspend (E) -> Unit
+    ): ObserveWrapper<T> {
+        eventList.add(
+            ErrorEvent(
+                wrapper = WrapObserver<Throwable, Any>(observer = { observer.invoke(it as E) }),
+                single = single,
+                dataStatus = dataStatus,
+                errorClass = clazz
+            )
+        )
+        return this
+    }
+
+    /**
+     * Runs [observer] when the result is in [DataResultStatus.ERROR] and [DataResult.error] is an instance of [clazz].
+     */
+    fun <E : Throwable> error(
+        clazz: KClass<E>,
+        single: Boolean = false,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        observer: suspend () -> Unit
+    ): ObserveWrapper<T> {
+        eventList.add(
+            ErrorEvent(
+                wrapper = WrapObserver<Throwable, Any>(emptyObserver = observer),
+                single = single,
+                dataStatus = dataStatus,
+                errorClass = clazz
+            )
+        )
+        return this
+    }
+
+    /**
+     * Transforms the error before invoking [observer] when [DataResult.error] is an instance of [clazz].
+     */
+    fun <E : Throwable, R> error(
+        clazz: KClass<E>,
+        single: Boolean = false,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        transformer: suspend (E) -> R,
+        observer: suspend (R) -> Unit
+    ): ObserveWrapper<T> {
+        eventList.add(
+            ErrorEvent(
+                wrapper = WrapObserver(
+                    transformer = { transformer.invoke(it as E) },
+                    transformerObserver = observer
+                ),
+                single = single,
+                dataStatus = dataStatus,
+                errorClass = clazz
             )
         )
         return this
@@ -455,11 +523,12 @@ class ObserveWrapper<T> internal constructor() {
                 )
 
                 // Handle Error
-                event is ErrorEvent && result.isError -> event.wrapper.handle(
-                    data = result.error,
-                    dispatcher = transformDispatcher,
-                    evaluate = evaluateBeforeDispatch
-                )
+                event is ErrorEvent && result.isError && event.shouldHandle(result) ->
+                    event.wrapper.handle(
+                        data = result.error,
+                        dispatcher = transformDispatcher,
+                        evaluate = evaluateBeforeDispatch
+                    )
 
                 // Handle Success
                 event is SuccessEvent && result.isSuccess -> event.wrapper.handle(
@@ -646,8 +715,12 @@ private class HideLoadingEvent(
 private class ErrorEvent(
     wrapper: WrapObserver<Throwable, *>,
     single: Boolean,
-    dataStatus: EventDataStatus
-) : ObserveEvent<Throwable>(wrapper, single, dataStatus)
+    dataStatus: EventDataStatus,
+    val errorClass: KClass<out Throwable>?
+) : ObserveEvent<Throwable>(wrapper, single, dataStatus) {
+    fun shouldHandle(result: DataResult<*>) =
+        errorClass == null || (result.error != null && errorClass.isInstance(result.error))
+}
 
 private class SuccessEvent(
     wrapper: WrapObserver<Nothing, *>,

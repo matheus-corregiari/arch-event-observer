@@ -20,7 +20,7 @@ jetbrains-coroutines = "1.11.0"
 jetbrains-serialization = "1.11.0"
 
 ## AndroidX
-androidx-plugin = "9.4.0"
+androidx-plugin = "9.4.1"
 
 ## Tools
 ktlint = "14.2.0"

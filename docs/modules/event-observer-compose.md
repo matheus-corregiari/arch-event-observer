@@ -34,17 +34,18 @@ flow.composable.Unwrap {
 
 ### Animations
 
-By default, `ComposableDataResult` uses `AnimatedVisibility` (fade-in/fade-out) when switching
-between states. You can customize or disable this:
+Animations are handled via the `contentTransform` property in `AnimationConfig`.
+- If `contentTransform` is `null`, animations are disabled, and the content is rendered directly.
+- If `contentTransform` is non-null, it uses `AnimatedContent` for smooth transitions.
+
+You can customize transitions or disable them:
 
 ```kotlin
 flow.composable
     .animation {
-        enabled = true
-        defaultEnterDuration = 300.milliseconds
-        defaultExitDuration = 200.milliseconds
+        contentTransform = slideInVertically() + fadeIn() togetherWith (slideOutVertically() + fadeOut())
     }
-    .Unwrap {
+    .Unwrap(modifier = Modifier.padding(16.dp)) {
         OnData { data -> Text(data) }
     }
 ```
@@ -52,7 +53,7 @@ flow.composable
 To disable animations globally:
 
 ```kotlin
-ComposableDataResult.AnimationConfig.enabledByDefault = false
+ComposableDataResult.AnimationConfig.defaultContentTransform = null
 ```
 
 ### Side Effects (Non-Compose)

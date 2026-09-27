@@ -17,12 +17,25 @@ fun <T> scenario(
     result: DataResult<T>,
     config: ObserveComposableWrapper<T>.() -> Unit,
     assert: ComposeUiTest.() -> Unit
+) = animationScenario(
+    result = result,
+    animationConfig = { contentTransform = null },
+    config = config,
+    assert = assert
+)
+
+@OptIn(ExperimentalTestApi::class)
+fun <T> animationScenario(
+    result: DataResult<T>,
+    animationConfig: ComposableDataResult.AnimationConfig.() -> Unit = {},
+    config: ObserveComposableWrapper<T>.() -> Unit,
+    assert: ComposeUiTest.() -> Unit
 ) = withGraphicsReady {
     runComposeUiTest {
         setContent {
             Column {
                 result.composable
-                    .animation { enabled = false }
+                    .animation(animationConfig)
                     .outsideComposable { /* See ObserveWrapper Tests */ }
                     .Unwrap(owner = null, config = config)
             }
@@ -32,7 +45,8 @@ fun <T> scenario(
     }
 }
 
-val stringConfig: ObserveComposableWrapper<String>.() -> Unit = { createConfig<String, String>() }
+val stringConfig: ObserveComposableWrapper<String>.() -> Unit =
+    { createConfig<String, String>() }
 val iterableConfig: ObserveComposableWrapper<Collection<String>>.() -> Unit =
     { createConfig<Collection<String>, String>() }
 val mapConfig: ObserveComposableWrapper<Map<String, String>>.() -> Unit =

@@ -8,27 +8,25 @@
 
 package br.com.arch.toolkit.compose
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import br.com.arch.toolkit.compose.ComposableDataResult.AnimationConfig.Defaults.defaultEnterDuration
-import br.com.arch.toolkit.compose.ComposableDataResult.AnimationConfig.Defaults.defaultExitDuration
-import br.com.arch.toolkit.compose.ComposableDataResult.AnimationConfig.Defaults.enabledByDefault
 import br.com.arch.toolkit.compose.observable.ComposeObservable
-import br.com.arch.toolkit.flow.ResponseFlow
 import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.result.ObserveWrapper
 import br.com.arch.toolkit.util.valueOrNull
@@ -64,7 +62,7 @@ import kotlin.time.DurationUnit
  * ### Example: Typical Usage
  * ```kotlin
  * myFlow.composable
- *   .animation { enabled = true }
+ *   .animation { contentTransform = fadeIn() togetherWith fadeOut() }
  *   .outsideComposable { error { t -> log(t) } }
  *   .Unwrap {
  *     OnShowLoading { CircularProgressIndicator() }
@@ -76,9 +74,7 @@ import kotlin.time.DurationUnit
  * ### Example: Animations
  * ```kotlin
  * comp.animation {
- *   enabled = true
- *   defaultEnterDuration = 300.milliseconds
- *   defaultExitDuration = 200.milliseconds
+ *   contentTransform = fadeIn() togetherWith fadeOut()
  * }
  * ```
  *
@@ -97,7 +93,6 @@ import kotlin.time.DurationUnit
 data class ComposableDataResult<T> internal constructor(val result: Flow<DataResult<T>>) {
 
     private val animationConfig = AnimationConfig()
-    private val wrapper = ObserveComposableWrapper<T>()
     private var notComposableBlock: (ObserveWrapper<T>.() -> Unit)? = null
 
     /**
@@ -108,13 +103,12 @@ data class ComposableDataResult<T> internal constructor(val result: Flow<DataRes
      *
      * ```kotlin
      * comp.animation {
-     *   enabled = true
-     *   defaultEnterDuration = 300.milliseconds
+     *   contentTransform = fadeIn() togetherWith fadeOut()
      * }
      * ```
      *
      * By default, animations are enabled with predefined fade-in and fade-out transitions.
-     * You can disable animations or customize the enter/exit transitions and their durations.
+     * You can disable animations by setting `contentTransform = null` or customize the enter/exit transitions.
      *
      * @param config A DSL block to customize the [AnimationConfig] for this instance.
      * @return This [ComposableDataResult] instance for chaining further configurations.
@@ -128,6 +122,7 @@ data class ComposableDataResult<T> internal constructor(val result: Flow<DataRes
      * Use this to add side effects or loggers via an [ObserveWrapper].
      *
      * Example:
+     *
      * ```kotlin
      * comp.outsideComposable {
      *   error { throwable -> logError(throwable) }
@@ -157,15 +152,18 @@ data class ComposableDataResult<T> internal constructor(val result: Flow<DataRes
      * }
      * ```
      *
+     * @param modifier Optional [Modifier] to apply to the layout root.
      * @param owner Optional [LifecycleOwner] for lifecycle-aware collection.
      * @param config DSL block on this [ComposableDataResult].
      */
     @Composable
     fun Unwrap(
+        modifier: Modifier = Modifier,
         owner: LifecycleOwner? = LocalLifecycleOwner.current,
         config: ObserveComposableWrapper<T>.() -> Unit
     ) {
         val animationConfig = remember { animationConfig }
+        val currentNotComposableBlock by rememberUpdatedState(notComposableBlock)
         val state: DataResult<T>? by if (owner != null) {
             result.collectAsStateWithLifecycle(result.valueOrNull(), owner)
         } else {
@@ -173,22 +171,33 @@ data class ComposableDataResult<T> internal constructor(val result: Flow<DataRes
         }
         val resultState = state ?: return
 
-        LaunchedEffect(resultState) { resultState.unwrap { notComposableBlock?.invoke(this) } }
-        wrapper.apply(config).list.forEachIndexed { index, observable ->
-            if (animationConfig.enabled) {
-                AnimatedVisibility(
-                    label = "observable - ${index.toString().padStart(3, '0')}",
-                    visible = observable.hasVisibleContent(resultState),
-                    modifier = animationConfig.animationModifier,
-                    enter = animationConfig.enterAnimation,
-                    exit = animationConfig.exitAnimation,
-                    content = { observable.Content(resultState) }
-                )
-            } else {
-                if (observable.hasVisibleContent(resultState)) observable.Content(resultState)
+        LaunchedEffect(resultState) {
+            resultState.unwrap { currentNotComposableBlock?.invoke(this) }
+        }
+
+        val listToRender = remember(config) {
+            ObserveComposableWrapper<T>().apply(config).list
+        }
+
+        val transform = animationConfig.contentTransform
+        if (transform != null) {
+            AnimatedContent(
+                targetState = resultState,
+                modifier = modifier,
+                transitionSpec = { transform },
+                content = { result ->
+                    for (item in listToRender) {
+                        if (item.hasVisibleContent(result)) item.Content(result)
+                    }
+                }
+            )
+        } else {
+            Box(modifier = modifier) {
+                for (item in listToRender) {
+                    if (item.hasVisibleContent(resultState)) item.Content(resultState)
+                }
             }
         }
-        wrapper.clear()
     }
     //endregion
 
@@ -198,9 +207,8 @@ data class ComposableDataResult<T> internal constructor(val result: Flow<DataRes
      * ---
      *
      * ### Behavior
-     * - Controls whether animations are applied to [AnimatedVisibility] when rendering
-     *   success, error, loading, or data states.
-     * - Defines the default `Modifier`, enter, and exit transitions.
+     * - Controls whether animations are applied to state transitions.
+     * - Defines the default `contentTransform`, which can be customized.
      * - Provides global defaults via [Defaults], which can be overridden before use.
      *
      * ---
@@ -208,83 +216,41 @@ data class ComposableDataResult<T> internal constructor(val result: Flow<DataRes
      * ### Example
      * ```kotlin
      * comp.animation {
-     *   enabled = true
-     *   enterAnimation = fadeIn(tween(300))
-     *   exitAnimation = fadeOut(tween(200))
+     *   contentTransform = slideInVertically() + fadeIn() togetherWith (slideOutVertically() + fadeOut())
      * }
      * ```
      *
      * Or set global defaults once:
      * ```kotlin
-     * ComposableDataResult.AnimationConfig.enabledByDefault = false
-     * ComposableDataResult.AnimationConfig.defaultEnterDuration = 200.milliseconds
+     * ComposableDataResult.AnimationConfig.defaultEnterDuration = 300.milliseconds
      * ComposableDataResult.AnimationConfig.defaultExitDuration = 200.milliseconds
      * ```
      *
      * ---
      *
-     * @property enabled Whether animations are active for the composable blocks.
-     *           Defaults to [Defaults.enabledByDefault].
-     * @property animationModifier A [Modifier] applied to the `AnimatedVisibility` wrapper.
-     * @property enterAnimation The [EnterTransition] for showing content.
-     *           Defaults to a fade-in with a delay equal to the exit duration.
-     * @property exitAnimation The [ExitTransition] for hiding content.
-     *           Defaults to a simple fade-out.
+     * @property contentTransform The [ContentTransform] for state transitions.
+     *           If `null`, animations are disabled.
+     *           Defaults to a fade-in/out transition.
      *
      * @see ComposableDataResult.animation
-     * @see AnimatedVisibility
      */
-    class AnimationConfig internal constructor() {
-        var enabled: Boolean = enabledByDefault
-        var animationModifier = Modifier
-        var enterAnimation: EnterTransition = fadeIn(
-            animationSpec = tween(
-                durationMillis = defaultEnterDuration.toInt(DurationUnit.MILLISECONDS),
-                // Delays enter to potentially run after a preceding exit animation completes
-                delayMillis = defaultExitDuration.toInt(DurationUnit.MILLISECONDS)
-            )
-        )
-        var exitAnimation: ExitTransition =
-            fadeOut(
+    class AnimationConfig {
+        var contentTransform: ContentTransform? = defaultContentTransform
+
+        companion object Defaults {
+            var defaultEnterDuration: Duration = 300.milliseconds
+            var defaultExitDuration: Duration = 200.milliseconds
+
+            var defaultContentTransform: ContentTransform? = fadeIn(
+                animationSpec = tween(
+                    durationMillis = defaultEnterDuration.toInt(DurationUnit.MILLISECONDS),
+                    delayMillis = defaultExitDuration.toInt(DurationUnit.MILLISECONDS)
+                )
+            ) togetherWith fadeOut(
                 animationSpec = tween(
                     durationMillis = defaultExitDuration.toInt(DurationUnit.MILLISECONDS)
                 )
             )
-
-        /**
-         * Provides global defaults for [AnimationConfig].
-         *
-         * ---
-         *
-         * ### Behavior
-         * - These values are applied whenever a new [AnimationConfig] is created.
-         * - Can be changed globally to affect all instances.
-         *
-         * ---
-         *
-         * ### Example
-         * ```kotlin
-         * // Disable animations everywhere
-         * ComposableDataResult.AnimationConfig.enabledByDefault = false
-         *
-         * // Faster transitions
-         * ComposableDataResult.AnimationConfig.defaultEnterDuration = 150.milliseconds
-         * ComposableDataResult.AnimationConfig.defaultExitDuration = 150.milliseconds
-         * ```
-         *
-         * ---
-         *
-         * @property enabledByDefault Global flag to enable/disable animations.
-         *           Default = `true`.
-         * @property defaultEnterDuration Default duration for [enterAnimation].
-         *           Default = `450.milliseconds`.
-         * @property defaultExitDuration Default duration for [exitAnimation].
-         *           Default = `450.milliseconds`.
-         */
-        companion object Defaults {
-            var enabledByDefault = true
-            var defaultEnterDuration: Duration = 450.milliseconds
-            var defaultExitDuration: Duration = 450.milliseconds
         }
     }
 }
