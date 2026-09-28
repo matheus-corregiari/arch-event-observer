@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import br.com.arch.toolkit.compose.observable.ComposeObservable
 import br.com.arch.toolkit.result.DataResult
 
 /**
@@ -62,16 +63,12 @@ fun <T> DataResultContent(
             transitionSpec = transitionSpec,
             contentKey = { it.animationContentKey() },
             content = { currentResult ->
-                for (item in listToRender) {
-                    if (item.hasVisibleContent(currentResult)) item.Content(currentResult)
-                }
+                RenderVisibleContent(listToRender, currentResult)
             }
         )
     } else {
         Box(modifier = modifier) {
-            for (item in listToRender) {
-                if (item.hasVisibleContent(result)) item.Content(result)
-            }
+            RenderVisibleContent(listToRender, result)
         }
     }
 }
@@ -129,3 +126,20 @@ private data class DataResultAnimationKey(
     val hasData: Boolean,
     val hasError: Boolean
 )
+
+
+@Composable
+@Suppress("FunctionNaming")
+private fun <T> RenderVisibleContent(
+    observables: List<ComposeObservable<T, *>>,
+    result: DataResult<T>
+) {
+    var index = 0
+    while (index < observables.size) {
+        val observable = observables[index]
+        if (observable.hasVisibleContent(result)) {
+            observable.Content(result)
+        }
+        index++
+    }
+}
