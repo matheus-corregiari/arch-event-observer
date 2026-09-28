@@ -22,8 +22,6 @@ import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.result.DataResultStatus
 import br.com.arch.toolkit.result.EventDataStatus
 import br.com.arch.toolkit.result.EventDataStatus.DoesNotMatter
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.update
 
 /**
  * A DSL wrapper used to register @Composable state observers for a [ComposableDataResult].
@@ -36,8 +34,8 @@ import kotlinx.atomicfu.update
 @Stable
 class ObserveComposableWrapper<T> internal constructor() {
 
-    private val observableList = atomic(listOf<ComposeObservable<T, *>>())
-    internal val list by observableList
+    private val observableList = mutableListOf<ComposeObservable<T, *>>()
+    internal val list: List<ComposeObservable<T, *>> get() = observableList
 
     // region Success
 
@@ -323,7 +321,8 @@ class ObserveComposableWrapper<T> internal constructor() {
     ) = register(ManyObservable(func))
     // endregion
 
-    internal fun clear() = observableList.update { emptyList() }
-    private fun register(observable: ComposeObservable<T, *>) =
-        observableList.update { it + observable }
+    internal fun clear() = observableList.clear()
+    private fun register(observable: ComposeObservable<T, *>) {
+        observableList.add(observable)
+    }
 }
