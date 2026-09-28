@@ -126,6 +126,9 @@ class ObserveWrapper<T> internal constructor() {
 
     /**
      * Runs [observer] when the result is in [DataResultStatus.ERROR].
+     *
+     * Error observers are independent. This observer also runs when a typed
+     * error observer matches the same result.
      */
     fun error(
         single: Boolean = false,
@@ -145,6 +148,9 @@ class ObserveWrapper<T> internal constructor() {
 
     /**
      * Runs [observer] when the result is in [DataResultStatus.ERROR] and [DataResult.error] is available.
+     *
+     * Error observers are independent. This observer also runs when a typed
+     * error observer matches the same result.
      */
     fun error(
         single: Boolean = false,
@@ -184,6 +190,35 @@ class ObserveWrapper<T> internal constructor() {
         )
         return this
     }
+
+    /**
+     * Runs [observer] when the error is an instance of [E].
+     */
+    inline fun <reified E : Throwable> error(
+        single: Boolean = false,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        noinline observer: suspend (E) -> Unit
+    ): ObserveWrapper<T> = error(E::class, single, dataStatus, observer)
+
+    /**
+     * Runs [observer] when the error is an instance of [E].
+     */
+    @JvmName("errorTypedWithoutArgument")
+    inline fun <reified E : Throwable> error(
+        single: Boolean = false,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        noinline observer: suspend () -> Unit
+    ): ObserveWrapper<T> = error(E::class, single, dataStatus, observer)
+
+    /**
+     * Transforms the error before invoking [observer] when it is an instance of [E].
+     */
+    inline fun <reified E : Throwable, R> error(
+        single: Boolean = false,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        noinline transformer: suspend (E) -> R,
+        noinline observer: suspend (R) -> Unit
+    ): ObserveWrapper<T> = error(E::class, single, dataStatus, transformer, observer)
 
     /**
      * Runs [observer] when the result is in [DataResultStatus.ERROR] and [DataResult.error] is an instance of [clazz].
@@ -523,7 +558,7 @@ class ObserveWrapper<T> internal constructor() {
                 )
 
                 // Handle Error
-                event is ErrorEvent && result.isError && event.shouldHandle(result) ->
+                event is ErrorEvent && result.isError && event.shouldHandle(result.error) ->
                     event.wrapper.handle(
                         data = result.error,
                         dispatcher = transformDispatcher,
@@ -718,8 +753,8 @@ private class ErrorEvent(
     dataStatus: EventDataStatus,
     val errorClass: KClass<out Throwable>?
 ) : ObserveEvent<Throwable>(wrapper, single, dataStatus) {
-    fun shouldHandle(result: DataResult<*>) =
-        errorClass == null || (result.error != null && errorClass.isInstance(result.error))
+    fun shouldHandle(error: Throwable?) =
+        errorClass == null || (error != null && errorClass.isInstance(error))
 }
 
 private class SuccessEvent(
