@@ -7,6 +7,12 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.assertDoesNotExist
+import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -53,4 +59,65 @@ class ComposableDataResultAnimationTest : PlatformTest() {
             onNodeWithTag("customData").assertIsDisplayed()
         }
     )
+
+    @Test
+    fun `same animation key updates payload content without keeping stale UI`() = withGraphicsReady {
+        var result by mutableStateOf(DataResult("First", null, DataResultStatus.SUCCESS))
+
+        runComposeUiTest {
+            setContent {
+                DataResultContent(
+                    result = result,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() }
+                ) {
+                    OnData { data ->
+                        BasicText(data, modifier = Modifier.testTag("payload"))
+                    }
+                }
+            }
+
+            onNodeWithTag("payload").assertTextEquals("First")
+            runOnIdle {
+                result = DataResult("Second", null, DataResultStatus.SUCCESS)
+            }
+            waitForIdle()
+
+            onNodeWithTag("payload").assertTextEquals("Second")
+        }
+    }
+
+    @Test
+    fun `collection shape change swaps visible structural content`() = withGraphicsReady {
+        var result by mutableStateOf(
+            DataResult<Collection<String>>(emptyList(), null, DataResultStatus.SUCCESS)
+        )
+
+        runComposeUiTest {
+            setContent {
+                DataResultContent(
+                    result = result,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() }
+                ) {
+                    OnEmpty {
+                        BasicText("empty", modifier = Modifier.testTag("empty"))
+                    }
+                    OnSingle<String> {
+                        BasicText(it, modifier = Modifier.testTag("single"))
+                    }
+                }
+            }
+
+            onNodeWithTag("empty").assertIsDisplayed()
+            onNodeWithTag("single").assertDoesNotExist()
+
+            runOnIdle {
+                result = DataResult(listOf("One"), null, DataResultStatus.SUCCESS)
+            }
+            waitForIdle()
+
+            onNodeWithTag("single").assertTextEquals("One")
+            onNodeWithTag("empty").assertDoesNotExist()
+        }
+    }
+
 }
