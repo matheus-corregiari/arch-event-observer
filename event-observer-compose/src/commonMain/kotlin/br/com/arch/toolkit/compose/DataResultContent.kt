@@ -115,7 +115,7 @@ fun <T> DataResult<T>.Content(
  * Payload changes that keep the same status and data/error presence should recompose
  * content without restarting the whole [AnimatedContent] transition.
  */
-internal fun DataResult<*>.animationContentKey() = DataResultAnimationKey(
+internal fun DataResult<*>.animationContentKey(): Any = DataResultAnimationKey(
     status = status,
     hasData = hasData,
     hasError = hasError
