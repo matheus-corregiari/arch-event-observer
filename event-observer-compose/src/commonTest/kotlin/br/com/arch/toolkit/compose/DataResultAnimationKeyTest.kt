@@ -43,10 +43,21 @@ class DataResultAnimationKeyTest {
     }
 
     @Test
-    fun `collection payload mutations do not restart animation`() {
+    fun `collection payload changes with same shape keep animation key`() {
+        val first = DataResult(listOf("One", "Two"), null, SUCCESS)
+        val second = DataResult(listOf("Three", "Four"), null, SUCCESS)
+
+        assertEquals(first.animationContentKey(), second.animationContentKey())
+    }
+
+    @Test
+    fun `collection shape changes update animation key`() {
+        val empty = DataResult(emptyList<String>(), null, SUCCESS)
         val single = DataResult(listOf("One"), null, SUCCESS)
         val many = DataResult(listOf("One", "Two"), null, SUCCESS)
 
-        assertEquals(single.animationContentKey(), many.animationContentKey())
+        assertNotEquals(empty.animationContentKey(), single.animationContentKey())
+        assertNotEquals(single.animationContentKey(), many.animationContentKey())
+        assertNotEquals(empty.animationContentKey(), many.animationContentKey())
     }
 }
