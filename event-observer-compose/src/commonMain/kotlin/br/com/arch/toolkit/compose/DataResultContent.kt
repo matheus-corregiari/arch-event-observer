@@ -135,17 +135,7 @@ private fun DataResult<*>.collectionShape(): CollectionShape = when (val value =
         else -> CollectionShape.Many
     }
 
-    is Sequence<*> -> {
-        val iterator = value.iterator()
-        when {
-            !iterator.hasNext() -> CollectionShape.Empty
-            else -> {
-                iterator.next()
-                if (iterator.hasNext()) CollectionShape.Many else CollectionShape.Single
-            }
-        }
-    }
-
+    is Sequence<*> -> CollectionShape.Sequence
     else -> CollectionShape.NotCollection
 }
 
@@ -158,6 +148,7 @@ private data class DataResultAnimationKey(
 
 private enum class CollectionShape {
     NotCollection,
+    Sequence,
     Empty,
     Single,
     Many
