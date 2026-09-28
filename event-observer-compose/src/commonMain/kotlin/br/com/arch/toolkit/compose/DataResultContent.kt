@@ -60,6 +60,7 @@ fun <T> DataResultContent(
             targetState = result,
             modifier = modifier,
             transitionSpec = transitionSpec,
+            contentKey = { it.animationContentKey() },
             content = { currentResult ->
                 for (item in listToRender) {
                     if (item.hasVisibleContent(currentResult)) item.Content(currentResult)
@@ -108,4 +109,23 @@ fun <T> DataResult<T>.Content(
     modifier = modifier,
     transitionSpec = transitionSpec,
     content = content
+)
+
+
+/**
+ * Animation identity for a [DataResult].
+ *
+ * Payload changes that keep the same status and data/error presence should recompose
+ * content without restarting the whole [AnimatedContent] transition.
+ */
+internal fun DataResult<*>.animationContentKey() = DataResultAnimationKey(
+    status = status,
+    hasData = hasData,
+    hasError = hasError
+)
+
+private data class DataResultAnimationKey(
+    val status: br.com.arch.toolkit.result.DataResultStatus,
+    val hasData: Boolean,
+    val hasError: Boolean
 )
