@@ -213,6 +213,26 @@ data class DataResult<T>(
         unwrap { error(transformer = transformer, observer = func) }
 
     /**
+     * Invokes [func] with [error] when it is an instance of [E].
+     */
+    inline fun <reified E : Throwable> error(noinline func: suspend (E) -> Unit) =
+        error(E::class, func)
+
+    /**
+     * Invokes [func] when [error] is an instance of [E].
+     */
+    inline fun <reified E : Throwable> error(noinline func: suspend () -> Unit) =
+        error(E::class, func)
+
+    /**
+     * Transforms [error] before invoking [func] when it is an instance of [E].
+     */
+    inline fun <reified E : Throwable, R> error(
+        noinline transformer: suspend (E) -> R,
+        noinline func: suspend (R) -> Unit
+    ) = error(E::class, transformer, func)
+
+    /**
      * Invokes [func] with [error] when [status] is [DataResultStatus.ERROR] and [error] is an instance of [clazz].
      */
     fun <E : Throwable> error(clazz: KClass<E>, func: suspend (E) -> Unit) =
