@@ -3,7 +3,6 @@
 package br.com.arch.toolkit.compose
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import br.com.arch.toolkit.compose.observable.ComposeObservable
 import br.com.arch.toolkit.compose.observable.DataObservable
 import br.com.arch.toolkit.compose.observable.EmptyObservable
@@ -31,7 +30,6 @@ import br.com.arch.toolkit.result.EventDataStatus.DoesNotMatter
  *
  * @param T The type of data being observed.
  */
-@Stable
 class ObserveComposableWrapper<T> internal constructor() {
 
     private val observableList = mutableListOf<ComposeObservable<T, *>>()
