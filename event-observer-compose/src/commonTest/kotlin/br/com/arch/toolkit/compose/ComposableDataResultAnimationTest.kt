@@ -39,10 +39,10 @@ class ComposableDataResultAnimationTest : PlatformTest() {
     )
 
     @Test
-    fun `custom contentTransform animation renders content`() = animationScenario(
+    fun `custom transitionSpec animation renders content`() = animationScenario(
         result = DataResult("Custom", null, DataResultStatus.SUCCESS),
-        animationConfig = {
-            contentTransform = fadeIn() togetherWith fadeOut()
+        transitionSpec = {
+            fadeIn() togetherWith fadeOut()
         },
         config = {
             OnData { data ->

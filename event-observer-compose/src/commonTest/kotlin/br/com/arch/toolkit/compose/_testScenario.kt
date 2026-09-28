@@ -2,6 +2,8 @@
 
 package br.com.arch.toolkit.compose
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ContentTransform
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.Modifier
@@ -19,7 +21,7 @@ fun <T> scenario(
     assert: ComposeUiTest.() -> Unit
 ) = animationScenario(
     result = result,
-    animationConfig = { contentTransform = null },
+    transitionSpec = null,
     config = config,
     assert = assert
 )
@@ -27,17 +29,17 @@ fun <T> scenario(
 @OptIn(ExperimentalTestApi::class)
 fun <T> animationScenario(
     result: DataResult<T>,
-    animationConfig: ComposableDataResult.AnimationConfig.() -> Unit = {},
+    transitionSpec: (AnimatedContentTransitionScope<DataResult<T>>.() -> ContentTransform)? = null,
     config: ObserveComposableWrapper<T>.() -> Unit,
     assert: ComposeUiTest.() -> Unit
 ) = withGraphicsReady {
     runComposeUiTest {
         setContent {
             Column {
-                result.composable
-                    .animation(animationConfig)
-                    .outsideComposable { /* See ObserveWrapper Tests */ }
-                    .Unwrap(owner = null, config = config)
+                result.Content(
+                    transitionSpec = transitionSpec,
+                    content = config
+                )
             }
         }
         runOnIdle { assert.invoke(this) }

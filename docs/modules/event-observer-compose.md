@@ -13,65 +13,126 @@ dependencies {
 
 ## Core Concept
 
-The entry point for Compose integration is the `.composable` extension property, which converts a
-`Flow<DataResult<T>>` (or a single `DataResult<T>`) into a `ComposableDataResult<T>`.
+There are two primary ways to render `DataResult` states in Jetpack Compose:
 
-You then use `Unwrap` to define how each state should be rendered.
+1. **Stateless / Direct Rendering (Recommended for UDF and Previews)**:
+   Use `DataResultContent(result = ...)` or `result.Content { ... }` when you observe state at the screen level (e.g., via `collectAsStateWithLifecycle()`).
+2. **Flow-Based Collection**:
+   Use `flow.Unwrap { ... }` or `ComposableDataResult(flow = ...) { ... }` to automatically collect and render a `Flow<DataResult<T>>` without intermediate wrapper object allocations.
+
+---
 
 ## Usage
 
-### Basic Example
+### Stateless / Direct Usage (`DataResultContent` & `@Preview`)
+
+When following Compose State Hoisting and Unidirectional Data Flow (UDF), collect state at the screen level and pass the `DataResult<T>` snapshot directly to `DataResultContent` or `result.Content`:
 
 ```kotlin
-val flow: ResponseFlow<String> = ...
+val resultState by viewModel.flow.collectAsStateWithLifecycle()
 
-flow.composable.Unwrap {
+DataResultContent(result = resultState) {
     OnShowLoading { CircularProgressIndicator() }
     OnData { data -> Text("Content: $data") }
     OnError { error -> Text("Error: ${error.message}") }
 }
 ```
 
+Or using the extension function:
+
+```kotlin
+resultState.Content {
+    OnShowLoading { CircularProgressIndicator() }
+    OnData { data -> Text("Content: $data") }
+    OnError { error -> Text("Error: ${error.message}") }
+}
+```
+
+This approach is **@Preview friendly** and allows instant rendering in Android Studio previews without requiring mock flows:
+
+```kotlin
+@Preview
+@Composable
+fun SuccessPreview() {
+    DataResult.success("Hello World").Content {
+        OnData { text -> Text(text) }
+    }
+}
+```
+
+---
+
+### Flow-Based Usage (`flow.Unwrap` & `ComposableDataResult`)
+
+For self-contained components driven by a single `ResponseFlow` or `Flow<DataResult<T>>`, use `flow.Unwrap` directly:
+
+```kotlin
+val flow: ResponseFlow<String> = ...
+
+flow.Unwrap {
+    OnShowLoading { CircularProgressIndicator() }
+    OnData { data -> Text("Content: $data") }
+    OnError { error -> Text("Error: ${error.message}") }
+}
+```
+
+Or using the top-level Composable function:
+
+```kotlin
+ComposableDataResult(flow = viewModel.flow) {
+    OnShowLoading { CircularProgressIndicator() }
+    OnData { data -> Text("Content: $data") }
+    OnError { error -> Text("Error: ${error.message}") }
+}
+```
+
+---
+
 ### Animations
 
-Animations are handled via the `contentTransform` property in `AnimationConfig`.
-- If `contentTransform` is `null`, animations are disabled, and the content is rendered directly.
-- If `contentTransform` is non-null, it uses `AnimatedContent` for smooth transitions.
-
-You can customize transitions or disable them:
+When using `DataResultContent` or `flow.Unwrap`, you can pass a standard Jetpack Compose `transitionSpec`:
 
 ```kotlin
-flow.composable
-    .animation {
-        contentTransform = slideInVertically() + fadeIn() togetherWith (slideOutVertically() + fadeOut())
+flow.Unwrap(
+    transitionSpec = {
+        slideInVertically() + fadeIn() togetherWith (slideOutVertically() + fadeOut())
     }
-    .Unwrap(modifier = Modifier.padding(16.dp)) {
-        OnData { data -> Text(data) }
-    }
+) {
+    OnData { data -> Text(data) }
+}
 ```
 
-To disable animations globally:
+By default, `transitionSpec` is `null` in `DataResultContent` and `flow.Unwrap` (no animation overhead).
 
-```kotlin
-ComposableDataResult.AnimationConfig.defaultContentTransform = null
-```
+---
 
 ### Side Effects (Non-Compose)
 
-If you need to trigger non-UI side effects (like logging) when a state changes, use
-`outsideComposable`:
+For `flow.Unwrap`, pass `outsideComposable` parameter to trigger non-UI side effects:
 
 ```kotlin
-flow.composable
-    .outsideComposable {
+flow.Unwrap(
+    outsideComposable = {
         error { throwable -> Logger.log(throwable) }
     }
-    .Unwrap {
-        OnData { data -> Text(data) }
-    }
+) {
+    OnData { data -> Text(data) }
+}
 ```
 
-## Available Observers (inside `Unwrap`)
+When using direct `DataResultContent`, handle non-UI side effects using standard Compose `LaunchedEffect`:
+
+```kotlin
+LaunchedEffect(resultState) {
+    resultState.unwrap {
+        error { throwable -> Logger.log(throwable) }
+    }
+}
+```
+
+---
+
+## Available Observers
 
 | Observer        | Triggered when...                                                |
 |:----------------|:-----------------------------------------------------------------|
@@ -88,16 +149,9 @@ flow.composable
 | `OnResult`      | On every emission.                                               |
 | `OnStatus`      | Matches a specific `DataResultStatus`.                           |
 
+---
+
 ## State Collection
 
 `Unwrap` uses `collectAsStateWithLifecycle()` when a `LifecycleOwner` is available (defaulting to
 `LocalLifecycleOwner.current`), ensuring efficient and lifecycle-aware collection.
-
-For manual control, you can use `collectAsComposableState()`:
-
-```kotlin
-val compState by flow.collectAsComposableState()
-compState.Unwrap {
-    OnData { data -> Text(data) }
-}
-```
