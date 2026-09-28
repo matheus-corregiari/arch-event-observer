@@ -60,4 +60,15 @@ class DataResultAnimationKeyTest {
         assertNotEquals(single.animationContentKey(), many.animationContentKey())
         assertNotEquals(empty.animationContentKey(), many.animationContentKey())
     }
+
+    @Test
+    fun `animation key does not consume sequence data`() {
+        val sequence = sequenceOf("One").constrainOnce()
+        val result = DataResult(sequence, null, SUCCESS)
+
+        result.animationContentKey()
+
+        assertEquals("One", sequence.first())
+    }
+
 }
