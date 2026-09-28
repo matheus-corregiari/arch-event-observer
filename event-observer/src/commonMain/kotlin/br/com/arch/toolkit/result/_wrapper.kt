@@ -203,7 +203,6 @@ class ObserveWrapper<T> internal constructor() {
     /**
      * Runs [observer] when the error is an instance of [E].
      */
-    @JvmName("errorTypedWithoutArgument")
     inline fun <reified E : Throwable> error(
         single: Boolean = false,
         dataStatus: EventDataStatus = DoesNotMatter,
