@@ -118,14 +118,50 @@ fun <T> DataResult<T>.Content(
 internal fun DataResult<*>.animationContentKey(): Any = DataResultAnimationKey(
     status = status,
     hasData = hasData,
-    hasError = hasError
+    hasError = hasError,
+    collectionShape = collectionShape()
 )
+
+private fun DataResult<*>.collectionShape(): CollectionShape = when (val value = data) {
+    is Collection<*> -> when (value.size) {
+        0 -> CollectionShape.Empty
+        1 -> CollectionShape.Single
+        else -> CollectionShape.Many
+    }
+
+    is Map<*, *> -> when (value.size) {
+        0 -> CollectionShape.Empty
+        1 -> CollectionShape.Single
+        else -> CollectionShape.Many
+    }
+
+    is Sequence<*> -> {
+        val iterator = value.iterator()
+        when {
+            !iterator.hasNext() -> CollectionShape.Empty
+            else -> {
+                iterator.next()
+                if (iterator.hasNext()) CollectionShape.Many else CollectionShape.Single
+            }
+        }
+    }
+
+    else -> CollectionShape.NotCollection
+}
 
 private data class DataResultAnimationKey(
     val status: br.com.arch.toolkit.result.DataResultStatus,
     val hasData: Boolean,
-    val hasError: Boolean
+    val hasError: Boolean,
+    val collectionShape: CollectionShape
 )
+
+private enum class CollectionShape {
+    NotCollection,
+    Empty,
+    Single,
+    Many
+}
 
 
 @Composable
@@ -134,12 +170,9 @@ private fun <T> RenderVisibleContent(
     observables: List<ComposeObservable<T, *>>,
     result: DataResult<T>
 ) {
-    var index = 0
-    while (index < observables.size) {
-        val observable = observables[index]
+    observables.forEach { observable ->
         if (observable.hasVisibleContent(result)) {
             observable.Content(result)
         }
-        index++
     }
 }
