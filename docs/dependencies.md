@@ -58,8 +58,9 @@ review the lockfile diff. Do not delete it to bypass dependency mismatches.
 AtomicFU remains available for modules that use atomic state; the Compose module no
 longer applies its plugin because observer registration is local to composition.
 
-The CodeQL-only Kotlin 2.3.21 compiler enables `-Xexplicit-backing-fields` for the
-Compose module. Normal builds use Kotlin 2.4.20, where this syntax is stable.
+CodeQL and normal builds both use Kotlin 2.4.20, where explicit backing fields are
+stable. [CodeQL 2.27.1 supports Kotlin 2.4.20](https://github.blog/changelog/2026-09-25-codeql-2-27-1-adds-c-and-c-query-and-kotlin-2-4-20-support/),
+so no compiler downgrade or backing-field opt-in is needed.
 
 ## Android SDK
 

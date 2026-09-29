@@ -10,10 +10,6 @@ plugins {
 }
 
 kotlin {
-    // CodeQL still analyzes with Kotlin 2.3, where explicit backing fields require opt-in.
-    if (libs.versions.jetbrains.kotlin.get().startsWith("2.3.")) {
-        compilerOptions.freeCompilerArgs.add("-Xexplicit-backing-fields")
-    }
 
     sourceSets {
         // Libraries

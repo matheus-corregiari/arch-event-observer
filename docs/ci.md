@@ -1,8 +1,9 @@
 # CI and releases
 
-The CI workflows and commands are identical in Arch Lumber, Arch Android and Arch Event Observer.
-The convention plugins select module tasks; `build-logic/ci.json` selects the runner and the isolated
-CodeQL compiler. Coverage floors live in `gradle.properties` and must only increase as tests improve.
+This guide describes the CI workflows and commands in Arch Event Observer.
+The convention plugins select module tasks; `build-logic/ci.json` selects the runner.
+Normal builds and CodeQL use the Kotlin version in `gradle/libs.versions.toml`.
+Coverage floors live in `gradle.properties` and must only increase as tests improve.
 
 ## Pull requests
 
@@ -32,12 +33,15 @@ at `release/1.0.0`.
 | CodeQL          | `./gradlew ciCodeql`: JVM/Android compilation; also analyzes Actions and Python |
 | CI Gate         | Requires successful completion of every gate, including policy                  |
 
+The aggregate Compose Detekt task currently reports `NO-SOURCE`; a green `ciLint`
+run includes ktlint and Android lint but does not establish full Compose Detekt coverage.
+
 `ciCoverage` already includes `ciTest`. There is no second test job. Projects with Apple targets use
 macOS for build/tests/publication; Android uses Linux. The same build job owns all supported targets,
 so JVM/Android/browser tests are not repeated on a second host. Windows local validation does not
 prove Apple binaries; the macOS CI run does.
 
-CodeQL has a separate checkout and compiler configuration. Its outputs are never published. Coverage
+CodeQL has a separate checkout and uses the same Kotlin compiler as normal builds. Its outputs are never published. Coverage
 reports are uploaded as artifacts; Codecov receives master reports for visibility, while Gradle
 enforces the actual gate. The Codecov upload is not the coverage threshold.
 

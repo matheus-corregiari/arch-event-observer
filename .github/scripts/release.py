@@ -170,13 +170,6 @@ def create_tag(branch):
     git("push", "origin", f"refs/tags/{release_version}")
 
 
-def codeql():
-    config = json.loads(Path("build-logic/ci.json").read_text())
-    if compiler := config.get("codeql_kotlin"):
-        path = Path("gradle/libs.versions.toml")
-        path.write_text(re.sub(r'jetbrains-kotlin = "[^"]+"', f'jetbrains-kotlin = "{compiler}"', path.read_text()))
-
-
 def security():
     repository = os.environ["GITHUB_REPOSITORY"]
     ref = "refs/heads/master" if os.environ["GITHUB_EVENT_NAME"] == "push" else os.environ["GITHUB_REF"]
@@ -226,11 +219,11 @@ def publications(destination):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("prepare", "verify-tag", "create-tag", "codeql", "security", "publications"))
+    parser.add_argument("command", choices=("prepare", "verify-tag", "create-tag", "security", "publications"))
     parser.add_argument("value", nargs="?")
     args = parser.parse_args()
     {"prepare": prepare, "verify-tag": lambda: verify_tag(args.value),
-     "create-tag": lambda: create_tag(args.value), "codeql": codeql, "security": security,
+     "create-tag": lambda: create_tag(args.value), "security": security,
      "publications": lambda: publications(args.value)}[args.command]()
 
 

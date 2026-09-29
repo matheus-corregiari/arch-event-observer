@@ -153,13 +153,6 @@ jobs:
         if: matrix.language == 'java-kotlin'
         with:
           cache-disabled: 'true'
-      - uses: actions/setup-python@v7
-        if: matrix.language == 'java-kotlin'
-        with:
-          python-version: '3.12'
-      - name: Select analysis compiler
-        if: matrix.language == 'java-kotlin'
-        run: python .github/scripts/release.py codeql
       - uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
