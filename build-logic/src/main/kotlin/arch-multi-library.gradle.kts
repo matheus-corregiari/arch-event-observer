@@ -44,7 +44,11 @@ extensions.configure<KotlinMultiplatformExtension> {
     }
 
     android {
-        compileSdk = libraries.version("build-sdk-compile").toInt()
+        compileSdk {
+            version = release(libraries.version("build-sdk-compile").toInt()) {
+                minorApiLevel = libraries.version("build-sdk-minor").toInt()
+            }
+        }
         minSdk = libraries.version("build-sdk-min").toInt()
         buildToolsVersion = libraries.version("build-tools")
         namespace = "br.com.arch.toolkit.$formatName"

@@ -6,7 +6,11 @@ plugins {
 
 kotlin {
     android {
-        compileSdk = versionInt(libs.versions.build.sdk.compile)
+        compileSdk {
+            version = release(versionInt(libs.versions.build.sdk.compile)) {
+                minorApiLevel = versionInt(libs.versions.build.sdk.minor)
+            }
+        }
         minSdk = versionInt(libs.versions.build.sdk.min)
         buildToolsVersion = versionString(libs.versions.build.tools)
     }

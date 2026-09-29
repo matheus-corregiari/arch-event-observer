@@ -1,20 +1,13 @@
 /**
- * Configures documentation and coverage tooling for publishable modules.
+ * Configures API documentation tooling for publishable modules.
  *
- * The plugin enables Dokka, Kover, and Jacoco with repository-wide defaults so CI can generate API
- * reference material and coverage reports consistently.
+ * The plugin enables Dokka with repository-wide defaults for API reference material.
  */
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.dokka.gradle.DokkaExtension
 
 plugins {
     id("org.jetbrains.dokka")
-    id("arch-coverage")
-    jacoco
-}
-
-extensions.configure(JacocoPluginExtension::class) {
-    toolVersion = libraries.version("jacoco")
 }
 
 extensions.configure(DokkaExtension::class) {
