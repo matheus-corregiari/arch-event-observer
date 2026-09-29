@@ -28,7 +28,8 @@ import br.com.arch.toolkit.result.DataResult
  *
  * ### Example: Direct Usage in Screen/Preview
  * ```kotlin
- * val resultState by viewModel.flow.collectAsStateWithLifecycle()
+ * // viewModel.state is a StateFlow<DataResult<User>>.
+ * val resultState by viewModel.state.collectAsStateWithLifecycle()
  *
  * DataResultContent(result = resultState) {
  *     OnShowLoading { CircularProgressIndicator() }
@@ -81,7 +82,8 @@ fun <T> DataResultContent(
  *
  * ### Example: Extension Usage
  * ```kotlin
- * val resultState by viewModel.flow.collectAsStateWithLifecycle()
+ * // viewModel.state is a StateFlow<DataResult<User>>.
+ * val resultState by viewModel.state.collectAsStateWithLifecycle()
  *
  * resultState.Content {
  *     OnShowLoading { CircularProgressIndicator() }

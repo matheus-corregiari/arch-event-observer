@@ -16,7 +16,7 @@ The project is split into three public modules:
 ![Test][badge-test]
 [![Coverage][badge-coverage]][link-coverage]
 
-## Requirements
+## Building this checkout
 
 - Kotlin `2.4.20`
 - Gradle wrapper `9.8.0`
@@ -26,6 +26,10 @@ The project is split into three public modules:
 - Use the project wrapper instead of a local Gradle install
 
 ## Overview
+
+The examples on this branch target the **unreleased 2.3.1 candidate**, including its new
+Compose API. For a published version, use the documentation from its Git tag. See the
+[Compose migration guide](docs/modules/event-observer-compose.md#migration-from-the-builder-api).
 
 The library centers on `DataResult<T>` and a small set of wrappers that keep loading, success,
 error, and list-state handling consistent across Android and Compose layers.
@@ -39,8 +43,8 @@ Use `event-observer` when you want:
 
 Use `event-observer-compose` when you want:
 
-- `ComposableDataResult` for declarative state rendering
-- `collectAsComposableState()` for `Flow<DataResult<T>>` and `LiveData<DataResult<T>>`
+- `DataResultContent` and `DataResult.Content` for snapshot rendering
+- `Flow<DataResult<T>>.Content` and `ComposableDataResult(flow)` for collection and rendering
 - Compose observables such as `OnData`, `OnError`, `OnShowLoading`, `OnEmpty`, `OnNotEmpty`,
   `OnSingle`, and `OnMany`
 - a Compose-first API on top of `event-observer`
@@ -171,7 +175,7 @@ The published MkDocs site is built from the same content and mirrors these pages
 
 ## Platform Notes
 
-- `event-observer` is Android-facing and integrates with LiveData.
+- `event-observer` shares result and Flow APIs across KMP targets; LiveData APIs are Android-only.
 - `event-observer-compose` builds on top of `event-observer`, Flow, and Compose state.
 - The API is designed to stay predictable in shared KMP-oriented architecture layers.
 

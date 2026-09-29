@@ -1,5 +1,5 @@
 site_name: Arch Event Observer
-site_description: Kotlin-first observation toolkit with dedicated base and Compose modules.
+site_description: Kotlin-first observation toolkit with result, Compose rendering and saved-state modules.
 site_url: https://matheus-corregiari.github.io/arch-event-observer/
 repo_url: https://github.com/matheus-corregiari/arch-event-observer
 edit_uri: blob/master/docs/

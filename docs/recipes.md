@@ -23,7 +23,9 @@ myFlow.Content {
 
 ## React To List States
 
-Use the list-aware callbacks when the payload is a collection, map, or sequence.
+This example uses a `Flow<DataResult<List<String>>>`. For sequences, materialize a
+finite list first: collection observers count sequence elements and may traverse them
+again. Constrained-once and unbounded sequences are unsuitable for these observers.
 
 ```kotlin
 itemsFlow.Content {

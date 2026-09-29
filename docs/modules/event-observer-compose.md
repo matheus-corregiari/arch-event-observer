@@ -3,6 +3,8 @@
 `event-observer-compose` is the UI-facing module for Jetpack Compose Multiplatform. It provides a
 declarative rendering DSL to handle the states of a `DataResult` or `ResponseFlow`.
 
+This page describes the unreleased 2.3.1 candidate. The [migration section](#migration-from-the-builder-api) lists APIs removed since 2.3.0.
+
 ## Install
 
 ```kotlin
@@ -18,7 +20,7 @@ There are two primary ways to render `DataResult` states in Jetpack Compose:
 1. **Stateless / Direct Rendering (Recommended for UDF and Previews)**:
    Use `DataResultContent(result = ...)` or `result.Content { ... }` when you observe state at the screen level (e.g., via `collectAsStateWithLifecycle()`).
 2. **Flow-Based Collection**:
-   Use `flow.Content { ... }` or `ComposableDataResult(flow = ...) { ... }` to automatically collect and render a `Flow<DataResult<T>>` without intermediate wrapper object allocations.
+   Use `flow.Content { ... }` or `ComposableDataResult(flow = ...) { ... }` to automatically collect and render a `Flow<DataResult<T>>` without creating a builder object.
 
 ---
 
@@ -28,8 +30,10 @@ There are two primary ways to render `DataResult` states in Jetpack Compose:
 
 When following Compose State Hoisting and Unidirectional Data Flow (UDF), collect state at the screen level and pass the `DataResult<T>` snapshot directly to `DataResultContent` or `result.Content`:
 
+Here `viewModel.state` is a `StateFlow<DataResult<User>>`.
+
 ```kotlin
-val resultState by viewModel.flow.collectAsStateWithLifecycle()
+val resultState by viewModel.state.collectAsStateWithLifecycle()
 
 DataResultContent(result = resultState) {
     OnShowLoading { CircularProgressIndicator() }
@@ -38,7 +42,13 @@ DataResultContent(result = resultState) {
 }
 ```
 
-Or using the extension function:
+For a plain `Flow<DataResult<T>>`, supply an initial snapshot when collecting:
+
+```kotlin
+val resultState by viewModel.flow.collectAsStateWithLifecycle(initialValue = dataResultNone())
+```
+
+Or render the collected snapshot using the extension function:
 
 ```kotlin
 resultState.Content {
@@ -161,16 +171,30 @@ The effect restarts when its key changes and is cancelled when it leaves composi
 | `OnResult`      | For the current snapshot, including None.                             |
 | `OnStatus`      | Receives the current status, optionally filtered by data presence.    |
 
+Collection observers also accept maps and sequences. Unlike animation keys, visibility
+checks for sequences count their elements, and `OnSingle` reads the first element again.
+Materialize finite sequences as lists before rendering; do not use constrained-once or
+unbounded sequences with these observers. For maps, `OnSingle<Pair<K, V>>` receives the
+single key/value pair.
+
+Treat `DataResult` payloads as snapshots: emit a new result and a new collection instead
+of mutating a collection in place. Visibility caching and Compose state equality rely
+on observable input changes.
+
 ---
 
 ## State Collection
 
-`Content` uses `collectAsStateWithLifecycle()` when a `LifecycleOwner` is available (defaulting to
-`LocalLifecycleOwner.current`), and collecting only while that owner is at least `STARTED`. A custom owner lets a nested
+`Flow.Content` and `ComposableDataResult` use `collectAsStateWithLifecycle()` by default
+with `LocalLifecycleOwner.current`, collecting only while that owner is at least `STARTED`. A custom owner lets a nested
 screen or navigation entry control collection independently of its parent.
 Pass `owner = null` to use `collectAsState()` until the composable leaves composition;
 this is useful in tests or hosts where lifecycle gating is not desired. Previews can
 use `DataResultContent(result)` without a flow or lifecycle owner.
+
+A plain flow with no initial/replayed value renders nothing until its first emission.
+`StateFlow` and replaying `SharedFlow` provide their current snapshot immediately.
+Snapshot `DataResult.Content` does not collect a flow or access a lifecycle owner.
 
 ## Content scope
 
@@ -179,6 +203,27 @@ a Kotlin `@DslMarker`. Nested receivers resolve
 implicit observer registrations against the nearest content scope.
 
 ## Migration from the builder API
+
+| Removed API                                                   | Replacement                                                                                             |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `result.composable.Unwrap { ... }`                            | `result.Content { ... }` or `DataResultContent(result) { ... }`                                         |
+| `flow.composable.Unwrap { ... }`                              | `flow.Content { ... }` or `ComposableDataResult(flow) { ... }`                                          |
+| `flow.collectAsComposableState()`                             | Collect with `collectAsStateWithLifecycle` and render the snapshot; use `initialValue` for a plain Flow |
+| `liveData.composable` / `liveData.collectAsComposableState()` | Convert with AndroidX `asFlow()`, remember that Flow, and render with `Content`                         |
+| Builder `.outsideComposable { ... }`                          | Explicit `LaunchedEffect` using the rendered snapshot                                                   |
+
+For Android LiveData, keep the converted Flow stable across recompositions:
+
+```kotlin
+import androidx.compose.runtime.remember
+import androidx.lifecycle.asFlow
+import br.com.arch.toolkit.compose.Content
+
+val flow = remember(userLiveData) { userLiveData.asFlow() }
+flow.Content {
+    OnData { user -> Text(user.toString()) }
+}
+```
 
 Replace `flow.composable.Unwrap { ... }`
 with `flow.Content { ... }`. Handle side effects explicitly with `LaunchedEffect`. Pass custom animations

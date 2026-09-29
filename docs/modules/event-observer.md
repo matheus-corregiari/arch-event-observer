@@ -64,10 +64,6 @@ The same typed overloads are available on `DataResult.error`. Use explicit lambd
 parameters (`{ error -> ... }`) or an explicit empty parameter list (`{ -> ... }`)
 to distinguish callbacks with and without an argument.
 
-## API Reference
-
-- [Base module API](../api/event-observer.md)
-
 ### Failures inside observer callbacks
 
 If a callback throws, recovery requires an error observer whose exception type and
@@ -75,3 +71,7 @@ If a callback throws, recovery requires an error observer whose exception type a
 data, so `WithData` handlers cannot handle it. A nonmatching typed handler does not
 silently consume the exception: the wrapper reports `DataResultException` with the
 original failure in `error`. An untyped handler can serve as a fallback.
+
+## API Reference
+
+- [Base module API](../api/event-observer.md)
