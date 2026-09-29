@@ -23,14 +23,15 @@ import br.com.arch.toolkit.result.EventDataStatus
 import br.com.arch.toolkit.result.EventDataStatus.DoesNotMatter
 
 /**
- * A DSL wrapper used to register @Composable state observers for a [ComposableDataResult].
+ * A DSL scope used to register @Composable state observers for a [ComposableDataResult].
  *
  * This class provides a set of `On...` methods to define how different states of a [DataResult]
  * should be rendered in Compose.
  *
  * @param T The type of data being observed.
  */
-class ObserveComposableWrapper<T> internal constructor() {
+@DataResultContentDsl
+class DataResultContentScope<T> internal constructor() {
 
     private val observableList = mutableListOf<ComposeObservable<T, *>>()
     internal val list: List<ComposeObservable<T, *>> get() = observableList
@@ -64,7 +65,7 @@ class ObserveComposableWrapper<T> internal constructor() {
     ) = register(ShowLoadingObservable(dataStatus, func))
 
     /**
-     * Registers a composable to be displayed when the [DataResult] transitions out of a loading state.
+     * Registers a composable to be displayed when the [DataResult] is in a success or error state.
      *
      * @param dataStatus Optional filter for the presence of data.
      * @param func The @Composable content to render.
@@ -185,7 +186,7 @@ class ObserveComposableWrapper<T> internal constructor() {
     // region Status
 
     /**
-     * Registers a composable to be displayed when the [DataResult] matches a specific status.
+     * Registers a composable to be displayed with the current [DataResultStatus], optionally filtered by data presence.
      *
      * @param dataStatus Optional filter for the presence of data.
      * @param func The @Composable content to render, receiving the [DataResultStatus].

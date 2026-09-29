@@ -16,12 +16,12 @@ import br.com.arch.toolkit.result.DataResult
  * Declarative Compose component for rendering the state of a [DataResult].
  *
  * [DataResultContent] receives a static [DataResult] snapshot and dispatches
- * the configured callbacks inside the [ObserveComposableWrapper] scope according to the status:
- * - **Loading** → [ObserveComposableWrapper.OnShowLoading], [ObserveComposableWrapper.OnHideLoading]
- * - **Error** → [ObserveComposableWrapper.OnError]
- * - **Success/Data** → [ObserveComposableWrapper.OnSuccess], [ObserveComposableWrapper.OnData]
- * - **Collections** → [ObserveComposableWrapper.OnEmpty], [ObserveComposableWrapper.OnNotEmpty],
- *   [ObserveComposableWrapper.OnSingle], [ObserveComposableWrapper.OnMany]
+ * the configured callbacks inside the [DataResultContentScope] scope according to the status:
+ * - **Loading** → [DataResultContentScope.OnShowLoading], [DataResultContentScope.OnHideLoading]
+ * - **Error** → [DataResultContentScope.OnError]
+ * - **Success/Data** → [DataResultContentScope.OnSuccess], [DataResultContentScope.OnData]
+ * - **Collections** → [DataResultContentScope.OnEmpty], [DataResultContentScope.OnNotEmpty],
+ *   [DataResultContentScope.OnSingle], [DataResultContentScope.OnMany]
  *
  * ---
  *
@@ -40,20 +40,20 @@ import br.com.arch.toolkit.result.DataResult
  * @param result The [DataResult] snapshot to render.
  * @param modifier Optional [Modifier] to apply to the layout root.
  * @param transitionSpec Optional transition animation spec for state changes. Defaults to `null` (no animation).
- * @param content DSL block on [ObserveComposableWrapper] defining state observers.
+ * @param content DSL block on [DataResultContentScope] defining state observers.
  *
  * @see DataResult
- * @see ObserveComposableWrapper
+ * @see DataResultContentScope
  */
 @Composable
 fun <T> DataResultContent(
     result: DataResult<T>,
     modifier: Modifier = Modifier,
     transitionSpec: (AnimatedContentTransitionScope<DataResult<T>>.() -> ContentTransform)? = null,
-    content: ObserveComposableWrapper<T>.() -> Unit
+    content: DataResultContentScope<T>.() -> Unit
 ) {
     val listToRender = remember(content) {
-        ObserveComposableWrapper<T>().apply(content).list
+        DataResultContentScope<T>().apply(content).list
     }
 
     if (transitionSpec != null) {
@@ -92,7 +92,7 @@ fun <T> DataResultContent(
  * @param T The type of data wrapped in [DataResult].
  * @param modifier Optional [Modifier] to apply to the layout root.
  * @param transitionSpec Optional transition animation spec for state changes. Defaults to `null` (no animation).
- * @param content DSL block on [ObserveComposableWrapper] defining state observers.
+ * @param content DSL block on [DataResultContentScope] defining state observers.
  *
  * @see DataResultContent
  */
@@ -100,14 +100,13 @@ fun <T> DataResultContent(
 fun <T> DataResult<T>.Content(
     modifier: Modifier = Modifier,
     transitionSpec: (AnimatedContentTransitionScope<DataResult<T>>.() -> ContentTransform)? = null,
-    content: ObserveComposableWrapper<T>.() -> Unit
+    content: DataResultContentScope<T>.() -> Unit
 ) = DataResultContent(
     result = this,
     modifier = modifier,
     transitionSpec = transitionSpec,
     content = content
 )
-
 
 /**
  * Animation identity for a [DataResult].
@@ -153,7 +152,6 @@ private enum class CollectionShape {
     Single,
     Many
 }
-
 
 @Composable
 @Suppress("FunctionNaming")

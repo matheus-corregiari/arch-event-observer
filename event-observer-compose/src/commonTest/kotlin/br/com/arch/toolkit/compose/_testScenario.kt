@@ -17,7 +17,7 @@ import br.com.arch.toolkit.result.EventDataStatus
 @OptIn(ExperimentalTestApi::class)
 fun <T> scenario(
     result: DataResult<T>,
-    config: ObserveComposableWrapper<T>.() -> Unit,
+    config: DataResultContentScope<T>.() -> Unit,
     assert: ComposeUiTest.() -> Unit
 ) = animationScenario(
     result = result,
@@ -30,7 +30,7 @@ fun <T> scenario(
 fun <T> animationScenario(
     result: DataResult<T>,
     transitionSpec: (AnimatedContentTransitionScope<DataResult<T>>.() -> ContentTransform)? = null,
-    config: ObserveComposableWrapper<T>.() -> Unit,
+    config: DataResultContentScope<T>.() -> Unit,
     assert: ComposeUiTest.() -> Unit
 ) = withGraphicsReady {
     runComposeUiTest {
@@ -47,15 +47,15 @@ fun <T> animationScenario(
     }
 }
 
-val stringConfig: ObserveComposableWrapper<String>.() -> Unit =
+val stringConfig: DataResultContentScope<String>.() -> Unit =
     { createConfig<String, String>() }
-val iterableConfig: ObserveComposableWrapper<Collection<String>>.() -> Unit =
+val iterableConfig: DataResultContentScope<Collection<String>>.() -> Unit =
     { createConfig<Collection<String>, String>() }
-val mapConfig: ObserveComposableWrapper<Map<String, String>>.() -> Unit =
+val mapConfig: DataResultContentScope<Map<String, String>>.() -> Unit =
     { createConfig<Map<String, String>, Pair<String, String>>() }
 
 @Suppress("LongMethod")
-private fun <T, R> ObserveComposableWrapper<T>.createConfig() {
+private fun <T, R> DataResultContentScope<T>.createConfig() {
     // Data
     OnData { data ->
         BasicText("$data", modifier = Modifier.testTag("dataTag1"))

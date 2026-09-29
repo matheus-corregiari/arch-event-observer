@@ -25,7 +25,7 @@ class DataResultContentTest : PlatformTest() {
 
     private fun <T> directContentScenario(
         result: DataResult<T>,
-        config: ObserveComposableWrapper<T>.() -> Unit,
+        config: DataResultContentScope<T>.() -> Unit,
         assert: ComposeUiTest.() -> Unit
     ) = withGraphicsReady {
         runComposeUiTest {
@@ -44,7 +44,7 @@ class DataResultContentTest : PlatformTest() {
 
     private fun <T> extensionContentScenario(
         result: DataResult<T>,
-        config: ObserveComposableWrapper<T>.() -> Unit,
+        config: DataResultContentScope<T>.() -> Unit,
         assert: ComposeUiTest.() -> Unit
     ) = withGraphicsReady {
         runComposeUiTest {

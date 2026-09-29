@@ -70,5 +70,4 @@ class DataResultAnimationKeyTest {
 
         assertEquals("One", sequence.first())
     }
-
 }

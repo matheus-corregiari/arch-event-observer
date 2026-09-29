@@ -2,21 +2,15 @@ package br.com.arch.toolkit.compose.observable
 
 import androidx.compose.runtime.Composable
 import br.com.arch.toolkit.result.DataResult
-import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
- * Base sealed class for wiring a [DataResult] stream into Compose UI updates.
+ * Selects and renders content from the current [DataResult] snapshot.
  *
- * Each subclass holds an internal [MutableStateFlow] of type [R], which represents
- * the transformed or raw content to be displayed in Compose. Subclasses must
- * emit into [flow] (e.g. `flow.value = newValue`) when their conditions are met.
+ * Implementations evaluate visibility without collecting a flow and pass the
+ * snapshot values to their registered composable content.
  *
  * @param T the type of the data carried by the source [DataResult]
- * @param R the type of the content emitted to Compose views
- *
- * @see MutableStateFlow
- * @see br.com.arch.toolkit.compose.ComposableDataResult
- *
+ * @param R the type of the content passed to Compose views
  */
 internal sealed class ComposeObservable<T, R> {
     /**
@@ -29,11 +23,7 @@ internal sealed class ComposeObservable<T, R> {
     /**
      * Invoked inside a @Composable context to render UI based on [result].
      *
-     * Subclasses should collect from [result] and display non-null values,
-     * for example:
-     * ```kotlin
-     * flow.collectAsState().value?.let { content -> /* render content */ }
-     * ```
+     * Implementations render values directly from this snapshot.
      */
     @Composable
     @Suppress("FunctionNaming")

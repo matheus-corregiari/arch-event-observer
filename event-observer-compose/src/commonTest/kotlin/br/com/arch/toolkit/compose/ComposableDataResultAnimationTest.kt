@@ -9,15 +9,15 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.assertDoesNotExist
-import androidx.compose.ui.test.v2.runComposeUiTest
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.v2.runComposeUiTest
 import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.result.DataResultStatus
 import br.com.arch.toolkit.test.PlatformTest
@@ -32,7 +32,7 @@ class ComposableDataResultAnimationTest : PlatformTest() {
     }
 
     @Test
-    fun `default animation renders content`() = animationScenario(
+    fun `default rendering works without animation`() = animationScenario(
         result = DataResult("Data", null, DataResultStatus.SUCCESS),
         config = {
             OnData { data ->
@@ -61,8 +61,9 @@ class ComposableDataResultAnimationTest : PlatformTest() {
     )
 
     @Test
-    fun `same animation key updates payload content without keeping stale UI`() = withGraphicsReady {
+    fun `same key preserves remembered state while updating payload`() = withGraphicsReady {
         var result by mutableStateOf(DataResult("First", null, DataResultStatus.SUCCESS))
+        var contentInstances = 0
 
         runComposeUiTest {
             setContent {
@@ -71,18 +72,19 @@ class ComposableDataResultAnimationTest : PlatformTest() {
                     transitionSpec = { fadeIn() togetherWith fadeOut() }
                 ) {
                     OnData { data ->
-                        BasicText(data, modifier = Modifier.testTag("payload"))
+                        val instance = remember { ++contentInstances }
+                        BasicText("$data/$instance", modifier = Modifier.testTag("payload"))
                     }
                 }
             }
 
-            onNodeWithTag("payload").assertTextEquals("First")
+            onNodeWithTag("payload").assertTextEquals("First/1")
             runOnIdle {
                 result = DataResult("Second", null, DataResultStatus.SUCCESS)
             }
             waitForIdle()
 
-            onNodeWithTag("payload").assertTextEquals("Second")
+            onNodeWithTag("payload").assertTextEquals("Second/1")
         }
     }
 
@@ -98,7 +100,7 @@ class ComposableDataResultAnimationTest : PlatformTest() {
                     result = result,
                     transitionSpec = { fadeIn() togetherWith fadeOut() }
                 ) {
-                    OnEmpty {
+                    OnEmpty { ->
                         BasicText("empty", modifier = Modifier.testTag("empty"))
                     }
                     OnSingle<String> {
@@ -119,5 +121,4 @@ class ComposableDataResultAnimationTest : PlatformTest() {
             onNodeWithTag("empty").assertDoesNotExist()
         }
     }
-
 }

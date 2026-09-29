@@ -12,16 +12,13 @@ package br.com.arch.toolkit.compose
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import br.com.arch.toolkit.result.DataResult
-import br.com.arch.toolkit.result.ObserveWrapper
 import br.com.arch.toolkit.util.valueOrNull
 import kotlinx.coroutines.flow.Flow
 
@@ -44,8 +41,7 @@ import kotlinx.coroutines.flow.Flow
  * @param modifier Optional [Modifier] to apply to the layout root.
  * @param owner Optional [LifecycleOwner] for lifecycle-aware collection.
  * @param transitionSpec Optional transition animation spec for state changes. Defaults to `null`.
- * @param outsideComposable Optional non-composable side effects block.
- * @param content DSL block on [ObserveComposableWrapper] defining state observers.
+ * @param content DSL block on [DataResultContentScope] defining state observers.
  */
 @Composable
 fun <T> ComposableDataResult(
@@ -53,20 +49,14 @@ fun <T> ComposableDataResult(
     modifier: Modifier = Modifier,
     owner: LifecycleOwner? = LocalLifecycleOwner.current,
     transitionSpec: (AnimatedContentTransitionScope<DataResult<T>>.() -> ContentTransform)? = null,
-    outsideComposable: (ObserveWrapper<T>.() -> Unit)? = null,
-    content: ObserveComposableWrapper<T>.() -> Unit
+    content: DataResultContentScope<T>.() -> Unit
 ) {
-    val currentOutsideComposable by rememberUpdatedState(outsideComposable)
     val state: DataResult<T>? by if (owner != null) {
         flow.collectAsStateWithLifecycle(flow.valueOrNull(), owner)
     } else {
         flow.collectAsState(flow.valueOrNull())
     }
     val resultState = state ?: return
-
-    LaunchedEffect(resultState) {
-        resultState.unwrap { currentOutsideComposable?.invoke(this) }
-    }
 
     DataResultContent(
         result = resultState,
@@ -95,21 +85,18 @@ fun <T> ComposableDataResult(
  * @param modifier Optional [Modifier] to apply to the layout root.
  * @param owner Optional [LifecycleOwner] for lifecycle-aware collection.
  * @param transitionSpec Optional transition animation spec for state changes. Defaults to `null`.
- * @param outsideComposable Optional non-composable side effects block.
- * @param content DSL block on [ObserveComposableWrapper] defining state observers.
+ * @param content DSL block on [DataResultContentScope] defining state observers.
  */
 @Composable
 fun <T> Flow<DataResult<T>>.Unwrap(
     modifier: Modifier = Modifier,
     owner: LifecycleOwner? = LocalLifecycleOwner.current,
     transitionSpec: (AnimatedContentTransitionScope<DataResult<T>>.() -> ContentTransform)? = null,
-    outsideComposable: (ObserveWrapper<T>.() -> Unit)? = null,
-    content: ObserveComposableWrapper<T>.() -> Unit
+    content: DataResultContentScope<T>.() -> Unit
 ) = ComposableDataResult(
     flow = this,
     modifier = modifier,
     owner = owner,
     transitionSpec = transitionSpec,
-    outsideComposable = outsideComposable,
     content = content
 )
