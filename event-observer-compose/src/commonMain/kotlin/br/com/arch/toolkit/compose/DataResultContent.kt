@@ -7,6 +7,7 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import br.com.arch.toolkit.compose.observable.ComposeObservable
@@ -114,8 +115,12 @@ private fun <T> RenderVisibleContent(
     observables: List<ComposeObservable<T, *>>,
     result: DataResult<T>
 ) {
-    observables.forEach { observable ->
-        if (observable.hasVisibleContent(result)) {
+    val visibleContent = remember(result, observables) {
+        observables.withIndex().filter { it.value.hasVisibleContent(result) }
+    }
+    visibleContent.forEach { (index, observable) ->
+        // Keep registration identity when preceding observers become hidden.
+        key(index) {
             observable.Content(result)
         }
     }

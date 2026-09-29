@@ -104,6 +104,13 @@ flow.Content(
 
 By default, `transitionSpec` is `null`, so content renders without animation.
 
+Observer registrations are remembered by the content lambda. Stable lambdas reuse the
+registrations; changed captures rebuild them so rendered callbacks stay current.
+Visibility is filtered once per result and observer list inside each animated content
+slot, preserving outgoing snapshots during transitions. Registration keys preserve
+remembered state when an earlier observer becomes hidden. This trades a filtered-list
+allocation on changes for avoiding repeated visibility checks on unchanged inputs.
+
 All matching observers render together, in registration order: for example, `OnSuccess`,
 `OnData` and `OnStatus` can render the same snapshot. Selecting only the first match
 would discard content. The animated container stays composed even when no observer
