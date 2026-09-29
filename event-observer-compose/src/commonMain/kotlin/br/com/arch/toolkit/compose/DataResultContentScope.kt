@@ -33,8 +33,8 @@ import br.com.arch.toolkit.result.EventDataStatus.DoesNotMatter
 @DataResultContentDsl
 class DataResultContentScope<T> internal constructor() {
 
-    private val observableList = mutableListOf<ComposeObservable<T, *>>()
-    internal val list: List<ComposeObservable<T, *>> get() = observableList
+    internal val list: List<ComposeObservable<T, *>>
+        field = mutableListOf<ComposeObservable<T, *>>()
 
     // region Success
 
@@ -320,8 +320,8 @@ class DataResultContentScope<T> internal constructor() {
     ) = register(ManyObservable(func))
     // endregion
 
-    internal fun clear() = observableList.clear()
+    internal fun clear() = list.clear()
     private fun register(observable: ComposeObservable<T, *>) {
-        observableList.add(observable)
+        list.add(observable)
     }
 }

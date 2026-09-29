@@ -39,7 +39,8 @@ import kotlinx.coroutines.flow.Flow
  * @param T The type of data wrapped in [DataResult].
  * @param flow The [Flow] emitting [DataResult] values.
  * @param modifier Optional [Modifier] to apply to the layout root.
- * @param owner Optional [LifecycleOwner] for lifecycle-aware collection.
+ * @param owner Collects while this owner is at least STARTED; defaults to [LocalLifecycleOwner].
+ * Pass `null` to collect for the lifetime of the composition without lifecycle gating.
  * @param transitionSpec Optional transition animation spec for state changes. Defaults to `null`.
  * @param content DSL block on [DataResultContentScope] defining state observers.
  */
@@ -74,7 +75,7 @@ fun <T> ComposableDataResult(
  *
  * ### Example
  * ```kotlin
- * viewModel.flow.Unwrap {
+ * viewModel.flow.Content {
  *     OnShowLoading { CircularProgressIndicator() }
  *     OnData { user -> Text("Hello ${user.name}") }
  *     OnError { e -> Text("Error: ${e.message}") }
@@ -83,12 +84,13 @@ fun <T> ComposableDataResult(
  *
  * @param T The type of data wrapped in [DataResult].
  * @param modifier Optional [Modifier] to apply to the layout root.
- * @param owner Optional [LifecycleOwner] for lifecycle-aware collection.
+ * @param owner Collects while this owner is at least STARTED; defaults to [LocalLifecycleOwner].
+ * Pass `null` to collect for the lifetime of the composition without lifecycle gating.
  * @param transitionSpec Optional transition animation spec for state changes. Defaults to `null`.
  * @param content DSL block on [DataResultContentScope] defining state observers.
  */
 @Composable
-fun <T> Flow<DataResult<T>>.Unwrap(
+fun <T> Flow<DataResult<T>>.Content(
     modifier: Modifier = Modifier,
     owner: LifecycleOwner? = LocalLifecycleOwner.current,
     transitionSpec: (AnimatedContentTransitionScope<DataResult<T>>.() -> ContentTransform)? = null,

@@ -148,12 +148,12 @@ class DataResultContentTest : PlatformTest() {
     )
 
     @Test
-    fun `Flow Unwrap renders SUCCESS state correctly`() = withGraphicsReady {
+    fun `Flow Content renders SUCCESS state correctly`() = withGraphicsReady {
         val flow = MutableStateFlow(DataResult("Hello Flow", null, DataResultStatus.SUCCESS))
         runComposeUiTest {
             setContent {
                 Column {
-                    flow.Unwrap(owner = null, content = stringConfig)
+                    flow.Content(owner = null, content = stringConfig)
                 }
             }
             runOnIdle {
