@@ -4,6 +4,7 @@ package br.com.arch.toolkit.result
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlin.jvm.JvmName
 import kotlin.reflect.KClass
 
 /**
@@ -215,18 +216,21 @@ data class DataResult<T>(
     /**
      * Invokes [func] with [error] when it is an instance of [E].
      */
+    @JvmName("errorTyped")
     inline fun <reified E : Throwable> error(noinline func: suspend (E) -> Unit) =
         error(E::class, func)
 
     /**
      * Invokes [func] when [error] is an instance of [E].
      */
+    @JvmName("errorTyped")
     inline fun <reified E : Throwable> error(noinline func: suspend () -> Unit) =
         error(E::class, func)
 
     /**
      * Transforms [error] before invoking [func] when it is an instance of [E].
      */
+    @JvmName("errorTyped")
     inline fun <reified E : Throwable, R> error(
         noinline transformer: suspend (E) -> R,
         noinline func: suspend (R) -> Unit

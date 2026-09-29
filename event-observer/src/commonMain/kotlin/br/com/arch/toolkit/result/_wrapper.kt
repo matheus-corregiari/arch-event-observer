@@ -19,6 +19,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.coroutineContext
+import kotlin.jvm.JvmName
 import kotlin.reflect.KClass
 
 /**
@@ -194,6 +195,7 @@ class ObserveWrapper<T> internal constructor() {
     /**
      * Runs [observer] when the error is an instance of [E].
      */
+    @JvmName("errorTyped")
     inline fun <reified E : Throwable> error(
         single: Boolean = false,
         dataStatus: EventDataStatus = DoesNotMatter,
@@ -203,6 +205,7 @@ class ObserveWrapper<T> internal constructor() {
     /**
      * Runs [observer] when the error is an instance of [E].
      */
+    @JvmName("errorTyped")
     inline fun <reified E : Throwable> error(
         single: Boolean = false,
         dataStatus: EventDataStatus = DoesNotMatter,
@@ -212,6 +215,7 @@ class ObserveWrapper<T> internal constructor() {
     /**
      * Transforms the error before invoking [observer] when it is an instance of [E].
      */
+    @JvmName("errorTyped")
     inline fun <reified E : Throwable, R> error(
         single: Boolean = false,
         dataStatus: EventDataStatus = DoesNotMatter,
