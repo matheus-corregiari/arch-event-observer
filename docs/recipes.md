@@ -6,7 +6,7 @@ Use the loading callbacks directly from `DataResult` or, in the Compose module,
 `ComposableDataResult`.
 
 ```kotlin
-myFlow.Unwrap {
+myFlow.Content {
     OnShowLoading { CircularProgressIndicator() }
     OnHideLoading { Text("Done") }
 }
@@ -15,7 +15,7 @@ myFlow.Unwrap {
 ## Show Data Or Error
 
 ```kotlin
-myFlow.Unwrap {
+myFlow.Content {
     OnData { value -> Text(value.toString()) }
     OnError { error -> Text(error.message ?: "Unknown error") }
 }
@@ -26,7 +26,7 @@ myFlow.Unwrap {
 Use the list-aware callbacks when the payload is a collection, map, or sequence.
 
 ```kotlin
-itemsFlow.Unwrap {
+itemsFlow.Content {
     OnEmpty { -> Text("No items") }
     OnNotEmpty { items -> Text("Items: ${items.size}") }
     OnSingle<String> { item -> Text("One item: $item") }
@@ -87,7 +87,7 @@ Pass an optional `transitionSpec` to animate structural state changes with `Anim
 The default `null` renders content without animation.
 
 ```kotlin
-myFlow.Unwrap(
+myFlow.Content(
     modifier = Modifier.padding(16.dp),
     transitionSpec = {
         slideInVertically() + fadeIn() togetherWith (slideOutVertically() + fadeOut())

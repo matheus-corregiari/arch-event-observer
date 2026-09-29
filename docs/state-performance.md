@@ -26,10 +26,10 @@ Two kinds of tests serve different purposes:
 
 A local Windows/JDK 21 instrumented run produced:
 
-| Items | Asynchronous save | 100 subsequent UI reads |
-| --- | --- | --- |
-| 100,000 | 155 ms | 2.8 ms |
-| 1,000,000 | 556 ms | 0.6 ms |
+| Items     | Asynchronous save | 100 subsequent UI reads |
+| --------- | ----------------- | ----------------------- |
+| 100,000   | 155 ms            | 2.8 ms                  |
+| 1,000,000 | 556 ms            | 0.6 ms                  |
 
 Encoding and decoding ran on workers, and the reads performed no additional codec calls. These are observations, not latency guarantees or release benchmarks.
 The gating tests passed after the change. Garbage collection, device contention, rendering and the

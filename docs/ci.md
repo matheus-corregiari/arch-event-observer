@@ -23,14 +23,14 @@ at `release/1.0.0`.
 
 ## Required gates
 
-| Check | Command or responsibility |
-|---|---|
-| Release Policy | Python policy unit tests and validation against remote tags |
-| Coverage Gate | `./gradlew ciBuild ciCoverage`: assemble, tests, merged coverage verification |
-| Static Analysis | `./gradlew ciLint`: Detekt, ktlint and available Android lint tasks |
-| Docs Gate | `./gradlew ciDocs`, then `python -m mkdocs build --strict` |
-| CodeQL | `./gradlew ciCodeql`: JVM/Android compilation; also analyzes Actions and Python |
-| CI Gate | Requires successful completion of every gate, including policy |
+| Check           | Command or responsibility                                                       |
+| --------------- | ------------------------------------------------------------------------------- |
+| Release Policy  | Python policy unit tests and validation against remote tags                     |
+| Coverage Gate   | `./gradlew ciBuild ciCoverage`: assemble, tests, merged coverage verification   |
+| Static Analysis | `./gradlew ciLint`: Detekt, ktlint and available Android lint tasks             |
+| Docs Gate       | `./gradlew ciDocs`, then `python -m mkdocs build --strict`                      |
+| CodeQL          | `./gradlew ciCodeql`: JVM/Android compilation; also analyzes Actions and Python |
+| CI Gate         | Requires successful completion of every gate, including policy                  |
 
 `ciCoverage` already includes `ciTest`. There is no second test job. Projects with Apple targets use
 macOS for build/tests/publication; Android uses Linux. The same build job owns all supported targets,

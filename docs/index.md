@@ -45,7 +45,7 @@ result.unwrap {
 ```
 
 ```kotlin
-myFlow.Unwrap {
+myFlow.Content {
     OnShowLoading { CircularProgressIndicator() }
     OnData { value -> Text(value.toString()) }
     OnError { error -> Text(error.message ?: "Unknown error") }

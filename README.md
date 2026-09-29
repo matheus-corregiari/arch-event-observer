@@ -19,10 +19,10 @@ The project is split into three public modules:
 ## Requirements
 
 - Kotlin `2.4.20`
-- Gradle wrapper `9.7.1`
+- Gradle wrapper `9.8.0`
 - JDK `21` via the Gradle toolchain
-- Android `minSdk 23` and `compileSdk 37`
-- Compose Multiplatform `1.12.0` with iOS ARM targets
+- Android `minSdk 23` and `compileSdk 37.2`
+- Compose Multiplatform `1.12.1` with iOS ARM targets
 - Use the project wrapper instead of a local Gradle install
 
 ## Overview
@@ -114,11 +114,11 @@ result.unwrap {
 }
 ```
 
-For Compose, convert the upstream state into a `ComposableDataResult` and render the blocks you care
+For Compose, collect and render the upstream state with `Content`, selecting the blocks you care
 about.
 
 ```kotlin
-myFlow.Unwrap {
+myFlow.Content {
     OnShowLoading { CircularProgressIndicator() }
     OnData { value -> Text(value.toString()) }
     OnError { error -> Text(error.message ?: "Unknown error") }
@@ -199,18 +199,12 @@ limitations under the License.
 
 [link-coverage]: https://codecov.io/gh/matheus-corregiari/arch-event-observer
 [link-release]: https://github.com/matheus-corregiari/arch-event-observer/releases/latest
-
 [badge-kotlin]: https://img.shields.io/badge/kotlin-2.4.20-blue.svg?logo=kotlin
 [badge-release]: https://img.shields.io/github/v/release/matheus-corregiari/arch-event-observer
-
 [badge-license]: https://img.shields.io/github/license/matheus-corregiari/arch-event-observer
-
 [badge-coverage]: https://codecov.io/gh/matheus-corregiari/arch-event-observer/graph/badge.svg?token=146UU167K6
-
 [badge-lint]: https://github.com/matheus-corregiari/arch-event-observer/actions/workflows/ci.yml/badge.svg
-
 [badge-test]: https://github.com/matheus-corregiari/arch-event-observer/actions/workflows/ci.yml/badge.svg
-
 
 ## Saved screen state
 

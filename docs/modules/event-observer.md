@@ -67,3 +67,11 @@ to distinguish callbacks with and without an argument.
 ## API Reference
 
 - [Base module API](../api/event-observer.md)
+
+### Failures inside observer callbacks
+
+If a callback throws, recovery requires an error observer whose exception type and
+`dataStatus` match the replayed error result. Recovery uses an error result without
+data, so `WithData` handlers cannot handle it. A nonmatching typed handler does not
+silently consume the exception: the wrapper reports `DataResultException` with the
+original failure in `error`. An untyped handler can serve as a fallback.

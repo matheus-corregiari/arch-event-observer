@@ -68,11 +68,11 @@ userLiveData.observe(this) {
 
 ## Render It In Compose
 
-Add `event-observer-compose`, then render a `Flow<DataResult<T>>` using `Unwrap`.
+Add `event-observer-compose`, then render a `Flow<DataResult<T>>` using `Content`.
 For a static `DataResult<T>`, use `Content` or `DataResultContent`.
 
 ```kotlin
-myFlow.Unwrap {
+myFlow.Content {
     OnShowLoading { CircularProgressIndicator() }
     OnData { value -> Text(value.toString()) }
     OnError { error -> Text(error.message ?: "Unknown error") }
