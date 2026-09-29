@@ -118,11 +118,11 @@ For Compose, convert the upstream state into a `ComposableDataResult` and render
 about.
 
 ```kotlin
-myFlow.composable
-    .OnShowLoading { CircularProgressIndicator() }
-    .OnData { value -> Text(value.toString()) }
-    .OnError { error -> Text(error.message ?: "Unknown error") }
-    .Unwrap()
+myFlow.Unwrap {
+    OnShowLoading { CircularProgressIndicator() }
+    OnData { value -> Text(value.toString()) }
+    OnError { error -> Text(error.message ?: "Unknown error") }
+}
 ```
 
 For saved state, declare a shared ViewModel and start a new operation on refresh:

@@ -76,7 +76,7 @@ These APIs live in [`event-observer`](modules/event-observer.md).
 
 ## Compose
 
-`ComposableDataResult<T>` turns a `Flow<DataResult<T>>` into a declarative Compose DSL.
+`ComposableDataResult(flow)` turns a `Flow<DataResult<T>>` into a declarative Compose DSL.
 
 It renders common blocks such as:
 
@@ -91,8 +91,8 @@ It renders common blocks such as:
 - `OnSingle`
 - `OnMany`
 
-It also supports optional animation configuration and non-Compose side effects through
-`outsideComposable`.
+It supports optional animations through `transitionSpec`. Handle side effects explicitly
+with Compose `LaunchedEffect`.
 
 These APIs live in [`event-observer-compose`](modules/event-observer-compose.md).
 

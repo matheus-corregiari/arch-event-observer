@@ -54,7 +54,7 @@ This approach is **@Preview friendly** and allows instant rendering in Android S
 @Preview
 @Composable
 fun SuccessPreview() {
-    DataResult.success("Hello World").Content {
+    dataResultSuccess("Hello World").Content {
         OnData { text -> Text(text) }
     }
 }
@@ -102,33 +102,33 @@ flow.Unwrap(
 }
 ```
 
-By default, `transitionSpec` is `null` in `DataResultContent` and `flow.Unwrap` (no animation overhead).
+By default, `transitionSpec` is `null`, so content renders without animation.
+
+With animation enabled, payload updates preserve the content identity when status, data/error presence and collection shape stay the same. Empty, single and multiple-item collections have distinct keys. Sequence keys do not traverse their elements.
 
 ---
 
 ### Side Effects (Non-Compose)
 
-For `flow.Unwrap`, pass `outsideComposable` parameter to trigger non-UI side effects:
+Handle side effects explicitly with `LaunchedEffect`. Collect the state once and share
+the same snapshot between the effect and `DataResultContent`. In this example,
+`viewModel.state` is a `StateFlow<DataResult<T>>`:
 
 ```kotlin
-flow.Unwrap(
-    outsideComposable = {
-        error { throwable -> Logger.log(throwable) }
-    }
-) {
-    OnData { data -> Text(data) }
-}
-```
+val resultState by viewModel.state.collectAsStateWithLifecycle()
 
-When using direct `DataResultContent`, handle non-UI side effects using standard Compose `LaunchedEffect`:
-
-```kotlin
 LaunchedEffect(resultState) {
-    resultState.unwrap {
-        error { throwable -> Logger.log(throwable) }
+    if (resultState.isError) {
+        resultState.error?.let { Logger.log(it) }
     }
 }
+
+DataResultContent(result = resultState) {
+    OnData { data -> Text(data.toString()) }
+}
 ```
+
+The effect restarts when its key changes and is cancelled when it leaves composition.
 
 ---
 
@@ -139,15 +139,15 @@ LaunchedEffect(resultState) {
 | `OnData`        | Data is present, regardless of status (Success, Error, Loading). |
 | `OnSuccess`     | `DataResult` is Success.                                         |
 | `OnShowLoading` | `DataResult` is Loading.                                         |
-| `OnHideLoading` | `DataResult` transitions out of Loading.                         |
+| `OnHideLoading` | `DataResult` is Success or Error; no prior Loading state is required.                         |
 | `OnError`       | `DataResult` is Error.                                           |
 | `OnEmpty`       | Data is a collection and it is empty.                            |
 | `OnNotEmpty`    | Data is a collection and it is NOT empty.                        |
 | `OnSingle`      | Data is a collection and has exactly one item.                   |
 | `OnMany`        | Data is a collection and has multiple items.                     |
 | `OnNone`        | `DataResult` is in the 'None' state.                             |
-| `OnResult`      | On every emission.                                               |
-| `OnStatus`      | Matches a specific `DataResultStatus`.                           |
+| `OnResult`      | For the current snapshot, including None.                                               |
+| `OnStatus`      | Receives the current status, optionally filtered by data presence.                           |
 
 ---
 
@@ -155,3 +155,19 @@ LaunchedEffect(resultState) {
 
 `Unwrap` uses `collectAsStateWithLifecycle()` when a `LifecycleOwner` is available (defaulting to
 `LocalLifecycleOwner.current`), ensuring efficient and lifecycle-aware collection.
+
+## Content scope
+
+The content receiver `DataResultContentScope<T>` carries `@DataResultContentDsl`,
+a Kotlin `@DslMarker`. Nested receivers resolve
+implicit observer registrations against the nearest content scope.
+
+## Migration from the builder API
+
+Replace `flow.composable.Unwrap { ... }`
+with `flow.Unwrap { ... }`. Handle side effects explicitly with `LaunchedEffect`. Pass custom animations
+through `transitionSpec`; the former `AnimationConfig` and its global defaults
+are removed. The default is now no animation. Explicit references to
+`ObserveComposableWrapper<T>` must become `DataResultContentScope<T>`.
+
+These are source and binary incompatible changes for existing Compose consumers.
