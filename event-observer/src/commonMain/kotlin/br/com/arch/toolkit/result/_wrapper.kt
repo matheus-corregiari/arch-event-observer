@@ -46,7 +46,13 @@ class ObserveWrapper<T> internal constructor() {
             is DataResultException, is DataResultTransformationException -> throw cause
         }
 
-        if (eventList.none { it is ErrorEvent }) {
+        val errorResult = dataResultError<T>(throwable)
+        val hasMatchingHandler = eventList.any {
+            it is ErrorEvent &&
+                it.shouldHandle(throwable) &&
+                it.dataStatus.considerEvent(errorResult)
+        }
+        if (!hasMatchingHandler) {
             throw DataResultException(
                 message = "Any error event found, please add one error { ... } to retry",
                 error = throwable
@@ -55,7 +61,7 @@ class ObserveWrapper<T> internal constructor() {
 
         suspendFunc {
             runCatching {
-                handleResult(dataResultError(throwable))
+                handleResult(errorResult)
             }.onFailure {
                 throw DataResultException(
                     message = "Error retried but without any success",
