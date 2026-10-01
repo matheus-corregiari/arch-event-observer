@@ -44,6 +44,7 @@ nav:
   - Ecosystem: ecosystem.md
   - Changelog:
       - Overview: changelog/index.md
+      - Upcoming major: changelog/upcoming-major.md
       - "2.3.1": changelog/2.3.1.md
       - "2.3.0": changelog/2.3.0.md
       - "2.2.1": changelog/2.2.1.md

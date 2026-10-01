@@ -12,6 +12,10 @@ The repository is split into three public modules:
 This branch documents the unreleased **2.3.1 candidate**. For released APIs, use the
 documentation from the corresponding Git tag. See the [Compose migration guide](modules/event-observer-compose.md#migration-from-the-builder-api).
 
+State modernization in this checkout targets the **next major release**, not the hotfix.
+See [state migration](migration-state.md#upcoming-major-version-privately-owned-state) and
+[major-release validation status](changelog/upcoming-major.md).
+
 ## What You Get
 
 - A single `DataResult<T>` model for success, loading, error, and neutral states

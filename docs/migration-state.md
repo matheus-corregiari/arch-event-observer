@@ -60,3 +60,25 @@ Loading and errors are transient. `savedStateHandleCompat()` and `enableSavedSta
 from the old README were not implemented APIs and are not provided here.
 
 See the [module guide](modules/event-observer-state.md) for complete operation and platform semantics.
+
+## Upcoming major version: privately owned state
+
+The next major version publishes payload and result status from one immutable snapshot.
+Public holder/delegate APIs and the saved JSON format stay compatible; existing JSON strings,
+keys, `Json` configuration and explicit serializers need no conversion. Payload restoration
+still produces Success for non-null data and None for null.
+
+The behavioral change is ownership: an active holder no longer observes direct writes to its
+SavedStateHandle key. Replace `handle[key] = json` with `holder.set(payload)` for small values
+or `holder.setAsync(payload)` for expensive writes. Do not create two active holders or a raw
+handle flow for the same key. Fallback/property delegates obey the same rule. Separate restored
+owners/handles remain supported.
+
+Async operations prepare a detached payload, JSON and deep comparisons on the worker, then
+save and publish on the owner. A collector can clear, replace or cancel synchronously without
+an older publication overwriting its status. Synchronous setters, restore and cheap selectors
+still execute on their caller. Default equality suppression is retained; equal payloads reuse
+the previous immutable value. Throwable identity determines whether an error is a new result.
+
+This change is intended for a major release, not the 2.3.1 hotfix. No persistence guarantees
+are added for platforms without a restoring owner, and no automatic disk storage is introduced.

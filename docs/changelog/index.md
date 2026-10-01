@@ -2,6 +2,8 @@
 
 ## Planned
 
+- [Upcoming major: state modernization](upcoming-major.md)
+
 - [2.3.1](2.3.1.md)
 
 ## Tagged releases

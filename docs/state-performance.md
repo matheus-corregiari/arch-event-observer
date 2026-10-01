@@ -67,7 +67,7 @@ There is no universal promise that arbitrary code can never freeze the UI:
 
 - `set`, delegated property assignments, construction/restoration and `select` are synchronous APIs.
   Initial restoration still decodes on the caller thread. Use compact saved models and asynchronous
-  operations/projections for expensive updates. External raw-key writes also decode on the next read.
+  operations/projections for expensive updates. Raw writes to a privately owned key are unsupported.
 - On JVM/Android and Native, `Dispatchers.Default` uses background threads. On browser JS/Wasm,
   changing dispatcher does not create a worker thread. A single huge synchronous serializer or mapper
   can still block the event loop. Split work with suspension points (for example `yield()` between
@@ -86,3 +86,76 @@ The tests demonstrate worker separation and avoidance of repeated computation. T
 References: [Default dispatcher](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-default.html),
 [Main dispatcher](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-main.html),
 and [cooperative yield](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/yield.html).
+
+## Snapshot publication in the upcoming major version
+
+Holder flows project one immutable snapshot held by MutableStateFlow. Revision identities
+make publication and built-in payload/result projections independent of deep payload equality.
+Async preparation includes encoding, detached decoding and equality comparison on the worker.
+`selectAsync` also publishes its projected value and compares outputs on the worker, under the
+original scope Job; an expensive output equality check therefore does not migrate back to the UI.
+If the owner changes while comparison runs, it is repeated on the worker before committing.
+The handle receives prepared JSON before publication. There is no post-publication mutation.
+Equal payloads reuse the previous immutable payload. User `select` functions and their output
+equality run in their collector context and must remain cheap; `selectAsync` is the heavy-work API.
+
+The platform still copies/marshals saved JSON synchronously. Pre-encoding does not eliminate
+that cost or Android's saved-state size limit. Restore decodes once on the owner to preserve
+immediate initial reads. Custom serializers and equality implementations must be safe for workers.
+
+`PublicationPerformanceTest` measures 100, 1,000 and 10,000 integer records with live data/result
+subscribers. It asserts codecs and payload equality stay off the owner and prints JSON byte size,
+async latency, 100-read time and allocated bytes on the owner. JVM allocation counts come from
+ThreadMXBean and include coroutine scheduling/measurement overhead. Large-list tests remain codec
+stress tests, not recommendations for Android saved state.
+
+## Android frame comparison
+
+Opt in with `-PstateBenchmarks=true`; ordinary CI/publication excludes the benchmark modules.
+The app includes a frozen baseline from hotfix commit `f483b58` and the new implementation in the
+same APK, with identical UI, dependencies and integer fixtures. Run on a physical API 29+ device:
+
+```shell
+./gradlew -PstateBenchmarks=true :state-macrobenchmark:connectedReleaseAndroidTest
+```
+
+The parameterized benchmark measures both backends at 100, 1,000 and 10,000 rows, ten iterations
+per case with full compilation. It renders a list, refreshes, merges, scrolls, rotates, backgrounds,
+kills the background process and restores. FrameTimingMetric records frame costs; StateSave and
+StateRestore trace metrics measure lifecycle costs. Logcat `StateBenchmark` records saved Bundle
+bytes and process allocation deltas (including UI work). Keep JSON reports and Perfetto traces
+from `build/bench/test/outputs/`. Benchmark build paths are shortened for Windows trace exports.
+
+Compare frame CPU/overrun percentiles on the same device, refresh rate and power/thermal conditions.
+Repeat full runs to establish variability; a regression outside that observed variability blocks
+release. Keep device measurements separate from deterministic CI. Emulator runs only validate the
+harness and cannot certify hardware frame performance. No measured Android frame envelope is
+claimed until physical-device reports are available. iOS requires macOS for its test target.
+
+## Android harness validation (2026-10-01)
+
+All six cases passed on an API 37.1 Android emulator: both backends at 100, 1,000 and
+10,000 rows, one iteration per case. Rotation and background-process death restored the
+payload without a new load (`sequence=0`). The complete Activity Bundle, measured through
+Parcel, contained 2,272, 9,476 and 99,484 bytes respectively for these integer fixtures.
+This validates the harness and platform save/restore path, not hardware frame acceptance.
+
+For a quick harness run, pass `stateBenchmarkIterations=1` as an instrumentation argument
+and explicitly suppress the `EMULATOR` benchmark check. `stateBenchmarkSmoke=true` limits
+that run to 100 rows. Do not suppress device checks for the physical-device acceptance run.
+
+## Current local JVM observations
+
+A Windows/JDK 21 instrumented run with live payload/result collectors produced:
+
+| Integer records | JSON UTF-8 bytes | Async write | 100 owner reads | Owner allocated bytes |
+| --- | --- | --- | --- | --- |
+| 100 | 291 | 13.28 ms | 3.67 ms | 1,169,136 |
+| 1,000 | 3,891 | 8.45 ms | 0.33 ms | 8,896 |
+| 10,000 | 48,891 | 15.12 ms | 0.36 ms | 53,888 |
+
+The first fixture includes cold startup overhead. These are diagnostic observations from
+`PublicationPerformanceTest`, not warmed benchmarks or Android frame acceptance results.
+All recorded codec and payload-equality calls ran outside the owner thread. Allocations include
+the test fixture's JSON byte-count conversion and coroutine scheduling; they are not exclusively
+holder allocations. Do not infer a production limit from these integer-only fixtures.

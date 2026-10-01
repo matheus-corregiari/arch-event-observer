@@ -31,6 +31,10 @@ The examples on this branch target the **unreleased 2.3.1 candidate**, including
 Compose API. For a published version, use the documentation from its Git tag. See the
 [Compose migration guide](docs/modules/event-observer-compose.md#migration-from-the-builder-api).
 
+This checkout also includes state modernization intended for the **next major release**,
+not the 2.3.1 hotfix. Review the [state migration](docs/migration-state.md#upcoming-major-version-privately-owned-state)
+and [validation status](docs/changelog/upcoming-major.md) before releasing.
+
 The library centers on `DataResult<T>` and a small set of wrappers that keep loading, success,
 error, and list-state handling consistent across Android and Compose layers.
 
