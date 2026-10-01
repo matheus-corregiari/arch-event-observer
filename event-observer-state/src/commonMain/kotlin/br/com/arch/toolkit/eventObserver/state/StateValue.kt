@@ -43,7 +43,7 @@ class StateValue<T : Any>(
     /** Saves synchronously. Encoding failures leave the old value intact. Null does not remove the key. */
     fun set(value: T?) = state().set(value)
 
-    /** Stable, read-through observable state. Do not call SavedStateHandle.remove on its key. */
+    /** Stable immediate observable state. The handle key is private; update through this delegate. */
     fun flow(): StateFlow<T?> = state().flow
 
     /** Read fallbacks do not persist another value; assignments still update the saved property. */

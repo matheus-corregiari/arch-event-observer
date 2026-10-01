@@ -2,9 +2,7 @@ package br.com.arch.toolkit.eventObserver.state
 
 import androidx.lifecycle.SavedStateHandle
 import br.com.arch.toolkit.result.DataResult
-import br.com.arch.toolkit.util.dataResultError
-import br.com.arch.toolkit.util.dataResultNone
-import br.com.arch.toolkit.util.dataResultSuccess
+import br.com.arch.toolkit.result.DataResultStatus
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +10,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
@@ -35,7 +32,7 @@ sealed class ViewModelState<T : Any>(
     /** Dispatcher for repository work, transformations and serialization. */
     val workerDispatcher: CoroutineDispatcher
 ) {
-    private val stored = StoredState(stateHandle, name, serializer, json, default)
+    internal val stored = StoredState(stateHandle, name, serializer, json, default)
     internal val operation = StateOperation(scope)
 
     /** Saved payload stream, independent of execution status. */
@@ -61,14 +58,30 @@ sealed class ViewModelState<T : Any>(
      * Plain failures propagate to the scope; result holders expose an Error with the old payload.
      */
     fun setAsync(value: T?): Job = operation.start(::onFailure) { checkCurrent ->
-        val prepared = withContext(workerDispatcher) { prepare(value) }
+        val prepared = withContext(workerDispatcher) { stored.prepare(value) }
         checkCurrent()
-        commit(prepared)
+        commitAsync(prepared, checkCurrent)
     }
 
-    internal fun prepare(value: T?): PreparedState<T> = stored.prepare(value)
-
     internal open fun commit(prepared: PreparedState<T>) = stored.commit(prepared)
+
+    // A synchronous write can occur while preparation is running. Recompare off-owner until
+    // the prepared base is current; there is no suspension between the final check and commit.
+    internal suspend fun commitAsync(
+        prepared: PreparedState<T>,
+        checkCurrent: suspend () -> Unit,
+        status: DataResultStatus? = null,
+        error: Throwable? = null
+    ) {
+        var ready = prepared
+        while (ready.base !== stored.current) {
+            val base = stored.current
+            ready = withContext(workerDispatcher) { stored.rebase(ready, base) }
+            checkCurrent()
+        }
+        checkCurrent()
+        if (status == null) commit(ready) else stored.commit(ready, status, error)
+    }
 
     internal open fun onFailure(failure: Throwable): Unit = throw failure
 
@@ -124,10 +137,10 @@ sealed class ViewModelState<T : Any>(
                     }
                     val next = reduce(current, value)
                     currentCoroutineContext().ensureActive()
-                    val prepared = prepare(next)
+                    val prepared = stored.prepare(next)
                     withContext(ownerContext) {
                         checkCurrent()
-                        commit(prepared)
+                        commitAsync(prepared, checkCurrent)
                     }
                 }
             }
@@ -144,35 +157,35 @@ sealed class ViewModelState<T : Any>(
         default: T? = null,
         workerDispatcher: CoroutineDispatcher = Dispatchers.Default
     ) : ViewModelState<T>(name, serializer, stateHandle, scope, json, default, workerDispatcher) {
-        private val transient = MutableStateFlow(
-            get()?.let(::dataResultSuccess) ?: dataResultNone<T>()
-        )
-        private val results = ResultState(data, transient)
-
-        /** One stable stream across all executions, including after each producer completes. */
-        fun flow(): StateFlow<DataResult<T>> = results
+        /** One stable stream across all executions, with payload and status from one snapshot. */
+        fun flow(): StateFlow<DataResult<T>> = stored.results
 
         override fun set(value: T?) = set(value, distinct = false)
 
         /** Skips equal payload encoding while still resetting transient status. */
-        override fun set(value: T?, distinct: Boolean) = results.update {
-            if (!distinct || value != get()) super.set(value)
-            transient.value = value?.let(::dataResultSuccess) ?: dataResultNone()
-        }
-
-        internal override fun commit(prepared: PreparedState<T>) = results.update {
-            super.commit(prepared)
-            transient.value = prepared.value?.let(::dataResultSuccess) ?: dataResultNone()
+        override fun set(value: T?, distinct: Boolean) {
+            if (!distinct || value != get()) {
+                super.set(value)
+            } else {
+                stored.updateStatus(
+                    if (value == null) DataResultStatus.NONE else DataResultStatus.SUCCESS,
+                    null
+                )
+            }
         }
 
         internal override fun onFailure(failure: Throwable) {
-            transient.value = dataResultError(failure, get())
+            stored.updateStatus(DataResultStatus.ERROR, failure)
         }
 
-        /** Results without payload keep the last saved data; use invalidate to explicitly clear. */
-        fun set(value: DataResult<T>) = results.update {
-            value.data?.let { super.set(it) }
-            transient.value = value.copy(data = get())
+        /** Results without payload retain the last saved data; invalidate explicitly clears it. */
+        fun set(value: DataResult<T>) {
+            val prepared = value.data?.let(stored::prepare)
+            if (prepared == null) {
+                stored.updateStatus(value.status, value.error)
+            } else {
+                stored.commit(prepared, value.status, value.error)
+            }
         }
 
         /** Always starts a new request. To reuse restored data, check get() before calling. */
@@ -200,13 +213,14 @@ sealed class ViewModelState<T : Any>(
                     val prepared = result.data?.let { payload ->
                         val next = reduce(current, payload)
                         currentCoroutineContext().ensureActive()
-                        prepare(next)
+                        stored.prepare(next)
                     }
                     withContext(ownerContext) {
                         checkCurrent()
-                        results.update {
-                            prepared?.let { super.commit(it) }
-                            transient.value = DataResult(get(), result.error, result.status)
+                        if (prepared == null) {
+                            stored.updateStatus(result.status, result.error)
+                        } else {
+                            commitAsync(prepared, checkCurrent, result.status, result.error)
                         }
                     }
                 }
