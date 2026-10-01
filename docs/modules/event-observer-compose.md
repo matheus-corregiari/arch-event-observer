@@ -3,7 +3,7 @@
 `event-observer-compose` is the UI-facing module for Jetpack Compose Multiplatform. It provides a
 declarative rendering DSL to handle the states of a `DataResult` or `ResponseFlow`.
 
-This page describes the unreleased 3.0.0 candidate. The [migration section](#migration-from-the-builder-api) lists APIs removed since 2.3.0.
+This page describes the 3.0.0 API. See [GitHub Releases](https://github.com/matheus-corregiari/arch-event-observer/releases) for publication status. The [migration section](#migration-from-the-builder-api) lists APIs removed since 2.3.0.
 
 ## Install
 

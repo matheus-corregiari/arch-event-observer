@@ -1,6 +1,6 @@
-ï»¿# Getting Started
+Ã¯Â»Â¿# Getting Started
 
-The Compose examples below use the unreleased 3.0.0 candidate API. When upgrading
+The Compose examples below use the 3.0.0 API. When upgrading
 from a published version, follow the [migration guide](modules/event-observer-compose.md#migration-from-the-builder-api).
 
 ## Install The Right Module

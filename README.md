@@ -27,8 +27,9 @@ The project is split into three public modules:
 
 ## Overview
 
-The examples on this branch target the **unreleased 3.0.0 candidate**, including its new
-Compose API. For a published version, use the documentation from its Git tag. See the
+The examples on this branch describe the **3.0.0 API**, including its new Compose API.
+For publication status, see [GitHub Releases](https://github.com/matheus-corregiari/arch-event-observer/releases).
+Use the documentation from the Git tag matching your installed version. See the
 [Compose migration guide](docs/modules/event-observer-compose.md#migration-from-the-builder-api).
 
 Version **3.0.0** includes both the Compose API migration and privately owned State keys.
@@ -218,7 +219,7 @@ limitations under the License.
 
 See [event-observer-state](docs/modules/event-observer-state.md) for one-shot requests, refresh, filters, continuous streams and transformations. Existing Toolkit consumers should follow the [migration guide](docs/migration-state.md).
 
-## Next release: 3.0.0
+## 3.0.0 migration and release notes
 
 See [release notes](docs/changelog/3.0.0.md), [dependency versions](docs/dependencies.md) and
-[coverage configuration](docs/ci.md#coverage-and-codecov). This release is a candidate until tagged and published.
+[coverage configuration](docs/ci.md#coverage-and-codecov). See GitHub Releases for publication status.

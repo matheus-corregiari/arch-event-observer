@@ -9,8 +9,8 @@ The repository is split into three public modules:
 - `event-observer-compose` for snapshot and Flow-driven Compose rendering
 - `event-observer-state` for saved screen state and repository operations
 
-This branch documents the unreleased **3.0.0 candidate**. For released APIs, use the
-documentation from the corresponding Git tag. See the [Compose migration guide](modules/event-observer-compose.md#migration-from-the-builder-api).
+This branch documents the **3.0.0 API**. See [GitHub Releases](https://github.com/matheus-corregiari/arch-event-observer/releases)
+for publication status and use the documentation from the Git tag matching your installed version. See the [Compose migration guide](modules/event-observer-compose.md#migration-from-the-builder-api).
 
 Version **3.0.0** includes Compose API changes and privately owned State keys.
 See [state migration](migration-state.md#300-privately-owned-state) and
