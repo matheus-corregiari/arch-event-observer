@@ -33,8 +33,7 @@ at `release/1.0.0`.
 | CodeQL          | `./gradlew ciCodeql`: JVM/Android compilation; also analyzes Actions and Python |
 | CI Gate         | Requires successful completion of every gate, including policy                  |
 
-The aggregate Compose Detekt task currently reports `NO-SOURCE`; a green `ciLint`
-run includes ktlint and Android lint but does not establish full Compose Detekt coverage.
+Aggregate Detekt analyzes production Kotlin files across all KMP `*Main` source sets.
 
 `ciCoverage` already includes `ciTest`. There is no second test job. Projects with Apple targets use
 macOS for build/tests/publication; Android uses Linux. The same build job owns all supported targets,
@@ -58,7 +57,8 @@ GitHub App sends the tag so its push triggers `release.yml`. Pages deploys the a
 
 The tag workflow requires the annotated remote tag, a matching merged PR, master ancestry and a
 successful master CI run for the exact SHA. It publishes using the tag's exact version, first to Maven
-Central and then to GitHub Packages, from a single host. It confirms publication coordinates before
+Central and then to GitHub Packages, from a single host. Vanniktech uses DeploymentValidation.VALIDATED: Central validation must pass,
+while public download availability and search indexing may follow later. Both publication tasks must succeed before
 creating the GitHub Release. No additional test/lint/coverage suite runs for the tag; native publication
 tasks may compile/package their dependencies, reusing available Gradle outputs.
 
@@ -71,7 +71,7 @@ recover a publication failure.
 
 Use the Release workflow's manual dispatch with the existing tag and destination `central`, `github`,
 `both`, or `release-only`. Skipped destinations must already contain every publication's POM; the
-workflow verifies this before proceeding and checks both registries before creating the GitHub Release.
+workflow verifies omitted destinations before proceeding. `release-only` checks both registries.`nThere is no HTTP polling after successful publication tasks.
 If Central is still processing a deployment, wait for that deployment rather than uploading it again.
 Selecting `both` is only appropriate when neither destination has accepted the release.
 
@@ -130,3 +130,7 @@ GitHub notes as a fallback for historical tags without a page.
 Keep `kotlin-js-store/yarn.lock` versioned and update it through Gradle when dependencies change.
 It makes the Kotlin/JS npm dependency tree reproducible locally and in CI.
 See [Kotlin/JS version locking](https://kotlinlang.org/docs/js-project-setup.html#version-locking-via-kotlin-js-store).
+
+The weekly CodeQL workflow supplements required PR/master scanning. It uses manual JVM/Android
+compilation with the same setup and compiler, and separate SARIF categories. It does not replace
+CodeQL, CodeQL Policy or CI Gate checks on pull requests.

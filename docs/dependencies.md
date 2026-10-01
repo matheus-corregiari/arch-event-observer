@@ -1,15 +1,15 @@
 # Dependencies
 
-Audited against Maven Central, Google Maven and the Gradle Plugin Portal on 2026-09-29 for `2.3.1`.
+Audited against Maven Central, Google Maven and the Gradle Plugin Portal on 2026-10-01 for `2.3.1`.
 Runtime dependencies and AGP use stable releases. Detekt retains its existing alpha line.
-Gradle **9.8.0**, JDK **21**, Kover **0.9.10**, MkDocs Material **9.7.7**.
+Gradle **9.8.0**, JDK **21**, Kover **0.9.11**, MkDocs Material **9.7.7**.
 
 | Alias                                      | Version         | Source                                                                                                                                                                 |
 | ------------------------------------------ | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `jetbrains-dokka`                          | `2.2.0`         | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/dokka/dokka-gradle-plugin/maven-metadata.xml)                                                            |
 | `jetbrains-plugin`                         | `2.4.20`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/maven-metadata.xml)                                                          |
 | `jetbrains-multiplatform`                  | `2.4.20`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/multiplatform/org.jetbrains.kotlin.multiplatform.gradle.plugin/maven-metadata.xml)                |
-| `jetbrains-kover`                          | `0.9.10`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kover-gradle-plugin/maven-metadata.xml)                                                          |
+| `jetbrains-kover`                          | `0.9.11`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kover-gradle-plugin/maven-metadata.xml)                                                          |
 | `jetbrains-compose-runtime`                | `1.12.1`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/runtime/runtime/maven-metadata.xml)                                                              |
 | `jetbrains-compose-animation`              | `1.12.1`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/animation/animation/maven-metadata.xml)                                                          |
 | `jetbrains-compose-foundation`             | `1.12.1`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/foundation/foundation/maven-metadata.xml)                                                        |
@@ -71,3 +71,23 @@ AGP **9.4.1** and Build Tools **37.0.0** are the latest stable releases verified
 and the [SDK repository](https://dl.google.com/android/repository/repository2-3.xml).
 `minSdk` remains **23**. These are KMP library modules; the consuming application owns
 `targetSdk` and its runtime behavior. See the [Android SDK configuration guide](https://developer.android.com/build).
+
+## Stable update assessment (2026-10-01)
+
+- Adopt Kover **0.9.11**. Its [release](https://github.com/Kotlin/kotlinx-kover/releases/tag/v0.9.11)
+  reverts a 0.9.10 change that produced zero coverage with Gradle configuration cache
+  ([issue 831](https://github.com/Kotlin/kotlinx-kover/issues/831)). Configuration cache remains disabled here;
+  retain report filters and module thresholds and verify coverage before accepting the update.
+- Gradle **9.8.0**, Kotlin **2.4.20**, Compose **1.12.1**, AGP **9.4.1**, SDK **37.2**,
+  Build Tools **37.0.0**, AtomicFU **0.33.0**, Dokka **2.2.0**, coroutines/serialization **1.11.0**,
+  JaCoCo **0.8.15**, ktlint **14.2.0**, publishing **0.37.0**, Robolectric **4.17** and MockK **1.14.11**
+  match stable metadata. The dependency table covers every declared Maven library.
+- Detekt **2.0.0-alpha.6** has no stable release in the `dev.detekt` line. Keep the existing tool;
+  reverting to the old stable 1.x coordinates would be a migration, not a patch update.
+- Retain current major references for Actions: checkout/Python/artifact/Codecov **v7**, Java/Gradle **v6**,
+  Android/CodeQL **v4**, GitHub App/release **v3** and Pages **v5**. Latest stable tags remain in
+  those majors; floating major tags receive their compatible patch updates.
+- MkDocs Material **9.7.7** remains current. Library modules have no application `targetSdk`;
+  opt-in benchmark apps use the catalog's API **37**. Compile SDK **37.2** is a minor API level,
+  not a reason to invent a library target API or raise `minSdk` **23**.
+- Do not introduce Compose 1.13 alpha or prerelease AGP/Kotlin in this publication.

@@ -32,5 +32,4 @@ Before release, execute iOS tests on macOS and compare release-build frame metri
 Android device against measured variability. Emulator results validate the harness, not frame
 acceptance. See [performance measurements and limits](../state-performance.md).
 
-The global lint check currently reports an unused `EnterTransition` import in the separately
-preserved local Compose diff; that change is outside this state implementation.
+The unused Compose import was removed during the 2026-10-01 CI readiness review.
