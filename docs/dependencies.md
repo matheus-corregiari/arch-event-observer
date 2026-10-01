@@ -1,6 +1,6 @@
 # Dependencies
 
-Audited against Maven Central, Google Maven and the Gradle Plugin Portal on 2026-10-01 for `2.3.1`.
+Audited against Maven Central, Google Maven and the Gradle Plugin Portal on 2026-10-01 for `3.0.0`.
 Runtime dependencies and AGP use stable releases. Detekt retains its existing alpha line.
 Gradle **9.8.0**, JDK **21**, Kover **0.9.11**, MkDocs Material **9.7.7**.
 

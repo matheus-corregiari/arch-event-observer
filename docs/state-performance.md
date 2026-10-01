@@ -87,7 +87,7 @@ References: [Default dispatcher](https://kotlinlang.org/api/kotlinx.coroutines/k
 [Main dispatcher](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-main.html),
 and [cooperative yield](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/yield.html).
 
-## Snapshot publication in the upcoming major version
+## Snapshot publication in 3.0.0
 
 Holder flows project one immutable snapshot held by MutableStateFlow. Revision identities
 make publication and built-in payload/result projections independent of deep payload equality.
@@ -149,10 +149,10 @@ that run to 100 rows. Do not suppress device checks for the physical-device acce
 A Windows/JDK 21 instrumented run with live payload/result collectors produced:
 
 | Integer records | JSON UTF-8 bytes | Async write | 100 owner reads | Owner allocated bytes |
-| --- | --- | --- | --- | --- |
-| 100 | 291 | 13.28 ms | 3.67 ms | 1,169,136 |
-| 1,000 | 3,891 | 8.45 ms | 0.33 ms | 8,896 |
-| 10,000 | 48,891 | 15.12 ms | 0.36 ms | 53,888 |
+| --------------- | ---------------- | ----------- | --------------- | --------------------- |
+| 100             | 291              | 13.28 ms    | 3.67 ms         | 1,169,136             |
+| 1,000           | 3,891            | 8.45 ms     | 0.33 ms         | 8,896                 |
+| 10,000          | 48,891           | 15.12 ms    | 0.36 ms         | 53,888                |
 
 The first fixture includes cold startup overhead. These are diagnostic observations from
 `PublicationPerformanceTest`, not warmed benchmarks or Android frame acceptance results.

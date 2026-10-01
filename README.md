@@ -27,13 +27,13 @@ The project is split into three public modules:
 
 ## Overview
 
-The examples on this branch target the **unreleased 2.3.1 candidate**, including its new
+The examples on this branch target the **unreleased 3.0.0 candidate**, including its new
 Compose API. For a published version, use the documentation from its Git tag. See the
 [Compose migration guide](docs/modules/event-observer-compose.md#migration-from-the-builder-api).
 
-This checkout also includes state modernization intended for the **next major release**,
-not the 2.3.1 hotfix. Review the [state migration](docs/migration-state.md#upcoming-major-version-privately-owned-state)
-and [validation status](docs/changelog/upcoming-major.md) before releasing.
+Version **3.0.0** includes both the Compose API migration and privately owned State keys.
+Review the [state migration](docs/migration-state.md#300-privately-owned-state)
+and [release notes](docs/changelog/3.0.0.md) before upgrading.
 
 The library centers on `DataResult<T>` and a small set of wrappers that keep loading, success,
 error, and list-state handling consistent across Android and Compose layers.
@@ -218,7 +218,7 @@ limitations under the License.
 
 See [event-observer-state](docs/modules/event-observer-state.md) for one-shot requests, refresh, filters, continuous streams and transformations. Existing Toolkit consumers should follow the [migration guide](docs/migration-state.md).
 
-## Next release: 2.3.1
+## Next release: 3.0.0
 
-See [release notes](docs/changelog/2.3.1.md), [dependency versions](docs/dependencies.md) and
+See [release notes](docs/changelog/3.0.0.md), [dependency versions](docs/dependencies.md) and
 [coverage configuration](docs/ci.md#coverage-and-codecov). This release is a candidate until tagged and published.

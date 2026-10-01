@@ -6,7 +6,7 @@ notice; there is **no Maven relocation** and no automatic dependency or import r
 
 | Before                                                 | After                                                     |
 | ------------------------------------------------------ | --------------------------------------------------------- |
-| `io.github.matheus-corregiari:state-handle:2.0.0-rc17` | `io.github.matheus-corregiari:event-observer-state:2.3.0` |
+| `io.github.matheus-corregiari:state-handle:2.0.0-rc17` | `io.github.matheus-corregiari:event-observer-state:3.0.0` |
 | `br.com.arch.toolkit.stateHandle`                      | `br.com.arch.toolkit.eventObserver.state`                 |
 | Koin-provided `Json`                                   | Default `Json`, or an explicit argument                   |
 | Native value with JSON shadow fallback                 | One JSON value per key                                    |
@@ -61,9 +61,9 @@ from the old README were not implemented APIs and are not provided here.
 
 See the [module guide](modules/event-observer-state.md) for complete operation and platform semantics.
 
-## Upcoming major version: privately owned state
+## 3.0.0: privately owned state
 
-The next major version publishes payload and result status from one immutable snapshot.
+Version 3.0.0 publishes payload and result status from one immutable snapshot.
 Public holder/delegate APIs and the saved JSON format stay compatible; existing JSON strings,
 keys, `Json` configuration and explicit serializers need no conversion. Payload restoration
 still produces Success for non-null data and None for null.
@@ -80,5 +80,5 @@ an older publication overwriting its status. Synchronous setters, restore and ch
 still execute on their caller. Default equality suppression is retained; equal payloads reuse
 the previous immutable value. Throwable identity determines whether an error is a new result.
 
-This change is intended for a major release, not the 2.3.1 hotfix. No persistence guarantees
+This behavior changes in 3.0.0. No persistence guarantees
 are added for platforms without a restoring owner, and no automatic disk storage is introduced.

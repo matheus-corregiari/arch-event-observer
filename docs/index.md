@@ -9,12 +9,12 @@ The repository is split into three public modules:
 - `event-observer-compose` for snapshot and Flow-driven Compose rendering
 - `event-observer-state` for saved screen state and repository operations
 
-This branch documents the unreleased **2.3.1 candidate**. For released APIs, use the
+This branch documents the unreleased **3.0.0 candidate**. For released APIs, use the
 documentation from the corresponding Git tag. See the [Compose migration guide](modules/event-observer-compose.md#migration-from-the-builder-api).
 
-State modernization in this checkout targets the **next major release**, not the hotfix.
-See [state migration](migration-state.md#upcoming-major-version-privately-owned-state) and
-[major-release validation status](changelog/upcoming-major.md).
+Version **3.0.0** includes Compose API changes and privately owned State keys.
+See [state migration](migration-state.md#300-privately-owned-state) and
+[release notes](changelog/3.0.0.md).
 
 ## What You Get
 

@@ -1,4 +1,4 @@
-// Frozen baseline from hotfix/2.3.1 at f483b58; benchmark use only.
+// Frozen baseline from commit f483b58; benchmark use only.
 package br.com.arch.toolkit.statebenchmark.baseline
 
 import br.com.arch.toolkit.result.DataResult

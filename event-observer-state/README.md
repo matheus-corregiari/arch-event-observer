@@ -47,7 +47,7 @@ browser targets and large saved-state payloads.
 Objects, typed lists and typed maps are supported. Complex values need `@Serializable` or a supplied
 serializer. The implementation is entirely in `commonMain`; use the main thread and a handle supplied
 by a restoring owner. Only payloads are saved; transient loading and errors are not restored.
-The upcoming major version privately owns each key; use the holder to write and one holder per key.
+Version 3.0.0 privately owns each key; use the holder to write and one holder per key.
 Payload and result status publish together from one immutable snapshot. Existing JSON restores unchanged.
 
 ## Documentation
