@@ -141,7 +141,7 @@ jobs:
             category: /language:actions
           - language: java-kotlin
             build-mode: manual
-            category: .github/workflows/codeql.yml:analyze
+            category: .github/workflows/ci.yml:codeql
           - language: python
             build-mode: none
             category: /language:python
