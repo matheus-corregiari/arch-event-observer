@@ -4,6 +4,8 @@ package br.com.arch.toolkit.result
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlin.jvm.JvmName
+import kotlin.reflect.KClass
 
 /**
  * Snapshot of an operation result.
@@ -210,5 +212,49 @@ data class DataResult<T>(
      */
     fun <R> error(transformer: suspend (Throwable) -> R, func: suspend (R) -> Unit) =
         unwrap { error(transformer = transformer, observer = func) }
+
+    /**
+     * Invokes [func] with [error] when it is an instance of [E].
+     */
+    @JvmName("errorTyped")
+    inline fun <reified E : Throwable> error(noinline func: suspend (E) -> Unit) =
+        error(E::class, func)
+
+    /**
+     * Invokes [func] when [error] is an instance of [E].
+     */
+    @JvmName("errorTyped")
+    inline fun <reified E : Throwable> error(noinline func: suspend () -> Unit) =
+        error(E::class, func)
+
+    /**
+     * Transforms [error] before invoking [func] when it is an instance of [E].
+     */
+    @JvmName("errorTyped")
+    inline fun <reified E : Throwable, R> error(
+        noinline transformer: suspend (E) -> R,
+        noinline func: suspend (R) -> Unit
+    ) = error(E::class, transformer, func)
+
+    /**
+     * Invokes [func] with [error] when [status] is [DataResultStatus.ERROR] and [error] is an instance of [clazz].
+     */
+    fun <E : Throwable> error(clazz: KClass<E>, func: suspend (E) -> Unit) =
+        unwrap { error(clazz = clazz, observer = func) }
+
+    /**
+     * Invokes [func] when [status] is [DataResultStatus.ERROR] and [error] is an instance of [clazz].
+     */
+    fun <E : Throwable> error(clazz: KClass<E>, func: suspend () -> Unit) =
+        unwrap { error(clazz = clazz, observer = func) }
+
+    /**
+     * Transforms [error] before invoking [func] when [error] is an instance of [clazz].
+     */
+    fun <E : Throwable, R> error(
+        clazz: KClass<E>,
+        transformer: suspend (E) -> R,
+        func: suspend (R) -> Unit
+    ) = unwrap { error(clazz = clazz, transformer = transformer, observer = func) }
     //endregion
 }

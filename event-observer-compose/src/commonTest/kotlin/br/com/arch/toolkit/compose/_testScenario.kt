@@ -2,6 +2,8 @@
 
 package br.com.arch.toolkit.compose
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ContentTransform
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.Modifier
@@ -15,16 +17,29 @@ import br.com.arch.toolkit.result.EventDataStatus
 @OptIn(ExperimentalTestApi::class)
 fun <T> scenario(
     result: DataResult<T>,
-    config: ObserveComposableWrapper<T>.() -> Unit,
+    config: DataResultContentScope<T>.() -> Unit,
+    assert: ComposeUiTest.() -> Unit
+) = animationScenario(
+    result = result,
+    transitionSpec = null,
+    config = config,
+    assert = assert
+)
+
+@OptIn(ExperimentalTestApi::class)
+fun <T> animationScenario(
+    result: DataResult<T>,
+    transitionSpec: (AnimatedContentTransitionScope<DataResult<T>>.() -> ContentTransform)? = null,
+    config: DataResultContentScope<T>.() -> Unit,
     assert: ComposeUiTest.() -> Unit
 ) = withGraphicsReady {
     runComposeUiTest {
         setContent {
             Column {
-                result.composable
-                    .animation { enabled = false }
-                    .outsideComposable { /* See ObserveWrapper Tests */ }
-                    .Unwrap(owner = null, config = config)
+                result.Content(
+                    transitionSpec = transitionSpec,
+                    content = config
+                )
             }
         }
         runOnIdle { assert.invoke(this) }
@@ -32,14 +47,15 @@ fun <T> scenario(
     }
 }
 
-val stringConfig: ObserveComposableWrapper<String>.() -> Unit = { createConfig<String, String>() }
-val iterableConfig: ObserveComposableWrapper<Collection<String>>.() -> Unit =
+val stringConfig: DataResultContentScope<String>.() -> Unit =
+    { createConfig<String, String>() }
+val iterableConfig: DataResultContentScope<Collection<String>>.() -> Unit =
     { createConfig<Collection<String>, String>() }
-val mapConfig: ObserveComposableWrapper<Map<String, String>>.() -> Unit =
+val mapConfig: DataResultContentScope<Map<String, String>>.() -> Unit =
     { createConfig<Map<String, String>, Pair<String, String>>() }
 
 @Suppress("LongMethod")
-private fun <T, R> ObserveComposableWrapper<T>.createConfig() {
+private fun <T, R> DataResultContentScope<T>.createConfig() {
     // Data
     OnData { data ->
         BasicText("$data", modifier = Modifier.testTag("dataTag1"))

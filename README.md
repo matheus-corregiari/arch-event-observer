@@ -16,16 +16,25 @@ The project is split into three public modules:
 ![Test][badge-test]
 [![Coverage][badge-coverage]][link-coverage]
 
-## Requirements
+## Building this checkout
 
-- Kotlin `2.4.10`
-- Gradle wrapper `9.7.1`
+- Kotlin `2.4.20`
+- Gradle wrapper `9.8.0`
 - JDK `21` via the Gradle toolchain
-- Android `minSdk 23` and `compileSdk 37`
-- Compose Multiplatform `1.12.0` with iOS ARM targets
+- Android `minSdk 23` and `compileSdk 37.2`
+- Compose Multiplatform `1.12.1` with iOS ARM targets
 - Use the project wrapper instead of a local Gradle install
 
 ## Overview
+
+The examples on this branch describe the **3.0.0 API**, including its new Compose API.
+For publication status, see [GitHub Releases](https://github.com/matheus-corregiari/arch-event-observer/releases).
+Use the documentation from the Git tag matching your installed version. See the
+[Compose migration guide](docs/modules/event-observer-compose.md#migration-from-the-builder-api).
+
+Version **3.0.0** includes both the Compose API migration and privately owned State keys.
+Review the [state migration](docs/migration-state.md#300-privately-owned-state)
+and [release notes](docs/changelog/3.0.0.md) before upgrading.
 
 The library centers on `DataResult<T>` and a small set of wrappers that keep loading, success,
 error, and list-state handling consistent across Android and Compose layers.
@@ -39,8 +48,8 @@ Use `event-observer` when you want:
 
 Use `event-observer-compose` when you want:
 
-- `ComposableDataResult` for declarative state rendering
-- `collectAsComposableState()` for `Flow<DataResult<T>>` and `LiveData<DataResult<T>>`
+- `DataResultContent` and `DataResult.Content` for snapshot rendering
+- `Flow<DataResult<T>>.Content` and `ComposableDataResult(flow)` for collection and rendering
 - Compose observables such as `OnData`, `OnError`, `OnShowLoading`, `OnEmpty`, `OnNotEmpty`,
   `OnSingle`, and `OnMany`
 - a Compose-first API on top of `event-observer`
@@ -114,15 +123,15 @@ result.unwrap {
 }
 ```
 
-For Compose, convert the upstream state into a `ComposableDataResult` and render the blocks you care
+For Compose, collect and render the upstream state with `Content`, selecting the blocks you care
 about.
 
 ```kotlin
-myFlow.composable
-    .OnShowLoading { CircularProgressIndicator() }
-    .OnData { value -> Text(value.toString()) }
-    .OnError { error -> Text(error.message ?: "Unknown error") }
-    .Unwrap()
+myFlow.Content {
+    OnShowLoading { CircularProgressIndicator() }
+    OnData { value -> Text(value.toString()) }
+    OnError { error -> Text(error.message ?: "Unknown error") }
+}
 ```
 
 For saved state, declare a shared ViewModel and start a new operation on refresh:
@@ -171,7 +180,7 @@ The published MkDocs site is built from the same content and mirrors these pages
 
 ## Platform Notes
 
-- `event-observer` is Android-facing and integrates with LiveData.
+- `event-observer` shares result and Flow APIs across KMP targets; LiveData APIs are Android-only.
 - `event-observer-compose` builds on top of `event-observer`, Flow, and Compose state.
 - The API is designed to stay predictable in shared KMP-oriented architecture layers.
 
@@ -199,19 +208,18 @@ limitations under the License.
 
 [link-coverage]: https://codecov.io/gh/matheus-corregiari/arch-event-observer
 [link-release]: https://github.com/matheus-corregiari/arch-event-observer/releases/latest
-
-[badge-kotlin]: https://img.shields.io/badge/kotlin-2.4.10-blue.svg?logo=kotlin
+[badge-kotlin]: https://img.shields.io/badge/kotlin-2.4.20-blue.svg?logo=kotlin
 [badge-release]: https://img.shields.io/github/v/release/matheus-corregiari/arch-event-observer
-
 [badge-license]: https://img.shields.io/github/license/matheus-corregiari/arch-event-observer
-
 [badge-coverage]: https://codecov.io/gh/matheus-corregiari/arch-event-observer/graph/badge.svg?token=146UU167K6
-
 [badge-lint]: https://github.com/matheus-corregiari/arch-event-observer/actions/workflows/ci.yml/badge.svg
-
 [badge-test]: https://github.com/matheus-corregiari/arch-event-observer/actions/workflows/ci.yml/badge.svg
-
 
 ## Saved screen state
 
 See [event-observer-state](docs/modules/event-observer-state.md) for one-shot requests, refresh, filters, continuous streams and transformations. Existing Toolkit consumers should follow the [migration guide](docs/migration-state.md).
+
+## 3.0.0 migration and release notes
+
+See [release notes](docs/changelog/3.0.0.md), [dependency versions](docs/dependencies.md) and
+[coverage configuration](docs/ci.md#coverage-and-codecov). See GitHub Releases for publication status.

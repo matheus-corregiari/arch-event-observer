@@ -1,5 +1,5 @@
 site_name: Arch Event Observer
-site_description: Kotlin-first observation toolkit with dedicated base and Compose modules.
+site_description: Kotlin-first observation toolkit with result, Compose rendering and saved-state modules.
 site_url: https://matheus-corregiari.github.io/arch-event-observer/
 repo_url: https://github.com/matheus-corregiari/arch-event-observer
 edit_uri: blob/master/docs/
@@ -44,14 +44,17 @@ nav:
   - Ecosystem: ecosystem.md
   - Changelog:
       - Overview: changelog/index.md
+      - "3.0.0": changelog/3.0.0.md
       - "2.3.0": changelog/2.3.0.md
       - "2.2.1": changelog/2.2.1.md
       - "2.2.0": changelog/2.2.0.md
+      - "2.1.3": changelog/2.1.3.md
       - "2.1.2": changelog/2.1.2.md
       - "2.1.1": changelog/2.1.1.md
       - "2.1.0": changelog/2.1.0.md
       - "2.0.1": changelog/2.0.1.md
       - "2.0.0": changelog/2.0.0.md
+  - Dependencies: dependencies.md
   - CI and Releases: ci.md
   - Contributing: contributing.md
   - API Reference:

@@ -46,3 +46,8 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
+
+// Aggregate Detekt must analyze production sources in every KMP source set.
+tasks.named<Detekt>("detekt") {
+    setSource(fileTree("src") { include("**/*Main/**/*.kt") })
+}

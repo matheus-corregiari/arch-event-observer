@@ -1,4 +1,3 @@
 {
-  "runner": "macos-15",
-  "codeql_kotlin": "2.3.21"
+  "runner": "macos-15"
 }

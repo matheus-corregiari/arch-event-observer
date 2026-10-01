@@ -105,18 +105,49 @@ class ScreenViewModel(handle: SavedStateHandle) : ViewModel() {
 ```
 
 Map one repository response into `Screen` with `bindMapped`, or use `saveResponseState<Screen>()`
-and `loadMapped` when it carries `DataResult`. `select` returns distinct read-through state;
+and `loadMapped` when it carries `DataResult`. `select` returns distinct immediate state;
 it does not serialize another copy. Observe the full screen state when an atomic snapshot of all
 fields is required. A separate editable filter or selection can have its own saved entry.
+
+
+## Compose flows using standard operators
+
+Use `combine(a, b) { left, right -> Screen(left, right) }` to build a screen model from the
+latest values of two sources, then `screen.bind(combined)`. Both sources must emit before
+`combine` produces its first value. Use `merge(first, second)` with `bindReducing` to apply
+updates from several sources; define ordering/conflict rules in your reducer. `merge` does
+not guarantee ordering between sources. Reconnecting a holder replaces its previous operation.
+
+Reducers read the current holder before each emission and may suspend on the worker. A direct
+write during a suspended reducer is not implicitly merged with its output. Use immutable values
+and route edits through one reducer when those edits must participate in the same merge rule.
+
+Observe from a lifecycle-bound collector, for example in an Android View:
+
+```kotlin
+lifecycleScope.launch {
+    repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.users.flow().collect { result -> render(result) }
+    }
+}
+```
+
+Use `collectAsStateWithLifecycle` in Compose. Stopping UI collection does not stop a holder's
+operation: the ViewModel scope owns it. Call `cancel()` or dispose its owner to stop repository work.
+StateFlow retains the latest state and can skip intermediate emissions for slow collectors;
+use an event stream for actions that must each be delivered.
 
 ## Persistence contract
 
 - Keys contain JSON strings. A stored `"null"` is different from an absent key: defaults initialize
   only absent keys. `invalidate()` and `set(null)` clear data without removing the key or its observers.
-- `get()`, `flow().value` and `select(...).value` read the handle-backed representation. External
-  updates to the owned key must be valid JSON for the same serializer and configuration.
+- `get()`, `flow().value` and `select(...).value` read one immutable in-memory snapshot.
+  Payload and transient status are published together, after saving the prepared JSON.
+- The key is private to one holder. Do not write/remove it or create another active holder or
+  handle flow for it. Raw handle writes do not update an active holder; use `set` or `setAsync`.
+  Existing JSON is decoded once when the holder is created.
 - Do not call `SavedStateHandle.remove()` on an active key: AndroidX detaches its existing flows.
-  Use the holder's clearing API. Use one logical state per key and matching serializers.
+  Use the holder's clearing API. Use one holder per key.
 - Primitive types and typed lists/maps use built-in serializers. Complex objects require
   `@Serializable` or an explicit `KSerializer<T>`. Nested collection elements and map keys must
   also be serializable. Complex map keys require the appropriate `Json` configuration, such as

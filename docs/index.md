@@ -3,10 +3,18 @@
 Arch Event Observer is a Kotlin-first event and result observation toolkit for Android and Compose
 Multiplatform.
 
-The repository is split into two public modules:
+The repository is split into three public modules:
 
 - `event-observer` for `DataResult`, `ResponseLiveData`, `ResponseFlow`, and reactive helpers
-- `event-observer-compose` for `ComposableDataResult` and Compose-driven state rendering
+- `event-observer-compose` for snapshot and Flow-driven Compose rendering
+- `event-observer-state` for saved screen state and repository operations
+
+This branch documents the **3.0.0 API**. See [GitHub Releases](https://github.com/matheus-corregiari/arch-event-observer/releases)
+for publication status and use the documentation from the Git tag matching your installed version. See the [Compose migration guide](modules/event-observer-compose.md#migration-from-the-builder-api).
+
+Version **3.0.0** includes Compose API changes and privately owned State keys.
+See [state migration](migration-state.md#300-privately-owned-state) and
+[release notes](changelog/3.0.0.md).
 
 ## What You Get
 
@@ -21,12 +29,14 @@ The repository is split into two public modules:
 - [`event-observer`](modules/event-observer.md) for the base model, LiveData, and Flow support
 - [`event-observer-compose`](modules/event-observer-compose.md) for Compose rendering on top of the
   base module
+- [`event-observer-state`](modules/event-observer-state.md) for restorable shared screen state
 
 ## Start Here
 
 - [Getting Started](getting-started.md)
 - [event-observer](modules/event-observer.md)
 - [event-observer-compose](modules/event-observer-compose.md)
+- [event-observer-state](modules/event-observer-state.md)
 - [Core Concepts](core-concepts.md)
 - [Recipes](recipes.md)
 - [API Reference](api/index.md)
@@ -45,7 +55,7 @@ result.unwrap {
 ```
 
 ```kotlin
-myFlow.composable.Unwrap {
+myFlow.Content {
     OnShowLoading { CircularProgressIndicator() }
     OnData { value -> Text(value.toString()) }
     OnError { error -> Text(error.message ?: "Unknown error") }

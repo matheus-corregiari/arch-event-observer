@@ -21,6 +21,8 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import br.com.arch.toolkit.util.dataResultError
 import br.com.arch.toolkit.util.dataResultSuccess
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.encoding.Encoder
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -28,6 +30,7 @@ import org.robolectric.annotation.Config
 import kotlin.test.assertEquals
 import kotlin.test.assertNotSame
 import kotlin.test.assertNull
+import kotlin.test.assertSame
 
 /** Exercises SavedStateRegistry and a real parcel round trip, not a reused in-memory handle. */
 @RunWith(RobolectricTestRunner::class)
@@ -63,6 +66,39 @@ class AndroidRestoreTest {
         }
     }
 
+    @Test
+    fun configurationChangeRetainsViewModelAndStateFlow() {
+        val first = Owner(null)
+        val model = first.model()
+        val stream = model.response.flow()
+        model.response.set(dataResultSuccess(Screen(emptyList(), mapOf("total" to 7))))
+        val saved = first.save()
+        first.destroy(clearStore = false)
+        val second = Owner(saved, first.viewModelStore)
+        try {
+            assertSame(model, second.model())
+            assertSame(stream, second.model().response.flow())
+            assertEquals(7, second.model().response.get()?.counts?.get("total"))
+        } finally {
+            second.destroy()
+        }
+    }
+
+    @Test
+    fun savingPreparedJsonDoesNotRunTheModelCodecAgain() {
+        val owner = Owner(null)
+        try {
+            val model = owner.model()
+            model.screen.set(Screen(listOf(Profile("Ada")), emptyMap()))
+            val beforeSave = model.screenEncodes
+            parcelCopy(owner.save())
+            assertEquals(1, beforeSave)
+            assertEquals(beforeSave, model.screenEncodes)
+        } finally {
+            owner.destroy()
+        }
+    }
+
     private fun parcelCopy(bundle: Bundle): Bundle {
         val parcel = Parcel.obtain()
         return try {
@@ -77,19 +113,29 @@ class AndroidRestoreTest {
     }
 
     private class Model(handle: SavedStateHandle) : ViewModel() {
-        val screen by handle.saveState<Screen>()
+        var screenEncodes = 0
+            private set
+        private val screenCodec = object : KSerializer<Screen> by Screen.serializer() {
+            override fun serialize(encoder: Encoder, value: Screen) {
+                screenEncodes++
+                Screen.serializer().serialize(encoder, value)
+            }
+        }
+        val screen by handle.saveState(serializer = screenCodec)
         val profiles by handle.saveState<List<Profile>>()
         val map by handle.saveState<Map<String, Profile>>()
         val response by handle.saveResponseState<Screen>()
         val cleared by handle.saveState<Int>(default = 99)
     }
 
-    private class Owner(restored: Bundle?) : SavedStateRegistryOwner, ViewModelStoreOwner {
+    private class Owner(
+        restored: Bundle?,
+        override val viewModelStore: ViewModelStore = ViewModelStore()
+    ) : SavedStateRegistryOwner, ViewModelStoreOwner {
         private val registry = LifecycleRegistry(this)
         private val controller = SavedStateRegistryController.create(this)
         override val lifecycle: Lifecycle get() = registry
         override val savedStateRegistry: SavedStateRegistry get() = controller.savedStateRegistry
-        override val viewModelStore = ViewModelStore()
 
         init {
             controller.performAttach()
@@ -113,9 +159,9 @@ class AndroidRestoreTest {
             return Bundle().also(controller::performSave)
         }
 
-        fun destroy() {
+        fun destroy(clearStore: Boolean = true) {
             registry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-            viewModelStore.clear()
+            if (clearStore) viewModelStore.clear()
         }
     }
 }

@@ -337,7 +337,7 @@ class OperationsTest {
     }
 
     @Test
-    fun resultSubscribersSeeExternalHandleChangesAndNewSubscriptions() = runTest {
+    fun resultSubscribersIgnoreRawWritesAndSeeNewSubscriptions() = runTest {
         val handle = SavedStateHandle()
         val state = ViewModelState.Result(
             "result",
@@ -355,8 +355,8 @@ class OperationsTest {
         runCurrent()
         handle["result"] = "4"
         runCurrent()
-        assertEquals(dataResultSuccess(4), state.flow().value)
-        assertEquals(dataResultSuccess(4), observed.last())
+        assertEquals(dataResultNone(), state.flow().value)
+        assertEquals(dataResultNone(), observed.last())
         state.set(dataResultLoading())
         runCurrent()
         assertEquals(DataResultStatus.LOADING, observed.last().status)

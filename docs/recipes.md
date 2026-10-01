@@ -1,4 +1,4 @@
-﻿# Recipes
+# Recipes
 
 ## Render A Loading Screen
 
@@ -6,7 +6,7 @@ Use the loading callbacks directly from `DataResult` or, in the Compose module,
 `ComposableDataResult`.
 
 ```kotlin
-myFlow.composable.Unwrap {
+myFlow.Content {
     OnShowLoading { CircularProgressIndicator() }
     OnHideLoading { Text("Done") }
 }
@@ -15,7 +15,7 @@ myFlow.composable.Unwrap {
 ## Show Data Or Error
 
 ```kotlin
-myFlow.composable.Unwrap {
+myFlow.Content {
     OnData { value -> Text(value.toString()) }
     OnError { error -> Text(error.message ?: "Unknown error") }
 }
@@ -23,13 +23,15 @@ myFlow.composable.Unwrap {
 
 ## React To List States
 
-Use the list-aware callbacks when the payload is a collection, map, or sequence.
+This example uses a `Flow<DataResult<List<String>>>`. For sequences, materialize a
+finite list first: collection observers count sequence elements and may traverse them
+again. Constrained-once and unbounded sequences are unsuitable for these observers.
 
 ```kotlin
-itemsFlow.composable.Unwrap {
-    OnEmpty { Text("No items") }
+itemsFlow.Content {
+    OnEmpty { -> Text("No items") }
     OnNotEmpty { items -> Text("Items: ${items.size}") }
-    OnSingle { item -> Text("One item: $item") }
+    OnSingle<String> { item -> Text("One item: $item") }
     OnMany { items -> Text("Many items: ${items.size}") }
 }
 ```
@@ -76,41 +78,48 @@ Use `combineNotNull` when both sides must have data, and `chainWith` when the se
 ## Wrap A Plain Result Into Compose
 
 ```kotlin
-dataResultSuccess("Ready").composable.Unwrap {
+dataResultSuccess("Ready").Content {
     OnData { data -> Text(data) }
 }
 ```
 
 ## Custom Animations in Compose
 
-By default, state transitions in Compose are animated with a fade. You can customize this per-call:
+Pass an optional `transitionSpec` to animate structural state changes with `AnimatedContent`.
+The default `null` renders content without animation.
 
 ```kotlin
-myFlow.composable
-    .animation {
-        enabled = true
-        enterAnimation = slideInVertically() + fadeIn()
-        exitAnimation = slideOutVertically() + fadeOut()
+myFlow.Content(
+    modifier = Modifier.padding(16.dp),
+    transitionSpec = {
+        slideInVertically() + fadeIn() togetherWith (slideOutVertically() + fadeOut())
     }
-    .Unwrap {
-        OnData { data -> Text(data) }
-    }
+) {
+    OnData { data -> Text(data) }
+}
 ```
 
 ## Side Effects with Compose Observers
 
-If you need to log errors or trigger analytics while using the Compose DSL, use `outsideComposable`:
+Handle side effects explicitly with `LaunchedEffect`. Collect the state once and share
+the same snapshot between the effect and `DataResultContent`. Here,
+`viewModel.state` is a `StateFlow<DataResult<T>>`:
 
 ```kotlin
-myFlow.composable
-    .outsideComposable {
-        error { t -> Analytics.logError(t) }
-        data { d -> Analytics.logView(d) }
+val resultState by viewModel.state.collectAsStateWithLifecycle()
+
+LaunchedEffect(resultState) {
+    if (resultState.isError) {
+        resultState.error?.let { Logger.log(it) }
     }
-    .Unwrap {
-        OnData { data -> Text(data) }
-    }
+}
+
+DataResultContent(result = resultState) {
+    OnData { data -> Text(data.toString()) }
+}
 ```
+
+The effect restarts when its key changes and is cancelled when it leaves composition.
 
 ## Practical Rule
 

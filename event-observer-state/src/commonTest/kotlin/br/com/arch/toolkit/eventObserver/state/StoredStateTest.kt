@@ -81,7 +81,7 @@ class StoredStateTest {
     }
 
     @Test
-    fun observersSurviveClearingAndSeeExternalWrites() = runTest {
+    fun observersSurviveClearingAndIgnoreExternalWrites() = runTest {
         val handle = SavedStateHandle()
         val state = handle.value<Int>("count")
         val values = mutableListOf<Int?>()
@@ -93,10 +93,10 @@ class StoredStateTest {
         state.set(null)
         state.set(2)
         handle["count"] = "3"
-        assertEquals(listOf(null, 1, null, 2, 3), values)
-        assertEquals(3, state.get())
-        assertEquals(3, state.flow().value)
-        assertEquals(3, state.flow().replayCache.single())
+        assertEquals(listOf(null, 1, null, 2), values)
+        assertEquals(2, state.get())
+        assertEquals(2, state.flow().value)
+        assertEquals(2, state.flow().replayCache.single())
     }
 
     @Test
@@ -189,12 +189,12 @@ class StoredStateTest {
     }
 
     @Test
-    fun malformedExternalJsonIsNotSilentlyIgnored() {
+    fun rawWritesDoNotReplaceTheOwnedSnapshot() {
         val handle = SavedStateHandle()
         val state = handle.value<Profile>("profile")
         state.set(Profile("Ada"))
         handle["profile"] = "broken"
-        assertFailsWith<SerializationException> { state.flow().value }
+        assertEquals(Profile("Ada"), state.flow().value)
         assertEquals("broken", handle.get<String>("profile"))
         state.set(Profile("Lin"))
         assertEquals(Profile("Lin"), state.get())

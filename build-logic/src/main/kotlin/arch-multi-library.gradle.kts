@@ -15,6 +15,13 @@ plugins {
     id("com.android.kotlin.multiplatform.library")
 }
 
+// Robolectric 4.17 accesses SharedSecrets when bootstrapping Android on JDK 21.
+tasks.withType<Test>().configureEach {
+    if (name.contains("AndroidHostTest")) {
+        jvmArgs("--add-opens=java.base/jdk.internal.access=ALL-UNNAMED")
+    }
+}
+
 private val formatName = project.name.split("-").joinToString("") { it }
     .replaceFirstChar { it.lowercase() }
 extensions.configure<KotlinMultiplatformExtension> {
@@ -37,7 +44,11 @@ extensions.configure<KotlinMultiplatformExtension> {
     }
 
     android {
-        compileSdk = libraries.version("build-sdk-compile").toInt()
+        compileSdk {
+            version = release(libraries.version("build-sdk-compile").toInt()) {
+                minorApiLevel = libraries.version("build-sdk-minor").toInt()
+            }
+        }
         minSdk = libraries.version("build-sdk-min").toInt()
         buildToolsVersion = libraries.version("build-tools")
         namespace = "br.com.arch.toolkit.$formatName"

@@ -9,6 +9,11 @@ import subprocess
 import time
 
 VERSION = re.compile(r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-rc([1-9]\d*))?")
+REQUIRED_RELEASE_GATES = {
+    "Release Policy", "Coverage Gate", "Static Analysis", "Docs Gate",
+    "CodeQL (actions)", "CodeQL (java-kotlin)", "CodeQL (python)",
+    "CodeQL Policy", "CI Gate", "Create Release Tag",
+}
 
 
 def git(*args):
@@ -122,9 +127,7 @@ def approved(sha):
         if runs:
             run = max(runs, key=lambda entry: entry["id"])
             jobs = pages(f"repos/{repository}/actions/runs/{run['id']}/jobs", "jobs")
-            required = {"Release Policy", "Coverage Gate", "Static Analysis", "Docs Gate",
-                        "CodeQL (actions)", "CodeQL (java-kotlin)", "CodeQL (python)",
-                        "CodeQL Policy", "CI Gate", "Create Release Tag"}
+            required = REQUIRED_RELEASE_GATES
             conclusions = {job["name"]: job["conclusion"] for job in jobs if job["name"] in required}
             failed = sorted(name for name, conclusion in conclusions.items()
                             if conclusion in ("failure", "cancelled", "timed_out", "action_required", "skipped"))
@@ -170,13 +173,6 @@ def create_tag(branch):
     git("push", "origin", f"refs/tags/{release_version}")
 
 
-def codeql():
-    config = json.loads(Path("build-logic/ci.json").read_text())
-    if compiler := config.get("codeql_kotlin"):
-        path = Path("gradle/libs.versions.toml")
-        path.write_text(re.sub(r'jetbrains-kotlin = "[^"]+"', f'jetbrains-kotlin = "{compiler}"', path.read_text()))
-
-
 def security():
     repository = os.environ["GITHUB_REPOSITORY"]
     ref = "refs/heads/master" if os.environ["GITHUB_EVENT_NAME"] == "push" else os.environ["GITHUB_REF"]
@@ -190,13 +186,16 @@ def security():
 
 
 def publications(destination):
-    """Prove skipped destinations exist, or confirm completion of both registries."""
+    """Prove destinations omitted during manual recovery already contain every POM."""
     import base64
     from urllib.error import HTTPError
     from urllib.request import Request, urlopen
 
-    selected = {"both": [], "central": ["github"], "github": ["central"],
-                "release-only": ["central", "github"], "complete": ["central", "github"]}[destination]
+    destinations = {"both": [], "central": ["github"], "github": ["central"],
+                    "release-only": ["central", "github"]}
+    if destination not in destinations:
+        raise ValueError(f"Unknown recovery destination: {destination}")
+    selected = destinations[destination]
     coordinates = [line.split("\t") for line in Path("build/ci/publications.tsv").read_text().splitlines()]
     if not coordinates:
         raise ValueError("Empty publication manifest")
@@ -211,26 +210,21 @@ def publications(destination):
                 url = f"https://maven.pkg.github.com/{os.environ['GITHUB_REPOSITORY']}/{path}"
                 auth = f"{os.environ['GITHUB_ACTOR']}:{os.environ['GH_TOKEN']}".encode()
                 headers = {"Authorization": "Basic " + base64.b64encode(auth).decode()}
-            attempts = 60 if destination == "complete" else 1
-            for attempt in range(attempts):
-                try:
-                    with urlopen(Request(url, headers=headers), timeout=30) as response:
-                        response.read(1)
-                    break
-                except HTTPError as error:
-                    if error.code != 404 or attempt == attempts - 1:
-                        raise ValueError(f"Publication not confirmed: {registry} {group}:{artifact}:{value}") from error
-                    time.sleep(15)
+            try:
+                with urlopen(Request(url, headers=headers), timeout=30) as response:
+                    response.read(1)
+            except HTTPError as error:
+                raise ValueError(f"Publication not confirmed: {registry} {group}:{artifact}:{value}") from error
             print(f"Confirmed {registry}: {group}:{artifact}:{value}")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("prepare", "verify-tag", "create-tag", "codeql", "security", "publications"))
+    parser.add_argument("command", choices=("prepare", "verify-tag", "create-tag", "security", "publications"))
     parser.add_argument("value", nargs="?")
     args = parser.parse_args()
     {"prepare": prepare, "verify-tag": lambda: verify_tag(args.value),
-     "create-tag": lambda: create_tag(args.value), "codeql": codeql, "security": security,
+     "create-tag": lambda: create_tag(args.value), "security": security,
      "publications": lambda: publications(args.value)}[args.command]()
 
 

@@ -44,6 +44,34 @@ userState.observe(this) {
 }
 ```
 
+## Typed error observers
+
+Filter errors by exception type using a reified type or `KClass`:
+
+```kotlin
+result.unwrap {
+    error<IllegalStateException> { error -> Logger.log(error) }
+    error(IllegalArgumentException::class) { error -> Logger.log(error) }
+    error { error: Throwable -> Logger.log(error) }
+}
+```
+
+Handlers are additive: the untyped handler still runs when a typed handler matches.
+Subclasses match their parent exception type. A typed handler skips null errors and
+non-error states; `single` and `dataStatus` filters still apply.
+
+The same typed overloads are available on `DataResult.error`. Use explicit lambda
+parameters (`{ error -> ... }`) or an explicit empty parameter list (`{ -> ... }`)
+to distinguish callbacks with and without an argument.
+
+### Failures inside observer callbacks
+
+If a callback throws, recovery requires an error observer whose exception type and
+`dataStatus` match the replayed error result. Recovery uses an error result without
+data, so `WithData` handlers cannot handle it. A nonmatching typed handler does not
+silently consume the exception: the wrapper reports `DataResultException` with the
+original failure in `error`. An untyped handler can serve as a fallback.
+
 ## API Reference
 
 - [Base module API](../api/event-observer.md)

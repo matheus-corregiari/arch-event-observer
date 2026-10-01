@@ -13,6 +13,7 @@ import kotlinx.coroutines.withContext
 /**
  * Computes an expensive projection on [workerDispatcher], retaining its last completed value.
  * Reading the returned StateFlow never invokes [transform]. New input cancels the old computation.
+ * Projection publication and output equality also run on the worker, using the same parent Job.
  * [scope] controls observation; [initialValue] is visible until the first computation completes.
  * Unlike [select], this projection updates asynchronously. Keep inputs immutable.
  * On JS/Wasm, a dispatcher does not provide a background thread: expensive work must cooperate
@@ -26,4 +27,8 @@ fun <A, B> StateFlow<A>.selectAsync(
     transform: suspend (A) -> B
 ): StateFlow<B> = mapLatest { value ->
     withContext(workerDispatcher) { transform(value) }
-}.stateIn(scope, SharingStarted.Eagerly, initialValue)
+}.stateIn(
+    CoroutineScope(scope.coroutineContext + workerDispatcher),
+    SharingStarted.Eagerly,
+    initialValue
+)

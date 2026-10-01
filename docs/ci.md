@@ -1,8 +1,9 @@
 # CI and releases
 
-The CI workflows and commands are identical in Arch Lumber, Arch Android and Arch Event Observer.
-The convention plugins select module tasks; `build-logic/ci.json` selects the runner and the isolated
-CodeQL compiler. Coverage floors live in `gradle.properties` and must only increase as tests improve.
+This guide describes the CI workflows and commands in Arch Event Observer.
+The convention plugins select module tasks; `build-logic/ci.json` selects the runner.
+Normal builds and CodeQL use the Kotlin version in `gradle/libs.versions.toml`.
+Coverage floors live in `gradle.properties` and must only increase as tests improve.
 
 ## Pull requests
 
@@ -23,21 +24,23 @@ at `release/1.0.0`.
 
 ## Required gates
 
-| Check | Command or responsibility |
-|---|---|
-| Release Policy | Python policy unit tests and validation against remote tags |
-| Coverage Gate | `./gradlew ciBuild ciCoverage`: assemble, tests, merged coverage verification |
-| Static Analysis | `./gradlew ciLint`: Detekt, ktlint and available Android lint tasks |
-| Docs Gate | `./gradlew ciDocs`, then `python -m mkdocs build --strict` |
-| CodeQL | `./gradlew ciCodeql`: JVM/Android compilation; also analyzes Actions and Python |
-| CI Gate | Requires successful completion of every gate, including policy |
+| Check           | Command or responsibility                                                       |
+| --------------- | ------------------------------------------------------------------------------- |
+| Release Policy  | Python policy unit tests and validation against remote tags                     |
+| Coverage Gate   | `./gradlew ciBuild ciCoverage`: assemble, tests, merged coverage verification   |
+| Static Analysis | `./gradlew ciLint`: Detekt, ktlint and available Android lint tasks             |
+| Docs Gate       | `./gradlew ciDocs`, then `python -m mkdocs build --strict`                      |
+| CodeQL          | `./gradlew ciCodeql`: JVM/Android compilation; also analyzes Actions and Python |
+| CI Gate         | Requires successful completion of every gate, including policy                  |
+
+Aggregate Detekt analyzes production Kotlin files across all KMP `*Main` source sets.
 
 `ciCoverage` already includes `ciTest`. There is no second test job. Projects with Apple targets use
 macOS for build/tests/publication; Android uses Linux. The same build job owns all supported targets,
 so JVM/Android/browser tests are not repeated on a second host. Windows local validation does not
 prove Apple binaries; the macOS CI run does.
 
-CodeQL has a separate checkout and compiler configuration. Its outputs are never published. Coverage
+CodeQL has a separate checkout and uses the same Kotlin compiler as normal builds. Its outputs are never published. Coverage
 reports are uploaded as artifacts; Codecov receives master reports for visibility, while Gradle
 enforces the actual gate. The Codecov upload is not the coverage threshold.
 
@@ -54,7 +57,8 @@ GitHub App sends the tag so its push triggers `release.yml`. Pages deploys the a
 
 The tag workflow requires the annotated remote tag, a matching merged PR, master ancestry and a
 successful master CI run for the exact SHA. It publishes using the tag's exact version, first to Maven
-Central and then to GitHub Packages, from a single host. It confirms publication coordinates before
+Central and then to GitHub Packages, from a single host. Vanniktech uses DeploymentValidation.VALIDATED: Central validation must pass,
+while public download availability and search indexing may follow later. Both publication tasks must succeed before
 creating the GitHub Release. No additional test/lint/coverage suite runs for the tag; native publication
 tasks may compile/package their dependencies, reusing available Gradle outputs.
 
@@ -67,7 +71,7 @@ recover a publication failure.
 
 Use the Release workflow's manual dispatch with the existing tag and destination `central`, `github`,
 `both`, or `release-only`. Skipped destinations must already contain every publication's POM; the
-workflow verifies this before proceeding and checks both registries before creating the GitHub Release.
+workflow verifies omitted destinations before proceeding. `release-only` checks both registries.`nThere is no HTTP polling after successful publication tasks.
 If Central is still processing a deployment, wait for that deployment rather than uploading it again.
 Selecting `both` is only appropriate when neither destination has accepted the release.
 
@@ -88,3 +92,45 @@ python -m mkdocs build --strict
 
 Use JDK 21 and the project wrapper. Publication also has `ciPublicationManifest` for verifying the
 complete list of Maven coordinates, without uploading packages.
+
+## Coverage and Codecov
+
+`build-logic/src/main/kotlin/arch-coverage.gradle.kts` is the single source of report exclusions. It applies the same Kover filter
+to every covered module and the root report. Only Android-generated `*.BuildConfig`, `*.R`
+and `*.R$*` are excluded: they contain generated constants/resources, not application behavior.
+Do not exclude DTOs, state classes, Compose functions or entire packages just to raise coverage.
+
+```sh
+./gradlew ciCoverage
+# Root report only (automatically runs the required JVM/Android host tests):
+./gradlew :koverXmlReport :koverHtmlReport :koverVerify
+```
+
+Open `build/reports/kover/html/index.html` locally. Codecov receives only
+`build/reports/kover/report.xml`, with `disable_search: true`; automatic discovery would also find
+module or older reports and could merge excluded classes back into the result.
+There is deliberately no second `ignore` list in `codecov.yml`: Codecov consumes the already-filtered
+XML. Its `ignore` patterns describe source paths, while Kover filters describe JVM class names.
+An IDE coverage run or another coverage tool must use this Gradle report to share these exclusions.
+
+Compare the same commit and line metric. Codecov's treatment of partially covered lines can differ
+from Kover, so equal file scope does not promise identical percentages. Existing Gradle verification
+rules remain authoritative; Codecov provides visibility rather than an additional threshold.
+JVM/Android host execution supplies the coverage counters. Apple, JS and Wasm tests still run in
+the platform test suite but do not add Kover coverage. On pushes to `master`, coverage is uploaded after the coverage job successfully builds and
+verifies the reports. Other CI gates run independently; all must pass before a release tag is created.
+
+References: [Kover report filtering](https://kotlin.github.io/kotlinx-kover/gradle-plugin/#filtering-reports),
+[Codecov file search](https://docs.codecov.com/docs/file-search) and
+[Codecov path ignores](https://docs.codecov.com/docs/ignoring-paths).
+
+Release notes use `docs/changelog/<version>.md` from the verified tag checkout, with generated
+GitHub notes as a fallback for historical tags without a page.
+
+Keep `kotlin-js-store/yarn.lock` versioned and update it through Gradle when dependencies change.
+It makes the Kotlin/JS npm dependency tree reproducible locally and in CI.
+See [Kotlin/JS version locking](https://kotlinlang.org/docs/js-project-setup.html#version-locking-via-kotlin-js-store).
+
+The weekly CodeQL workflow supplements required PR/master scanning. It uses manual JVM/Android
+compilation with the same setup and compiler, and separate SARIF categories. It does not replace
+CodeQL, CodeQL Policy or CI Gate checks on pull requests.

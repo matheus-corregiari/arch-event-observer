@@ -2,9 +2,9 @@ plugins {
     id("arch-multi-library")
     id("arch-lint")
     id("arch-documentation")
+    id("arch-coverage")
     id("arch-optimize")
     id("arch-publish")
-    alias(libs.plugins.jetbrains.atomic)
     alias(libs.plugins.jetbrains.compose.compiler)
     alias(libs.plugins.jetbrains.compose.kotlin)
 }
@@ -38,5 +38,16 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.jetbrains.compose.ui.test.junit4.desktop)
         }
+
+        val nonJsTest = create("nonJsTest") {
+            dependsOn(commonTest.get())
+        }
+        jvmTest.get().dependsOn(nonJsTest)
+        wasmJsTest.get().dependsOn(nonJsTest)
+        findByName("androidHostTest")?.dependsOn(nonJsTest)
+        findByName("javaTest")?.dependsOn(nonJsTest)
+        findByName("nativeTest")?.dependsOn(nonJsTest)
+        findByName("iosArm64Test")?.dependsOn(nonJsTest)
+        findByName("iosSimulatorArm64Test")?.dependsOn(nonJsTest)
     }
 }

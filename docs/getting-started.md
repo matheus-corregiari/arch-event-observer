@@ -1,4 +1,7 @@
-﻿# Getting Started
+Ã¯Â»Â¿# Getting Started
+
+The Compose examples below use the 3.0.0 API. When upgrading
+from a published version, follow the [migration guide](modules/event-observer-compose.md#migration-from-the-builder-api).
 
 ## Install The Right Module
 
@@ -68,11 +71,11 @@ userLiveData.observe(this) {
 
 ## Render It In Compose
 
-Add `event-observer-compose`, then wrap a `Flow<DataResult<T>>` or `LiveData<DataResult<T>>` with
-`composable` and render the states you need.
+Add `event-observer-compose`, then render a `Flow<DataResult<T>>` using `Content`.
+For a static `DataResult<T>`, use `Content` or `DataResultContent`.
 
 ```kotlin
-myFlow.composable.Unwrap {
+myFlow.Content {
     OnShowLoading { CircularProgressIndicator() }
     OnData { value -> Text(value.toString()) }
     OnError { error -> Text(error.message ?: "Unknown error") }
