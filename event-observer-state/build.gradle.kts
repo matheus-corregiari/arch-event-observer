@@ -1,4 +1,3 @@
-import dev.detekt.gradle.Detekt
 import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
 
 plugins {
@@ -28,11 +27,6 @@ kotlin {
             implementation(libs.robolectric.test)
         }
     }
-}
-
-// The generic detekt task does not discover KMP sources automatically.
-tasks.named<Detekt>("detekt") {
-    setSource(fileTree("src/commonMain") { include("**/*.kt") })
 }
 
 kover {

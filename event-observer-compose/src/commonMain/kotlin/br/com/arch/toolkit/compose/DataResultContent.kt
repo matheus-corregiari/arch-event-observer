@@ -64,14 +64,10 @@ fun <T> DataResultContent(
             modifier = modifier,
             transitionSpec = transitionSpec,
             contentKey = { it.animationContentKey() },
-            content = { currentResult ->
-                RenderVisibleContent(listToRender, currentResult)
-            }
+            content = { currentResult -> RenderVisibleContent(listToRender, currentResult) }
         )
     } else {
-        Box(modifier = modifier) {
-            RenderVisibleContent(listToRender, result)
-        }
+        Box(modifier = modifier) { RenderVisibleContent(listToRender, result) }
     }
 }
 
@@ -120,10 +116,8 @@ private fun <T> RenderVisibleContent(
     val visibleContent = remember(result, observables) {
         observables.withIndex().filter { it.value.hasVisibleContent(result) }
     }
+    // Keep registration identity when preceding observers become hidden.
     visibleContent.forEach { (index, observable) ->
-        // Keep registration identity when preceding observers become hidden.
-        key(index) {
-            observable.Content(result)
-        }
+        key(index) { observable.Content(result) }
     }
 }
