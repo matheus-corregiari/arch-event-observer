@@ -19,6 +19,11 @@ include(":event-observer-compose")
 include(":event-observer-state")
 include(":test")
 
+// Device benchmarks are opt-in and never participate in publication or ordinary coverage.
+if (providers.gradleProperty("stateBenchmarks").orNull == "true") {
+    include(":state-benchmark-app", ":state-macrobenchmark")
+}
+
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }

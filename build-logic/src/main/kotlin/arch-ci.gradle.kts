@@ -5,7 +5,7 @@ plugins {
 }
 
 dependencies {
-    subprojects.filter { it.name != "test" }.forEach { add("kover", project(it.path)) }
+    subprojects.filter { it.name in setOf("event-observer", "event-observer-compose", "event-observer-state") }.forEach { add("kover", project(it.path)) }
 }
 
 val syncContributingDocs = tasks.register("syncContributingDocs", Copy::class) {
