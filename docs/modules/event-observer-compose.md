@@ -232,3 +232,6 @@ are removed. The default is now no animation. Explicit references to
 `ObserveComposableWrapper<T>` must become `DataResultContentScope<T>`.
 
 These are source and binary incompatible changes for existing Compose consumers.
+
+See [result, event and persisted-state examples](../core-concepts.md#result-event-or-persisted-state)
+for choosing the appropriate lifetime and observation contract.

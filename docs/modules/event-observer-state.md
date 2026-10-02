@@ -199,3 +199,6 @@ Keep serialized screen state small. Large repository datasets belong in a databa
 IDs, filters or a compact screen snapshot when the platform's saved-state budget would be exceeded.
 
 See [migration](../migration-state.md) and [API reference](../api/event-observer-state.md).
+
+See [result, event and persisted-state examples](../core-concepts.md#result-event-or-persisted-state)
+for choosing the appropriate lifetime and observation contract.
