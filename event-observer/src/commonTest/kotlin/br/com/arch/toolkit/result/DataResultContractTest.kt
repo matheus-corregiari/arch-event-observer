@@ -105,10 +105,11 @@ class DataResultContractTest {
     @Test
     fun `large finite sequence does not traverse its tail`() {
         var reads = 0
-        val result = dataResultSuccess((0 until 1_000_000).asSequence().onEach {
+        val sequence = (0 until 1_000_000).asSequence().onEach {
             reads++
             check(reads <= 2)
-        })
+        }
+        val result = dataResultSuccess(sequence)
         assertTrue(result.hasManyItems)
         assertEquals(2, reads)
     }
