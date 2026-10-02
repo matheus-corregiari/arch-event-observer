@@ -75,3 +75,6 @@ original failure in `error`. An untyped handler can serve as a fallback.
 ## API Reference
 
 - [Base module API](../api/event-observer.md)
+
+See [result, event and persisted-state examples](../core-concepts.md#result-event-or-persisted-state)
+for choosing the appropriate lifetime and observation contract.

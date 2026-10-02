@@ -14,6 +14,11 @@ import kotlin.reflect.KClass
  * properties below describe the current shape of the result and the observation
  * helpers at the bottom attach callbacks for the matching state.
  *
+ * Equality, hash codes, destructuring and generated `copy()` use only these three
+ * constructor properties. Legacy observation settings are local to this instance;
+ * `copy()` and [transform] reset them. Prefer [unwrap] with an explicit scope to
+ * configure execution per observation without mutating this value.
+ *
  * @param T payload type
  * @property data current payload, or `null`
  * @property error current error, or `null`
@@ -29,21 +34,25 @@ data class DataResult<T>(
     private var transformDispatcher: CoroutineDispatcher? = null
 
     /**
-     * Sets the [CoroutineScope] used by the observation helpers.
+     * Sets the [CoroutineScope] used by the observation helpers on this instance.
+     * Not propagated by `copy()` or [transform]. Prefer explicit-scope [unwrap].
      *
      * @param scope scope used to launch callbacks
      */
     fun scope(scope: CoroutineScope) = apply { this.scope = scope }
 
     /**
-     * Creates a [CoroutineScope] from [dispatcher] and stores it for observers.
+     * Creates a [CoroutineScope] from the supplied dispatcher and stores it for observers.
+     * No external owner Job is supplied. Prefer an owned scope with [unwrap].
+     * Not propagated by `copy()` or [transform].
      *
      * @param dispatcher dispatcher used to create the internal [CoroutineScope]
      */
     fun scope(scope: CoroutineDispatcher) = apply { this.scope = CoroutineScope(scope) }
 
     /**
-     * Sets the dispatcher used by transformation callbacks.
+     * Sets the dispatcher used by transformation callbacks on this instance.
+     * Not propagated by `copy()` or [transform]. Prefer explicit-scope [unwrap].
      */
     fun transformDispatcher(dispatcher: CoroutineDispatcher) =
         apply { this.transformDispatcher = dispatcher }
@@ -61,52 +70,60 @@ data class DataResult<T>(
     /**
      * `true` when [data] is an empty [Collection], [Map], or [Sequence].
      *
-     * Sequence checks are eager and consume the sequence.
+     * Sequence checks obtain one iterator and call `hasNext()` once.
+     * They may trigger producer work in `hasNext()`. A constrained-once sequence
+     * cannot be inspected again; materialize finite sequences before repeated observation.
      */
     val isEmpty: Boolean
         get() = when (data) {
             is Collection<*> -> data.isEmpty()
             is Map<*, *> -> data.isEmpty()
-            is Sequence<*> -> data.count() == 0
+            is Sequence<*> -> !data.iterator().hasNext()
             else -> false
         }
 
     /**
      * `true` when [data] is a non-empty [Collection], [Map], or [Sequence].
      *
-     * Sequence checks are eager and consume the sequence.
+     * Sequence checks obtain one iterator and call `hasNext()` once.
+     * They may trigger producer work in `hasNext()`. A constrained-once sequence
+     * cannot be inspected again; materialize finite sequences before repeated observation.
      */
     val isNotEmpty: Boolean
         get() = when (data) {
             is Collection<*> -> data.isNotEmpty()
             is Map<*, *> -> data.isNotEmpty()
-            is Sequence<*> -> data.count() > 0
+            is Sequence<*> -> data.iterator().hasNext()
             else -> false
         }
 
     /**
      * `true` when [data] is a single-item [Collection], [Map], or [Sequence].
      *
-     * Sequence checks are eager and consume the sequence.
+     * Sequence checks obtain one iterator and inspect at most two elements.
+     * They may trigger producer work in `hasNext()`. A constrained-once sequence
+     * cannot be inspected again; materialize finite sequences before repeated observation.
      */
     val hasOneItem: Boolean
         get() = when (data) {
             is Collection<*> -> data.size == 1
             is Map<*, *> -> data.size == 1
-            is Sequence<*> -> data.count() == 1
+            is Sequence<*> -> data.take(2).count() == 1
             else -> false
         }
 
     /**
      * `true` when [data] is a multi-item [Collection], [Map], or [Sequence].
      *
-     * Sequence checks are eager and consume the sequence.
+     * Sequence checks obtain one iterator and inspect at most two elements.
+     * They may trigger producer work in `hasNext()`. A constrained-once sequence
+     * cannot be inspected again; materialize finite sequences before repeated observation.
      */
     val hasManyItems: Boolean
         get() = when (data) {
             is Collection<*> -> data.size > 1
             is Map<*, *> -> data.size > 1
-            is Sequence<*> -> data.count() > 1
+            is Sequence<*> -> data.take(2).count() > 1
             else -> false
         }
 
@@ -148,6 +165,7 @@ data class DataResult<T>(
      *
      * If [data] is `null`, the current instance is represented as-is. If the
      * transformation throws, the returned result switches to [DataResultStatus.ERROR].
+     * The returned value does not inherit legacy observation settings.
      */
     fun <R> transform(transform: (T) -> R): DataResult<R> = data?.runCatching {
         DataResult(transform(this), error, status)
@@ -160,6 +178,22 @@ data class DataResult<T>(
      */
     fun unwrap(config: ObserveWrapper<T>.() -> Unit) = ObserveWrapper<T>().also {
         scope?.let(it::scope)
+        transformDispatcher?.let(it::transformDispatcher)
+    }.apply(config).attachTo(this)
+
+    /**
+     * Observes this value with execution settings local to this call.
+     *
+     * Ignores legacy instance settings. [config] may override these settings on
+     * the wrapper. The caller owns [scope] and its cancellation; transformations
+     * use [transformDispatcher] when supplied, otherwise the wrapper default.
+     */
+    fun unwrap(
+        scope: CoroutineScope,
+        transformDispatcher: CoroutineDispatcher? = null,
+        config: ObserveWrapper<T>.() -> Unit
+    ) = ObserveWrapper<T>().also {
+        it.scope(scope)
         transformDispatcher?.let(it::transformDispatcher)
     }.apply(config).attachTo(this)
 

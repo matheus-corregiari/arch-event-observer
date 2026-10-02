@@ -24,8 +24,8 @@ myFlow.Content {
 ## React To List States
 
 This example uses a `Flow<DataResult<List<String>>>`. For sequences, materialize a
-finite list first: collection observers count sequence elements and may traverse them
-again. Constrained-once and unbounded sequences are unsuitable for these observers.
+finite list first: shape checks inspect a limited prefix, while collection observers may traverse them
+again to obtain content. Constrained-once and unbounded sequences are unsuitable for these observers.
 
 ```kotlin
 itemsFlow.Content {
