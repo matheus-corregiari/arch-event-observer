@@ -120,7 +120,7 @@ and `status`. Existing `.scope(...)` and `.transformDispatcher(...)` setters mut
 only that instance. Generated copies and `transform` results do **not** inherit
 those settings. This legacy behavior is retained for compatibility.
 
-Prefer execution settings on each observation:
+Starting in **3.1.0**, prefer execution settings on each observation:
 
 ```kotlin
 val result = dataResultSuccess("Ready")

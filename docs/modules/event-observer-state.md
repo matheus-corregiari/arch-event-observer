@@ -6,7 +6,7 @@ The state outlives individual requests; the handle's owner controls restoration.
 ```kotlin
 kotlin {
     sourceSets.commonMain.dependencies {
-        implementation("io.github.matheus-corregiari:event-observer-state:2.3.0")
+        implementation("io.github.matheus-corregiari:event-observer-state:<version>")
     }
 }
 ```
