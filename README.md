@@ -219,6 +219,15 @@ limitations under the License.
 
 See [event-observer-state](docs/modules/event-observer-state.md) for one-shot requests, refresh, filters, continuous streams and transformations. Existing Toolkit consumers should follow the [migration guide](docs/migration-state.md).
 
+## Planned 3.1.0
+
+[3.1.0 release notes](docs/changelog/3.1.0.md) describe removal of mutable
+`DataResult` execution settings, per-call helper parameters and bounded sequence
+checks. The removed setters and changed method signatures require consumer
+migration and recompilation. See [result, event and saved-state
+examples](docs/core-concepts.md#result-event-or-persisted-state) for choosing the
+appropriate lifetime. Existing 3.0.0 migration rules remain applicable.
+
 ## 3.0.0 migration and release notes
 
 See [release notes](docs/changelog/3.0.0.md), [dependency versions](docs/dependencies.md) and
