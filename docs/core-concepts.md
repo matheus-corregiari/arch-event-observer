@@ -115,26 +115,54 @@ matching results; they do not create a durable application event queue.
 
 ### Keep observation execution separate from the result
 
-`DataResult` equality, hashing, destructuring and `copy()` use only `data`, `error`
-and `status`. Existing `.scope(...)` and `.transformDispatcher(...)` setters mutate
-only that instance. Generated copies and `transform` results do **not** inherit
-those settings. This legacy behavior is retained for compatibility.
+`DataResult` contains only `data`, `error` and `status`. Equality, hashing,
+destructuring, `copy()` and synchronous `transform()` use those values; execution
+settings are never stored on the result.
 
-Starting in **3.1.0**, prefer execution settings on each observation:
+Configure each observation through parameters with defaults:
 
 ```kotlin
 val result = dataResultSuccess("Ready")
-val copy = result.copy()
-copy.unwrap(scope = viewModelScope, transformDispatcher = Dispatchers.Default) {
-    data(transformer = { it.uppercase() }) { prepared -> render(prepared) }
-}
+result.data(scope = viewModelScope) { render(it) }
+result.copy().data(
+    transformer = { it.uppercase() },
+    scope = viewModelScope,
+    transformDispatcher = Dispatchers.Default
+) { prepared -> render(prepared) }
 ```
 
-This overload ignores legacy instance settings; its DSL can override the supplied
-settings. It stores no configuration on either result. The owner cancels the scope;
-transformations run on the supplied dispatcher and callbacks return to the owner
-scope. The existing `unwrap { scope(viewModelScope); data { ... } }` is also supported.
-Avoid the dispatcher-only legacy setter when you already have an owned scope.
+`data` and all `error` overloads accept `scope` and `transformDispatcher`.
+`loading`, `showLoading` and `hideLoading` need only `scope`. `unwrap` accepts both
+settings and a DSL that can override them. `null` uses the existing wrapper
+default: a Main scope with a SupervisorJob and Default for transformations.
+Prefer an owned scope: cancellation then follows its owner. Callbacks execute in
+the observation scope, while suspend transformations execute on the supplied
+transform dispatcher. No observation changes this result or another observation.
+
+### Migrate removed result setters
+
+This is a source and binary API change: recompile consumers and replace calls to
+`DataResult.scope(...)` and `DataResult.transformDispatcher(...)`:
+
+```kotlin
+// Before
+result.scope(viewModelScope).transformDispatcher(Dispatchers.Default).data { render(it) }
+
+// After
+result.data(scope = viewModelScope, transformDispatcher = Dispatchers.Default) { render(it) }
+```
+
+Use named callbacks for old positional function arguments:
+`result.data(func = callback)` and
+`result.data(transformer = mapper, func = callback)`. Trailing callbacks such as
+`result.data { ... }` remain valid. Supply settings again for each observation;
+there is no configuration to propagate through copies or value transformations.
+
+`result.unwrap { scope(viewModelScope); data { ... } }` also remains supported:
+these DSL setters configure `ObserveWrapper`, not `DataResult`. Synchronous
+`transform { ... }` only maps a value on the calling thread, so it does not accept
+unused execution settings. Use an observation transformer or `withContext` when
+mapping requires a worker dispatcher.
 
 ### Render state; collect actions explicitly in Compose
 
@@ -180,7 +208,10 @@ storage. See the [state contract](modules/event-observer-state.md).
 
 `isEmpty` and `isNotEmpty` obtain an iterator and call `hasNext`; sequence builders
 may produce one element during that call. `hasOneItem` and `hasManyItems` inspect
-at most two elements. Unbounded sequences can therefore be checked directly,
+at most two elements: zero means empty, one means a single item, and a second
+item proves there are multiple items. `take(2)` prevents `count()` from reading the
+remaining tail; counting only one could not distinguish a single item from many.
+Unbounded sequences can therefore be checked directly,
 but work or failures beyond that prefix are not evaluated.
 
 Each check obtains a new iterator. A constrained-once sequence cannot be checked
