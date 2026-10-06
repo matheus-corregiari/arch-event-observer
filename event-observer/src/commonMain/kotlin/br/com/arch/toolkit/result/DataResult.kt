@@ -15,9 +15,10 @@ import kotlin.reflect.KClass
  * helpers at the bottom attach callbacks for the matching state.
  *
  * Equality, hash codes, destructuring and generated `copy()` use only these three
- * constructor properties. Legacy observation settings are local to this instance;
- * `copy()` and [transform] reset them. Prefer [unwrap] with an explicit scope to
- * configure execution per observation without mutating this value.
+ * constructor properties. Execution settings belong to individual observation
+ * calls and are never stored on this value. A null scope/dispatcher uses the
+ * [ObserveWrapper] defaults: Main with a SupervisorJob, and Default for transforms.
+ * Prefer an owned scope so cancellation follows the caller lifecycle.
  *
  * @param T payload type
  * @property data current payload, or `null`
@@ -29,33 +30,6 @@ data class DataResult<T>(
     val error: Throwable?,
     val status: DataResultStatus
 ) {
-
-    private var scope: CoroutineScope? = null
-    private var transformDispatcher: CoroutineDispatcher? = null
-
-    /**
-     * Sets the [CoroutineScope] used by the observation helpers on this instance.
-     * Not propagated by `copy()` or [transform]. Prefer explicit-scope [unwrap].
-     *
-     * @param scope scope used to launch callbacks
-     */
-    fun scope(scope: CoroutineScope) = apply { this.scope = scope }
-
-    /**
-     * Creates a [CoroutineScope] from the supplied dispatcher and stores it for observers.
-     * No external owner Job is supplied. Prefer an owned scope with [unwrap].
-     * Not propagated by `copy()` or [transform].
-     *
-     * @param dispatcher dispatcher used to create the internal [CoroutineScope]
-     */
-    fun scope(scope: CoroutineDispatcher) = apply { this.scope = CoroutineScope(scope) }
-
-    /**
-     * Sets the dispatcher used by transformation callbacks on this instance.
-     * Not propagated by `copy()` or [transform]. Prefer explicit-scope [unwrap].
-     */
-    fun transformDispatcher(dispatcher: CoroutineDispatcher) =
-        apply { this.transformDispatcher = dispatcher }
 
     /**
      * `true` when [data] is not `null`.
@@ -108,6 +82,7 @@ data class DataResult<T>(
         get() = when (data) {
             is Collection<*> -> data.size == 1
             is Map<*, *> -> data.size == 1
+            // A second element is enough to disprove a single-item sequence.
             is Sequence<*> -> data.take(2).count() == 1
             else -> false
         }
@@ -123,6 +98,7 @@ data class DataResult<T>(
         get() = when (data) {
             is Collection<*> -> data.size > 1
             is Map<*, *> -> data.size > 1
+            // Two elements establish multiplicity; the remaining tail is irrelevant.
             is Sequence<*> -> data.take(2).count() > 1
             else -> false
         }
@@ -165,7 +141,7 @@ data class DataResult<T>(
      *
      * If [data] is `null`, the current instance is represented as-is. If the
      * transformation throws, the returned result switches to [DataResultStatus.ERROR].
-     * The returned value does not inherit legacy observation settings.
+     * This synchronous value mapping uses no observation scope or dispatcher.
      */
     fun <R> transform(transform: (T) -> R): DataResult<R> = data?.runCatching {
         DataResult(transform(this), error, status)
@@ -174,26 +150,18 @@ data class DataResult<T>(
     } ?: DataResult(null, error, status)
 
     /**
-     * Creates an [ObserveWrapper], applies [config], and attaches this result.
-     */
-    fun unwrap(config: ObserveWrapper<T>.() -> Unit) = ObserveWrapper<T>().also {
-        scope?.let(it::scope)
-        transformDispatcher?.let(it::transformDispatcher)
-    }.apply(config).attachTo(this)
-
-    /**
      * Observes this value with execution settings local to this call.
      *
-     * Ignores legacy instance settings. [config] may override these settings on
-     * the wrapper. The caller owns [scope] and its cancellation; transformations
-     * use [transformDispatcher] when supplied, otherwise the wrapper default.
+     * Null settings use [ObserveWrapper] defaults. [config] may override the
+     * supplied settings. When provided, the caller owns [scope] and cancellation.
+     * Transformations use [transformDispatcher]; callbacks run in [scope].
      */
     fun unwrap(
-        scope: CoroutineScope,
+        scope: CoroutineScope? = null,
         transformDispatcher: CoroutineDispatcher? = null,
         config: ObserveWrapper<T>.() -> Unit
     ) = ObserveWrapper<T>().also {
-        it.scope(scope)
+        scope?.let(it::scope)
         transformDispatcher?.let(it::transformDispatcher)
     }.apply(config).attachTo(this)
 
@@ -202,13 +170,21 @@ data class DataResult<T>(
     /**
      * Invokes [func] when [data] is not `null`.
      */
-    fun data(func: suspend (T) -> Unit) = unwrap { data(observer = func) }
+    fun data(
+        scope: CoroutineScope? = null,
+        transformDispatcher: CoroutineDispatcher? = null,
+        func: suspend (T) -> Unit
+    ) = unwrap(scope, transformDispatcher) { data(observer = func) }
 
     /**
      * Transforms [data] before invoking [func].
      */
-    fun <R> data(transformer: suspend (T) -> R, func: suspend (R) -> Unit) =
-        unwrap { data(transformer = transformer, observer = func) }
+    fun <R> data(
+        transformer: suspend (T) -> R,
+        scope: CoroutineScope? = null,
+        transformDispatcher: CoroutineDispatcher? = null,
+        func: suspend (R) -> Unit
+    ) = unwrap(scope, transformDispatcher) { data(transformer = transformer, observer = func) }
     //endregion
 
     //region Loading
@@ -216,17 +192,26 @@ data class DataResult<T>(
     /**
      * Invokes [func] with the loading flag for this result.
      */
-    fun loading(func: suspend (Boolean) -> Unit) = unwrap { loading(observer = func) }
+    fun loading(
+        scope: CoroutineScope? = null,
+        func: suspend (Boolean) -> Unit
+    ) = unwrap(scope = scope) { loading(observer = func) }
 
     /**
      * Invokes [func] when [status] is [DataResultStatus.LOADING].
      */
-    fun showLoading(func: suspend () -> Unit) = unwrap { showLoading(observer = func) }
+    fun showLoading(
+        scope: CoroutineScope? = null,
+        func: suspend () -> Unit
+    ) = unwrap(scope = scope) { showLoading(observer = func) }
 
     /**
      * Invokes [func] when [status] is not [DataResultStatus.LOADING].
      */
-    fun hideLoading(func: suspend () -> Unit) = unwrap { hideLoading(observer = func) }
+    fun hideLoading(
+        scope: CoroutineScope? = null,
+        func: suspend () -> Unit
+    ) = unwrap(scope = scope) { hideLoading(observer = func) }
     //endregion
 
     //region Error
@@ -234,32 +219,50 @@ data class DataResult<T>(
     /**
      * Invokes [func] with [error] when [status] is [DataResultStatus.ERROR].
      */
-    fun error(func: suspend (Throwable) -> Unit) = unwrap { error(observer = func) }
+    fun error(
+        scope: CoroutineScope? = null,
+        transformDispatcher: CoroutineDispatcher? = null,
+        func: suspend (Throwable) -> Unit
+    ) = unwrap(scope, transformDispatcher) { error(observer = func) }
 
     /**
      * Invokes [func] when [status] is [DataResultStatus.ERROR].
      */
-    fun error(func: suspend () -> Unit) = unwrap { error(observer = func) }
+    fun error(
+        scope: CoroutineScope? = null,
+        transformDispatcher: CoroutineDispatcher? = null,
+        func: suspend () -> Unit
+    ) = unwrap(scope, transformDispatcher) { error(observer = func) }
 
     /**
      * Transforms [error] before invoking [func].
      */
-    fun <R> error(transformer: suspend (Throwable) -> R, func: suspend (R) -> Unit) =
-        unwrap { error(transformer = transformer, observer = func) }
+    fun <R> error(
+        transformer: suspend (Throwable) -> R,
+        scope: CoroutineScope? = null,
+        transformDispatcher: CoroutineDispatcher? = null,
+        func: suspend (R) -> Unit
+    ) = unwrap(scope, transformDispatcher) { error(transformer = transformer, observer = func) }
 
     /**
      * Invokes [func] with [error] when it is an instance of [E].
      */
     @JvmName("errorTyped")
-    inline fun <reified E : Throwable> error(noinline func: suspend (E) -> Unit) =
-        error(E::class, func)
+    inline fun <reified E : Throwable> error(
+        scope: CoroutineScope? = null,
+        transformDispatcher: CoroutineDispatcher? = null,
+        noinline func: suspend (E) -> Unit
+    ) = error(E::class, scope, transformDispatcher, func)
 
     /**
      * Invokes [func] when [error] is an instance of [E].
      */
     @JvmName("errorTyped")
-    inline fun <reified E : Throwable> error(noinline func: suspend () -> Unit) =
-        error(E::class, func)
+    inline fun <reified E : Throwable> error(
+        scope: CoroutineScope? = null,
+        transformDispatcher: CoroutineDispatcher? = null,
+        noinline func: suspend () -> Unit
+    ) = error(E::class, scope, transformDispatcher, func)
 
     /**
      * Transforms [error] before invoking [func] when it is an instance of [E].
@@ -267,20 +270,30 @@ data class DataResult<T>(
     @JvmName("errorTyped")
     inline fun <reified E : Throwable, R> error(
         noinline transformer: suspend (E) -> R,
+        scope: CoroutineScope? = null,
+        transformDispatcher: CoroutineDispatcher? = null,
         noinline func: suspend (R) -> Unit
-    ) = error(E::class, transformer, func)
+    ) = error(E::class, transformer, scope, transformDispatcher, func)
 
     /**
      * Invokes [func] with [error] when [status] is [DataResultStatus.ERROR] and [error] is an instance of [clazz].
      */
-    fun <E : Throwable> error(clazz: KClass<E>, func: suspend (E) -> Unit) =
-        unwrap { error(clazz = clazz, observer = func) }
+    fun <E : Throwable> error(
+        clazz: KClass<E>,
+        scope: CoroutineScope? = null,
+        transformDispatcher: CoroutineDispatcher? = null,
+        func: suspend (E) -> Unit
+    ) = unwrap(scope, transformDispatcher) { error(clazz = clazz, observer = func) }
 
     /**
      * Invokes [func] when [status] is [DataResultStatus.ERROR] and [error] is an instance of [clazz].
      */
-    fun <E : Throwable> error(clazz: KClass<E>, func: suspend () -> Unit) =
-        unwrap { error(clazz = clazz, observer = func) }
+    fun <E : Throwable> error(
+        clazz: KClass<E>,
+        scope: CoroutineScope? = null,
+        transformDispatcher: CoroutineDispatcher? = null,
+        func: suspend () -> Unit
+    ) = unwrap(scope, transformDispatcher) { error(clazz = clazz, observer = func) }
 
     /**
      * Transforms [error] before invoking [func] when [error] is an instance of [clazz].
@@ -288,7 +301,11 @@ data class DataResult<T>(
     fun <E : Throwable, R> error(
         clazz: KClass<E>,
         transformer: suspend (E) -> R,
+        scope: CoroutineScope? = null,
+        transformDispatcher: CoroutineDispatcher? = null,
         func: suspend (R) -> Unit
-    ) = unwrap { error(clazz = clazz, transformer = transformer, observer = func) }
+    ) = unwrap(scope, transformDispatcher) {
+        error(clazz = clazz, transformer = transformer, observer = func)
+    }
     //endregion
 }
