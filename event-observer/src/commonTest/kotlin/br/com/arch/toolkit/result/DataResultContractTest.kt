@@ -85,7 +85,7 @@ class DataResultContractTest {
             val result = dataResultSuccess("value")
             var observed: String? = null
             result.data {
-                assertEquals(main, currentCoroutineContext()[ContinuationInterceptor])
+                assertEquals(Dispatchers.Main, currentCoroutineContext()[ContinuationInterceptor])
                 observed = it
             }
             testScheduler.advanceUntilIdle()
