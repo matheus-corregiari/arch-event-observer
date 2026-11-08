@@ -66,6 +66,3 @@ jetbrains-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", versi
 jetbrains-compose-kotlin = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }
 vanniktech-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech-publish" }
 
-# ------------------------------------------------------------------------------------------------ #
-[bundles]
-## Nothing Here Yet!
