@@ -36,7 +36,7 @@ Here `viewModel.state` is a `StateFlow<DataResult<User>>`.
 val resultState by viewModel.state.collectAsStateWithLifecycle()
 
 DataResultContent(result = resultState) {
-    OnShowLoading { CircularProgressIndicator() }
+    OnShowLoading { -> CircularProgressIndicator() }
     OnData { data -> Text("Content: $data") }
     OnError { error -> Text("Error: ${error.message}") }
 }
@@ -52,7 +52,7 @@ Or render the collected snapshot using the extension function:
 
 ```kotlin
 resultState.Content {
-    OnShowLoading { CircularProgressIndicator() }
+    OnShowLoading { -> CircularProgressIndicator() }
     OnData { data -> Text("Content: $data") }
     OnError { error -> Text("Error: ${error.message}") }
 }
@@ -80,7 +80,7 @@ For self-contained components driven by a single `ResponseFlow` or `Flow<DataRes
 val flow: ResponseFlow<String> = ...
 
 flow.Content {
-    OnShowLoading { CircularProgressIndicator() }
+    OnShowLoading { -> CircularProgressIndicator() }
     OnData { data -> Text("Content: $data") }
     OnError { error -> Text("Error: ${error.message}") }
 }
@@ -90,7 +90,7 @@ Or using the top-level Composable function:
 
 ```kotlin
 ComposableDataResult(flow = viewModel.flow) {
-    OnShowLoading { CircularProgressIndicator() }
+    OnShowLoading { -> CircularProgressIndicator() }
     OnData { data -> Text("Content: $data") }
     OnError { error -> Text("Error: ${error.message}") }
 }

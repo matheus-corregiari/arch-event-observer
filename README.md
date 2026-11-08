@@ -128,7 +128,7 @@ about.
 
 ```kotlin
 myFlow.Content {
-    OnShowLoading { CircularProgressIndicator() }
+    OnShowLoading { -> CircularProgressIndicator() }
     OnData { value -> Text(value.toString()) }
     OnError { error -> Text(error.message ?: "Unknown error") }
 }

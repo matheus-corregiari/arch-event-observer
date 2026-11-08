@@ -56,8 +56,8 @@ class DataResultContentScope<T> internal constructor() {
     /** Renders the original data from a successful result when data is present. */
     fun OnSuccess(
         dataStatus: EventDataStatus = DoesNotMatter,
-        func: ResultDataContent<T>
-    ) = register(SuccessWithDataObservable(dataStatus) { func.Content(it) })
+        func: @Composable (T) -> Unit
+    ) = register(SuccessWithDataObservable(dataStatus, func))
 
     /** Renders successful data when it is an instance of [clazz], including subtypes. */
     fun <R : Any> OnSuccess(
@@ -88,8 +88,8 @@ class DataResultContentScope<T> internal constructor() {
     /** Renders the original data from a loading result when data is present. */
     fun OnShowLoading(
         dataStatus: EventDataStatus = DoesNotMatter,
-        func: ResultDataContent<T>
-    ) = register(LoadingWithDataObservable(dataStatus, loadingStatuses) { func.Content(it) })
+        func: @Composable (T) -> Unit
+    ) = register(LoadingWithDataObservable(dataStatus, loadingStatuses, func))
 
     /** Renders data from a loading result when it is an instance of [clazz]. */
     fun <R : Any> OnShowLoading(
@@ -114,8 +114,8 @@ class DataResultContentScope<T> internal constructor() {
     /** Renders the original data from a completed result when data is present. */
     fun OnHideLoading(
         dataStatus: EventDataStatus = DoesNotMatter,
-        func: ResultDataContent<T>
-    ) = register(LoadingWithDataObservable(dataStatus, completedStatuses) { func.Content(it) })
+        func: @Composable (T) -> Unit
+    ) = register(LoadingWithDataObservable(dataStatus, completedStatuses, func))
 
     /** Renders data from a completed result when it is an instance of [clazz]. */
     fun <R : Any> OnHideLoading(
@@ -413,17 +413,6 @@ class DataResultContentScope<T> internal constructor() {
     private fun register(observable: ComposeObservable<T, *>) {
         list.add(observable)
     }
-}
-
-/**
- * Composable content for a result carrying data of type [T].
- *
- * The SAM type preserves overload resolution for existing argumentless lambdas.
- */
-fun interface ResultDataContent<T> {
-    @Composable
-    @Suppress("FunctionNaming")
-    fun Content(data: T)
 }
 
 private val loadingStatuses = setOf(DataResultStatus.LOADING)

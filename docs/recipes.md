@@ -7,8 +7,8 @@ Use the loading callbacks directly from `DataResult` or, in the Compose module,
 
 ```kotlin
 myFlow.Content {
-    OnShowLoading { CircularProgressIndicator() }
-    OnHideLoading { Text("Done") }
+    OnShowLoading { -> CircularProgressIndicator() }
+    OnHideLoading { -> Text("Done") }
 }
 ```
 

@@ -32,7 +32,7 @@ import br.com.arch.toolkit.result.DataResult
  * val resultState by viewModel.state.collectAsStateWithLifecycle()
  *
  * DataResultContent(result = resultState) {
- *     OnShowLoading { CircularProgressIndicator() }
+ *     OnShowLoading { -> CircularProgressIndicator() }
  *     OnData { user -> Text("Hello ${user.name}") }
  *     OnError { e -> Text("Error: ${e.message}") }
  * }
@@ -82,7 +82,7 @@ fun <T> DataResultContent(
  * val resultState by viewModel.state.collectAsStateWithLifecycle()
  *
  * resultState.Content {
- *     OnShowLoading { CircularProgressIndicator() }
+ *     OnShowLoading { -> CircularProgressIndicator() }
  *     OnData { user -> Text("Hello ${user.name}") }
  *     OnError { e -> Text("Error: ${e.message}") }
  * }

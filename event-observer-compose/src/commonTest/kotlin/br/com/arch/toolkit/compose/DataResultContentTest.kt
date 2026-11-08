@@ -200,7 +200,7 @@ class DataResultContentTest : PlatformTest() {
             var result by mutableStateOf(DataResult("data", null, DataResultStatus.LOADING))
             var instances = 0
             val content: DataResultContentScope<String>.() -> Unit = {
-                OnShowLoading { BasicText("loading", Modifier.testTag("loading")) }
+                OnShowLoading { -> BasicText("loading", Modifier.testTag("loading")) }
                 OnData { data ->
                     val instance = remember { ++instances }
                     BasicText("$data/$instance", Modifier.testTag("data"))
