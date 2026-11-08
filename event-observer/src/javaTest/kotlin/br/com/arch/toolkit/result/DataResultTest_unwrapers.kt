@@ -9,7 +9,6 @@ import br.com.arch.toolkit.util.dataResultSuccess
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -66,18 +65,6 @@ class DataResultTest_unwrapers {
     fun before() {
         every { transformData.invoke(any()) } returns 123
         every { transformError.invoke(any()) } returns 123
-
-        resultA.scope(CoroutineScope(Dispatchers.Main))
-        resultA.transformDispatcher(Dispatchers.Main)
-        resultB.transformDispatcher(Dispatchers.Main)
-        resultC.transformDispatcher(Dispatchers.Main)
-        resultD.transformDispatcher(Dispatchers.Main)
-        resultE.transformDispatcher(Dispatchers.Main)
-        resultF.transformDispatcher(Dispatchers.Main)
-        resultG.transformDispatcher(Dispatchers.Main)
-        resultH.transformDispatcher(Dispatchers.Main)
-        resultI.transformDispatcher(Dispatchers.Main)
-        resultJ.transformDispatcher(Dispatchers.Main)
     }
 
     // region State: SUCCESS
@@ -308,17 +295,25 @@ class DataResultTest_unwrapers {
 
     private fun observe(result: DataResult<String>) {
         // Data
-        result.data(mockedData)
-        result.data(transformData, mockedTransformedData)
+        result.data(func = mockedData)
+        result.data(
+            transformer = transformData,
+            transformDispatcher = Dispatchers.Main,
+            func = mockedTransformedData
+        )
 
         // Loading
-        result.loading(mockedLoading)
-        result.hideLoading(mockedHideLoading)
-        result.showLoading(mockedShowLoading)
+        result.loading(func = mockedLoading)
+        result.hideLoading(func = mockedHideLoading)
+        result.showLoading(func = mockedShowLoading)
 
         // Error
-        result.error(mockedError)
-        result.error(mockedErrorWithoutArgument)
-        result.error(transformError, mockedTransformedError)
+        result.error(func = mockedError)
+        result.error(func = mockedErrorWithoutArgument)
+        result.error(
+            transformer = transformError,
+            transformDispatcher = Dispatchers.Main,
+            func = mockedTransformedError
+        )
     }
 }

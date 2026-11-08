@@ -3,6 +3,9 @@
 
 package br.com.arch.toolkit.compose
 
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
@@ -18,6 +21,19 @@ class ComposableDataResultSuccessTest : PlatformTest() {
     init {
         Dispatchers.setMain(StandardTestDispatcher())
     }
+
+    @Test
+    fun `success content receives original data`() = scenario(
+        result = DataResult("raw", null, DataResultStatus.SUCCESS),
+        config = {
+            OnSuccess { data ->
+                BasicText(data.uppercase(), Modifier.testTag("rawSuccess"))
+            }
+        },
+        assert = {
+            onNodeWithTag("rawSuccess").assertTextEquals("RAW")
+        }
+    )
 
     @Test
     fun `1 - String - SUCCESS - null`() = scenario(

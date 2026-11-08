@@ -1,26 +1,27 @@
 # Dependencies
 
-Audited against Maven Central, Google Maven and the Gradle Plugin Portal on 2026-10-01 for `3.0.0`.
+Audited against Maven Central, Google Maven and the Gradle Plugin Portal on 2026-11-08 for `3.1.0`.
 Runtime dependencies and AGP use stable releases. Detekt retains its existing alpha line.
-Gradle **9.8.0**, JDK **21**, Kover **0.9.11**, MkDocs Material **9.7.7**.
+Gradle **9.9.0**, JDK **25**, Kover **0.9.11**, MkDocs Material **9.8.1**.
+Published JVM bytecode targets Java **25**.
 
 | Alias                                      | Version         | Source                                                                                                                                                                 |
 | ------------------------------------------ | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `jetbrains-dokka`                          | `2.2.0`         | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/dokka/dokka-gradle-plugin/maven-metadata.xml)                                                            |
-| `jetbrains-plugin`                         | `2.4.20`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/maven-metadata.xml)                                                          |
-| `jetbrains-multiplatform`                  | `2.4.20`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/multiplatform/org.jetbrains.kotlin.multiplatform.gradle.plugin/maven-metadata.xml)                |
+| `jetbrains-dokka`                          | `2.3.0`         | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/dokka/dokka-gradle-plugin/maven-metadata.xml)                                                            |
+| `jetbrains-plugin`                         | `2.4.21`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/maven-metadata.xml)                                                          |
+| `jetbrains-multiplatform`                  | `2.4.21`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/multiplatform/org.jetbrains.kotlin.multiplatform.gradle.plugin/maven-metadata.xml)                |
 | `jetbrains-kover`                          | `0.9.11`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kover-gradle-plugin/maven-metadata.xml)                                                          |
-| `jetbrains-compose-runtime`                | `1.12.1`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/runtime/runtime/maven-metadata.xml)                                                              |
-| `jetbrains-compose-animation`              | `1.12.1`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/animation/animation/maven-metadata.xml)                                                          |
-| `jetbrains-compose-foundation`             | `1.12.1`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/foundation/foundation/maven-metadata.xml)                                                        |
-| `jetbrains-compose-ui-test`                | `1.12.1`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/ui/ui-test/maven-metadata.xml)                                                                   |
-| `jetbrains-compose-desktop`                | `1.12.1`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/desktop/desktop-jvm/maven-metadata.xml)                                                          |
-| `jetbrains-compose-ui-test-junit4-desktop` | `1.12.1`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/ui/ui-test-junit4-desktop/maven-metadata.xml)                                                    |
+| `jetbrains-compose-runtime`                | `1.12.2`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/runtime/runtime/maven-metadata.xml)                                                              |
+| `jetbrains-compose-animation`              | `1.12.2`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/animation/animation/maven-metadata.xml)                                                          |
+| `jetbrains-compose-foundation`             | `1.12.2`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/foundation/foundation/maven-metadata.xml)                                                        |
+| `jetbrains-compose-ui-test`                | `1.12.2`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/ui/ui-test/maven-metadata.xml)                                                                   |
+| `jetbrains-compose-desktop`                | `1.12.2`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/desktop/desktop-jvm/maven-metadata.xml)                                                          |
+| `jetbrains-compose-ui-test-junit4-desktop` | `1.12.2`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/ui/ui-test-junit4-desktop/maven-metadata.xml)                                                    |
 | `jetbrains-coroutines-core`                | `1.11.0`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core/maven-metadata.xml)                                                      |
 | `jetbrains-coroutines-test`                | `1.11.0`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-test/maven-metadata.xml)                                                      |
-| `jetbrains-kotlin-test`                    | `2.4.20`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-test/maven-metadata.xml)                                                                   |
-| `jetbrains-serialization-json`             | `1.11.0`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-serialization-json/maven-metadata.xml)                                                   |
-| `androidx-library`                         | `9.4.1`         | [Metadata](https://dl.google.com/dl/android/maven2/com/android/kotlin/multiplatform/library/com.android.kotlin.multiplatform.library.gradle.plugin/maven-metadata.xml) |
+| `jetbrains-kotlin-test`                    | `2.4.21`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-test/maven-metadata.xml)                                                                   |
+| `jetbrains-serialization-json`             | `1.12.0`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-serialization-json/maven-metadata.xml)                                                   |
+| `androidx-library`                         | `9.5.1`         | [Metadata](https://dl.google.com/dl/android/maven2/com/android/kotlin/multiplatform/library/com.android.kotlin.multiplatform.library.gradle.plugin/maven-metadata.xml) |
 | `androidx-arch-coreTesting`                | `2.2.0`         | [Metadata](https://dl.google.com/dl/android/maven2/androidx/arch/core/core-testing/maven-metadata.xml)                                                                 |
 | `androidx-compose-lifecycle`               | `2.11.0`        | [Metadata](https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-runtime-compose/maven-metadata.xml)                                                    |
 | `androidx-lifecycle-livedata`              | `2.11.0`        | [Metadata](https://dl.google.com/dl/android/maven2/androidx/lifecycle/lifecycle-livedata/maven-metadata.xml)                                                           |
@@ -32,8 +33,8 @@ Gradle **9.8.0**, JDK **21**, Kover **0.9.11**, MkDocs Material **9.7.7**.
 | `ktlint`                                   | `14.2.0`        | [Metadata](https://plugins.gradle.org/m2/org/jlleitschuh/gradle/ktlint/org.jlleitschuh.gradle.ktlint.gradle.plugin/maven-metadata.xml)                                 |
 | `vanniktech-publish`                       | `0.37.0`        | [Metadata](https://repo.maven.apache.org/maven2/com/vanniktech/gradle-maven-publish-plugin/maven-metadata.xml)                                                         |
 | `robolectric-test`                         | `4.17`          | [Metadata](https://repo.maven.apache.org/maven2/org/robolectric/robolectric/maven-metadata.xml)                                                                        |
-| `mockk-test-android`                       | `1.14.11`       | [Metadata](https://repo.maven.apache.org/maven2/io/mockk/mockk-android/maven-metadata.xml)                                                                             |
-| `mockk-test-agent`                         | `1.14.11`       | [Metadata](https://repo.maven.apache.org/maven2/io/mockk/mockk/maven-metadata.xml)                                                                                     |
+| `mockk-test-android`                       | `1.14.12`       | [Metadata](https://repo.maven.apache.org/maven2/io/mockk/mockk-android/maven-metadata.xml)                                                                             |
+| `mockk-test-agent`                         | `1.14.12`       | [Metadata](https://repo.maven.apache.org/maven2/io/mockk/mockk/maven-metadata.xml)                                                                                     |
 
 ## Tooling sources
 
@@ -50,29 +51,34 @@ with Node 24 and the maintained command-line tools provided by the action.
 
 ## JavaScript lockfile
 
-Commit `kotlin-js-store/yarn.lock` to keep resolved npm dependencies reproducible in
-local builds and CI, as recommended by the [Kotlin/JS setup guide](https://kotlinlang.org/docs/js-project-setup.html).
-After an intentional dependency change, run `./gradlew kotlinUpgradeYarnLock` and
-review the lockfile diff. Do not delete it to bypass dependency mismatches.
+Gradle keeps Yarn's generated lockfile in the ignored `kotlin-js-store/` directory.
+A fresh checkout resolves npm dependencies on its first web build.
 
 AtomicFU remains available for modules that use atomic state; the Compose module no
 longer applies its plugin because observer registration is local to composition.
 
-CodeQL and normal builds both use Kotlin 2.4.20, where explicit backing fields are
-stable. [CodeQL 2.27.1 supports Kotlin 2.4.20](https://github.blog/changelog/2026-09-25-codeql-2-27-1-adds-c-and-c-query-and-kotlin-2-4-20-support/),
+CodeQL and normal builds use the same Kotlin version from the catalog. Explicit
+backing fields became stable in Kotlin 2.4.20. [CodeQL 2.27.1 supports Kotlin 2.4.20](https://github.blog/changelog/2026-09-25-codeql-2-27-1-adds-c-and-c-query-and-kotlin-2-4-20-support/),
 so no compiler downgrade or backing-field opt-in is needed.
 
 ## Android SDK
 
 Compile against stable Android SDK **37.2** with the `compileSdk { version = release(37) {
 minorApiLevel = 2 } }` DSL. The catalog stores major and minor levels separately.
-AGP **9.4.1** and Build Tools **37.0.0** are the latest stable releases verified in
+AGP **9.5.1** and Build Tools **37.0.0** are available from
 [Google Maven](https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/maven-metadata.xml)
 and the [SDK repository](https://dl.google.com/android/repository/repository2-3.xml).
 `minSdk` remains **23**. These are KMP library modules; the consuming application owns
 `targetSdk` and its runtime behavior. See the [Android SDK configuration guide](https://developer.android.com/build).
 
-## Stable update assessment (2026-10-01)
+## Stable update assessment (2026-11-08)
+
+- Update Gradle to **9.9.0**, Kotlin to **2.4.21**, Compose Multiplatform to **1.12.2**,
+  AGP to **9.5.1**, Dokka to **2.3.0**, serialization to **1.12.0**, JaCoCo to **0.8.16**,
+  MockK to **1.14.12**, and MkDocs Material to **9.8.1**.
+- Use Temurin **25** for the Gradle daemon and CI. The published JVM target is **25**.
+
+## Previous stable update assessment (2026-10-01)
 
 - Adopt Kover **0.9.11**. Its [release](https://github.com/Kotlin/kotlinx-kover/releases/tag/v0.9.11)
   reverts a 0.9.10 change that produced zero coverage with Gradle configuration cache
@@ -81,33 +87,13 @@ and the [SDK repository](https://dl.google.com/android/repository/repository2-3.
 - Gradle **9.8.0**, Kotlin **2.4.20**, Compose **1.12.1**, AGP **9.4.1**, SDK **37.2**,
   Build Tools **37.0.0**, AtomicFU **0.33.0**, Dokka **2.2.0**, coroutines/serialization **1.11.0**,
   JaCoCo **0.8.15**, ktlint **14.2.0**, publishing **0.37.0**, Robolectric **4.17** and MockK **1.14.11**
-  match stable metadata. The dependency table covers published library modules; optional benchmark dependencies are audited below.
+  match stable metadata.
 - Detekt **2.0.0-alpha.6** has no stable release in the `dev.detekt` line. Keep the existing tool;
   reverting to the old stable 1.x coordinates would be a migration, not a patch update.
 - Retain current major references for Actions: checkout/Python/artifact/Codecov **v7**, Java/Gradle **v6**,
   Android/CodeQL **v4**, GitHub App/release **v3** and Pages **v5**. Latest stable tags remain in
   those majors; floating major tags receive their compatible patch updates.
 - MkDocs Material **9.7.7** remains current. Library modules have no application `targetSdk`;
-  opt-in benchmark apps use the catalog's API **37**. Compile SDK **37.2** is a minor API level,
-  not a reason to invent a library target API or raise `minSdk` **23**.
+  compile SDK **37.2** and `minSdk` **23** are configured in build-logic `Versions`.
 - Do not introduce Compose 1.13 alpha or prerelease AGP/Kotlin in this publication.
-
-## Optional benchmark tooling
-
-| Component       | Declared | Latest stable | Decision                                    |
-| --------------- | -------- | ------------- | ------------------------------------------- |
-| Activity KTX    | 1.13.0   | 1.13.0        | Retain                                      |
-| Macrobenchmark  | 1.5.0    | 1.5.0         | Retain                                      |
-| UI Automator    | 2.3.0    | 2.4.0         | Candidate for a separate device-test update |
-| Foojay resolver | 1.0.0    | 1.0.0         | Retain in both settings files               |
-
-[UI Automator 2.4.0](https://developer.android.com/jetpack/androidx/releases/test-uiautomator#2.4.0)
-adds a scoped test API, conditional waits, app-stability helpers and screenshot/reporting support.
-It can improve the opt-in benchmark harness, but requires compiling and rerunning all six device
-cases, including rotation and background-process restoration, before adoption. Keep the currently
-validated 2.3.0 harness in this publication; the new version does not affect published library artifacts.
-Sources: Google Maven metadata for
-[Activity](https://dl.google.com/dl/android/maven2/androidx/activity/activity-ktx/maven-metadata.xml),
-[Macrobenchmark](https://dl.google.com/dl/android/maven2/androidx/benchmark/benchmark-macro-junit4/maven-metadata.xml),
-[UI Automator](https://dl.google.com/dl/android/maven2/androidx/test/uiautomator/uiautomator/maven-metadata.xml)
-and the [Foojay plugin](https://plugins.gradle.org/m2/org/gradle/toolchains/foojay-resolver-convention/org.gradle.toolchains.foojay-resolver-convention.gradle.plugin/maven-metadata.xml).
+- Both settings files use [Foojay resolver 1.0.0](https://plugins.gradle.org/plugin/org.gradle.toolchains.foojay-resolver-convention/1.0.0).

@@ -1,16 +1,16 @@
-@file:Suppress("UnstableApiUsage")
+@file:Suppress("UnstableApiUsage", "UNCHECKED_CAST")
 
 // Setting up all repository plugins
 
 pluginManagement {
     apply(from = "$rootDir/../gradle/repositories.gradle.kts")
-    val repositoryList: RepositoryHandler.() -> Unit by extra
+    val repositoryList = extra["repositoryList"] as RepositoryHandler.() -> Unit
     repositories(repositoryList)
 }
 
 dependencyResolutionManagement {
     apply(from = "$rootDir/../gradle/repositories.gradle.kts")
-    val repositoryList: RepositoryHandler.() -> Unit by extra
+    val repositoryList = extra["repositoryList"] as RepositoryHandler.() -> Unit
     repositories(repositoryList)
     versionCatalogs { register("libs") { from(files("$rootDir/../gradle/libs.versions.toml")) } }
 }

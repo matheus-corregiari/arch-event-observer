@@ -7,7 +7,10 @@
  * The plugin owns common compiler, hierarchy, Android namespace, lint, test coverage, native
  * framework, and source jar defaults shared by publishable library modules.
  */
+
+import br.com.arch.toolkit.convention.Versions
 import com.android.build.api.variant.impl.capitalizeFirstChar
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 plugins {
@@ -17,17 +20,27 @@ plugins {
 
 // Robolectric 4.17 accesses SharedSecrets when bootstrapping Android on JDK 21.
 tasks.withType<Test>().configureEach {
+    jvmArgs(
+        "-Xshare:off",
+        "--enable-native-access=ALL-UNNAMED",
+        "--sun-misc-unsafe-memory-access=allow"
+    )
     if (name.contains("AndroidHostTest")) {
         jvmArgs("--add-opens=java.base/jdk.internal.access=ALL-UNNAMED")
     }
+}
+
+tasks.withType<JavaCompile>().matching { it.name.startsWith("compileJvm") }.configureEach {
+    options.release.set(Versions.JAVA)
 }
 
 private val formatName = project.name.split("-").joinToString("") { it }
     .replaceFirstChar { it.lowercase() }
 extensions.configure<KotlinMultiplatformExtension> {
     compilerOptions {
-        jvmToolchain(projectJavaVersionCode)
+        jvmToolchain(Versions.JAVA)
         progressiveMode.set(true)
+        optIn.add("kotlinx.coroutines.ExperimentalCoroutinesApi")
     }
     withSourcesJar(true)
     applyDefaultHierarchyTemplate {
@@ -44,13 +57,14 @@ extensions.configure<KotlinMultiplatformExtension> {
     }
 
     android {
+        compilerOptions.jvmTarget.set(JvmTarget.fromTarget(Versions.JAVA.toString()))
         compileSdk {
-            version = release(libraries.version("build-sdk-compile").toInt()) {
-                minorApiLevel = libraries.version("build-sdk-minor").toInt()
+            version = release(Versions.COMPILE_SDK) {
+                minorApiLevel = Versions.COMPILE_SDK_MINOR
             }
         }
-        minSdk = libraries.version("build-sdk-min").toInt()
-        buildToolsVersion = libraries.version("build-tools")
+        minSdk = Versions.MIN_SDK
+        buildToolsVersion = Versions.BUILD_TOOLS
         namespace = "br.com.arch.toolkit.$formatName"
         testNamespace = "test.$namespace"
         androidResources { enable = false }
@@ -65,14 +79,15 @@ extensions.configure<KotlinMultiplatformExtension> {
             ignoreWarnings = false
             absolutePaths = false
             warningsAsErrors = false
-
         }
-        testCoverage { jacocoVersion = libraries.version("jacoco") }
+        testCoverage { jacocoVersion = Versions.JACOCO }
         project.file("consumer-proguard-rules.pro")
             .takeIf(File::exists)
             ?.let(optimization.consumerKeepRules::file)
     }
-    jvm { }
+    jvm {
+        compilerOptions.jvmTarget.set(JvmTarget.fromTarget(Versions.JAVA.toString()))
+    }
     wasmJs {
         browser { testTask { useKarma { useChromeHeadless() } } }
         binaries.library()

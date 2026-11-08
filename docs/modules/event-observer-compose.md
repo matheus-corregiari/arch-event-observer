@@ -36,7 +36,7 @@ Here `viewModel.state` is a `StateFlow<DataResult<User>>`.
 val resultState by viewModel.state.collectAsStateWithLifecycle()
 
 DataResultContent(result = resultState) {
-    OnShowLoading { CircularProgressIndicator() }
+    OnShowLoading { -> CircularProgressIndicator() }
     OnData { data -> Text("Content: $data") }
     OnError { error -> Text("Error: ${error.message}") }
 }
@@ -52,7 +52,7 @@ Or render the collected snapshot using the extension function:
 
 ```kotlin
 resultState.Content {
-    OnShowLoading { CircularProgressIndicator() }
+    OnShowLoading { -> CircularProgressIndicator() }
     OnData { data -> Text("Content: $data") }
     OnError { error -> Text("Error: ${error.message}") }
 }
@@ -80,7 +80,7 @@ For self-contained components driven by a single `ResponseFlow` or `Flow<DataRes
 val flow: ResponseFlow<String> = ...
 
 flow.Content {
-    OnShowLoading { CircularProgressIndicator() }
+    OnShowLoading { -> CircularProgressIndicator() }
     OnData { data -> Text("Content: $data") }
     OnError { error -> Text("Error: ${error.message}") }
 }
@@ -90,7 +90,7 @@ Or using the top-level Composable function:
 
 ```kotlin
 ComposableDataResult(flow = viewModel.flow) {
-    OnShowLoading { CircularProgressIndicator() }
+    OnShowLoading { -> CircularProgressIndicator() }
     OnData { data -> Text("Content: $data") }
     OnError { error -> Text("Error: ${error.message}") }
 }
@@ -120,6 +120,33 @@ Visibility is filtered once per result and observer list inside each animated co
 slot, preserving outgoing snapshots during transitions. Registration keys preserve
 remembered state when an earlier observer becomes hidden. This trades a filtered-list
 allocation on changes for avoiding repeated visibility checks on unchanged inputs.
+
+Use `OnSuccess { data -> ... }` to render successful data with its original type.
+This observer renders when data is present. Use `OnSuccess(Subtype::class)` to render a particular variant of a sealed result with
+its concrete type. Use `OnError(ExceptionType::class)` to render errors whose throwable is
+an instance of that class, including subclasses.
+
+```kotlin
+result.Content {
+    OnSuccess(ScreenState.Ready::class) { ready -> Text(ready.title) }
+    OnError(IllegalArgumentException::class) { error, data ->
+        Text("${error.message}: $data")
+    }
+}
+```
+
+Use `OnData(Subtype::class)` when the matching data should render across result
+statuses. Like the unfiltered overload, it skips the `NONE` state. Its callbacks
+can receive the typed data alone, with the status, or with both the status and
+the optional throwable.
+
+`OnShowLoading { data -> ... }` and `OnHideLoading { data -> ... }` receive
+the original data when present. Pass `Subtype::class` to either observer to
+receive matching data with its concrete type. Show observes loading, and hide
+observes success and error.
+
+Use `OnError { error, data -> ... }` to receive the throwable and optional partial data.
+For error results without a throwable, use `OnError { -> ... }`.
 
 All matching observers render together, in registration order: for example, `OnSuccess`,
 `OnData` and `OnStatus` can render the same snapshot. Selecting only the first match
@@ -232,3 +259,6 @@ are removed. The default is now no animation. Explicit references to
 `ObserveComposableWrapper<T>` must become `DataResultContentScope<T>`.
 
 These are source and binary incompatible changes for existing Compose consumers.
+
+See [result, event and persisted-state examples](../core-concepts.md#result-event-or-persisted-state)
+for choosing the appropriate lifetime and observation contract.

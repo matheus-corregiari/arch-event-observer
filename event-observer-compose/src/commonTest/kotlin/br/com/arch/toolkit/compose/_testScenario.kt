@@ -67,23 +67,23 @@ private fun <T, R> DataResultContentScope<T>.createConfig() {
         BasicText("$data - $status - ${error?.message}", modifier = Modifier.testTag("dataTag3"))
     }
     // ShowLoading
-    OnShowLoading {
+    OnShowLoading { ->
         BasicText("ShowLoading 1", modifier = Modifier.testTag("showLoadingTag1"))
     }
-    OnShowLoading(EventDataStatus.WithData) {
+    OnShowLoading(EventDataStatus.WithData) { ->
         BasicText("ShowLoading 2", modifier = Modifier.testTag("showLoadingTag2"))
     }
-    OnShowLoading(EventDataStatus.WithoutData) {
+    OnShowLoading(EventDataStatus.WithoutData) { ->
         BasicText("ShowLoading 3", modifier = Modifier.testTag("showLoadingTag3"))
     }
     // HideLoading
-    OnHideLoading {
+    OnHideLoading { ->
         BasicText("HideLoading 1", modifier = Modifier.testTag("hideLoadingTag1"))
     }
-    OnHideLoading(EventDataStatus.WithData) {
+    OnHideLoading(EventDataStatus.WithData) { ->
         BasicText("HideLoading 2", modifier = Modifier.testTag("hideLoadingTag2"))
     }
-    OnHideLoading(EventDataStatus.WithoutData) {
+    OnHideLoading(EventDataStatus.WithoutData) { ->
         BasicText("HideLoading 3", modifier = Modifier.testTag("hideLoadingTag3"))
     }
     // Error Without Throwable
@@ -107,13 +107,13 @@ private fun <T, R> DataResultContentScope<T>.createConfig() {
         BasicText("Error 6 ${throwable.message}", modifier = Modifier.testTag("errorTag6"))
     }
     // Success
-    OnSuccess {
+    OnSuccess { ->
         BasicText("Success 1", modifier = Modifier.testTag("successTag1"))
     }
-    OnSuccess(EventDataStatus.WithData) {
+    OnSuccess(EventDataStatus.WithData) { ->
         BasicText("Success 2", modifier = Modifier.testTag("successTag2"))
     }
-    OnSuccess(EventDataStatus.WithoutData) {
+    OnSuccess(EventDataStatus.WithoutData) { ->
         BasicText("Success 3", modifier = Modifier.testTag("successTag3"))
     }
     // Empty

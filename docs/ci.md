@@ -90,7 +90,7 @@ python -m pip install -r .github/requirements-docs.txt
 python -m mkdocs build --strict
 ```
 
-Use JDK 21 and the project wrapper. Publication also has `ciPublicationManifest` for verifying the
+Use JDK 25 and the project wrapper. Publication also has `ciPublicationManifest` for verifying the
 complete list of Maven coordinates, without uploading packages.
 
 ## Coverage and Codecov
@@ -127,9 +127,8 @@ References: [Kover report filtering](https://kotlin.github.io/kotlinx-kover/grad
 Release notes use `docs/changelog/<version>.md` from the verified tag checkout, with generated
 GitHub notes as a fallback for historical tags without a page.
 
-Keep `kotlin-js-store/yarn.lock` versioned and update it through Gradle when dependencies change.
-It makes the Kotlin/JS npm dependency tree reproducible locally and in CI.
-See [Kotlin/JS version locking](https://kotlinlang.org/docs/js-project-setup.html#version-locking-via-kotlin-js-store).
+Kotlin/JS resolves npm dependencies on a fresh checkout. Gradle stores the
+generated Yarn lockfile locally in the ignored `kotlin-js-store/` directory.
 
 The weekly CodeQL workflow supplements required PR/master scanning. It uses manual JVM/Android
 compilation with the same setup and compiler, and separate SARIF categories. It does not replace

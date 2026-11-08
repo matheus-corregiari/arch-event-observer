@@ -1,8 +1,15 @@
 plugins {
     `kotlin-dsl`
+    alias(libs.plugins.ktlint)
 }
 
-kotlin { jvmToolchain(21) }
+configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    filter {
+        exclude { it.file.startsWith(layout.buildDirectory.get().asFile) }
+    }
+}
+
+kotlin { jvmToolchain(25) }
 
 group = "com.toolkit.plugin"
 version = "1.0.0"
@@ -21,7 +28,7 @@ dependencies {
     implementation(libs.ktlint)
 }
 
-configurations.configureEach {
+configurations.matching { !it.name.contains("ktlint", ignoreCase = true) }.configureEach {
     resolutionStrategy {
         failOnVersionConflict()
         preferProjectModules()

@@ -5,10 +5,12 @@ package br.com.arch.toolkit.compose
 import androidx.compose.runtime.Composable
 import br.com.arch.toolkit.compose.observable.ComposeObservable
 import br.com.arch.toolkit.compose.observable.DataObservable
+import br.com.arch.toolkit.compose.observable.DataWithClassObservable
 import br.com.arch.toolkit.compose.observable.EmptyObservable
 import br.com.arch.toolkit.compose.observable.ErrorObservable
 import br.com.arch.toolkit.compose.observable.ErrorWithThrowableObservable
 import br.com.arch.toolkit.compose.observable.HideLoadingObservable
+import br.com.arch.toolkit.compose.observable.LoadingWithDataObservable
 import br.com.arch.toolkit.compose.observable.ManyObservable
 import br.com.arch.toolkit.compose.observable.NoneObservable
 import br.com.arch.toolkit.compose.observable.NotEmptyObservable
@@ -17,10 +19,12 @@ import br.com.arch.toolkit.compose.observable.ShowLoadingObservable
 import br.com.arch.toolkit.compose.observable.SingleObservable
 import br.com.arch.toolkit.compose.observable.StatusObservable
 import br.com.arch.toolkit.compose.observable.SuccessObservable
+import br.com.arch.toolkit.compose.observable.SuccessWithDataObservable
 import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.result.DataResultStatus
 import br.com.arch.toolkit.result.EventDataStatus
 import br.com.arch.toolkit.result.EventDataStatus.DoesNotMatter
+import kotlin.reflect.KClass
 
 /**
  * A DSL scope used to register @Composable state observers for a [ComposableDataResult].
@@ -49,6 +53,23 @@ class DataResultContentScope<T> internal constructor() {
         func: @Composable () -> Unit
     ) = register(SuccessObservable(dataStatus, func))
 
+    /** Renders the original data from a successful result when data is present. */
+    fun OnSuccess(
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: @Composable (T) -> Unit
+    ) = register(SuccessWithDataObservable(dataStatus, func))
+
+    /** Renders successful data when it is an instance of [clazz], including subtypes. */
+    fun <R : Any> OnSuccess(
+        clazz: KClass<R>,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: @Composable (R) -> Unit
+    ) = register(
+        DataWithClassObservable(clazz, dataStatus, setOf(DataResultStatus.SUCCESS)) { data, _, _ ->
+            func(data)
+        }
+    )
+
     // endregion
 
     // region Loading
@@ -64,6 +85,21 @@ class DataResultContentScope<T> internal constructor() {
         func: @Composable () -> Unit
     ) = register(ShowLoadingObservable(dataStatus, func))
 
+    /** Renders the original data from a loading result when data is present. */
+    fun OnShowLoading(
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: @Composable (T) -> Unit
+    ) = register(LoadingWithDataObservable(dataStatus, loadingStatuses, func))
+
+    /** Renders data from a loading result when it is an instance of [clazz]. */
+    fun <R : Any> OnShowLoading(
+        clazz: KClass<R>,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: @Composable (R) -> Unit
+    ) = register(
+        DataWithClassObservable(clazz, dataStatus, loadingStatuses) { data, _, _ -> func(data) }
+    )
+
     /**
      * Registers a composable to be displayed when the [DataResult] is in a success or error state.
      *
@@ -74,6 +110,21 @@ class DataResultContentScope<T> internal constructor() {
         dataStatus: EventDataStatus = DoesNotMatter,
         func: @Composable () -> Unit
     ) = register(HideLoadingObservable(dataStatus, func))
+
+    /** Renders the original data from a completed result when data is present. */
+    fun OnHideLoading(
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: @Composable (T) -> Unit
+    ) = register(LoadingWithDataObservable(dataStatus, completedStatuses, func))
+
+    /** Renders data from a completed result when it is an instance of [clazz]. */
+    fun <R : Any> OnHideLoading(
+        clazz: KClass<R>,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: @Composable (R) -> Unit
+    ) = register(
+        DataWithClassObservable(clazz, dataStatus, completedStatuses) { data, _, _ -> func(data) }
+    )
 
     // endregion
 
@@ -100,7 +151,27 @@ class DataResultContentScope<T> internal constructor() {
     fun OnError(
         dataStatus: EventDataStatus = DoesNotMatter,
         func: @Composable (Throwable) -> Unit
-    ) = register(ErrorWithThrowableObservable(dataStatus, func))
+    ) = OnError(Throwable::class, dataStatus, func)
+
+    /** Renders an error when its throwable is an instance of [clazz], including subtypes. */
+    fun <E : Throwable> OnError(
+        clazz: KClass<E>,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: @Composable (E) -> Unit
+    ) = OnError(clazz, dataStatus) { error, _ -> func(error) }
+
+    /** Renders an error with its throwable and any partial data. */
+    fun OnError(
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: @Composable (Throwable, T?) -> Unit
+    ) = OnError(Throwable::class, dataStatus, func)
+
+    /** Renders a matching throwable and any partial data carried by the error result. */
+    fun <E : Throwable> OnError(
+        clazz: KClass<E>,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: @Composable (E, T?) -> Unit
+    ) = register(ErrorWithThrowableObservable(dataStatus, clazz, func))
 
     // endregion
 
@@ -147,6 +218,24 @@ class DataResultContentScope<T> internal constructor() {
     fun OnData(
         func: @Composable (T, DataResultStatus, Throwable?) -> Unit
     ) = register(DataObservable(func))
+
+    /** Renders data that is an instance of [clazz], including subtypes. */
+    inline fun <R : Any> OnData(
+        clazz: KClass<R>,
+        crossinline func: @Composable (R) -> Unit
+    ) = OnData(clazz) { data, _, _ -> func(data) }
+
+    /** Renders matching data with the current result status. */
+    inline fun <R : Any> OnData(
+        clazz: KClass<R>,
+        crossinline func: @Composable (R, DataResultStatus) -> Unit
+    ) = OnData(clazz) { data, status, _ -> func(data, status) }
+
+    /** Renders matching data with the current result status and optional error. */
+    fun <R : Any> OnData(
+        clazz: KClass<R>,
+        func: @Composable (R, DataResultStatus, Throwable?) -> Unit
+    ) = register(DataWithClassObservable(clazz, func = func))
 
     // endregion
 
@@ -325,3 +414,6 @@ class DataResultContentScope<T> internal constructor() {
         list.add(observable)
     }
 }
+
+private val loadingStatuses = setOf(DataResultStatus.LOADING)
+private val completedStatuses = setOf(DataResultStatus.SUCCESS, DataResultStatus.ERROR)

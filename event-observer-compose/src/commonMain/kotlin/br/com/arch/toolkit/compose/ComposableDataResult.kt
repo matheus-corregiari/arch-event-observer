@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.Flow
  * ### Example
  * ```kotlin
  * ComposableDataResult(flow = viewModel.flow) {
- *     OnShowLoading { CircularProgressIndicator() }
+ *     OnShowLoading { -> CircularProgressIndicator() }
  *     OnData { user -> Text("Hello ${user.name}") }
  *     OnError { e -> Text("Error: ${e.message}") }
  * }
@@ -76,7 +76,7 @@ fun <T> ComposableDataResult(
  * ### Example
  * ```kotlin
  * viewModel.flow.Content {
- *     OnShowLoading { CircularProgressIndicator() }
+ *     OnShowLoading { -> CircularProgressIndicator() }
  *     OnData { user -> Text("Hello ${user.name}") }
  *     OnError { e -> Text("Error: ${e.message}") }
  * }

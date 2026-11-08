@@ -18,11 +18,11 @@ The project is split into three public modules:
 
 ## Building this checkout
 
-- Kotlin `2.4.20`
-- Gradle wrapper `9.8.0`
-- JDK `21` via the Gradle toolchain
+- Kotlin `2.4.21`
+- Gradle wrapper `9.9.0`
+- JDK `25` via the Gradle toolchain; published JVM bytecode targets Java `25`
 - Android `minSdk 23` and `compileSdk 37.2`
-- Compose Multiplatform `1.12.1` with iOS ARM targets
+- Compose Multiplatform `1.12.2` with iOS ARM targets
 - Use the project wrapper instead of a local Gradle install
 
 ## Overview
@@ -128,7 +128,7 @@ about.
 
 ```kotlin
 myFlow.Content {
-    OnShowLoading { CircularProgressIndicator() }
+    OnShowLoading { -> CircularProgressIndicator() }
     OnData { value -> Text(value.toString()) }
     OnError { error -> Text(error.message ?: "Unknown error") }
 }
@@ -218,6 +218,15 @@ limitations under the License.
 ## Saved screen state
 
 See [event-observer-state](docs/modules/event-observer-state.md) for one-shot requests, refresh, filters, continuous streams and transformations. Existing Toolkit consumers should follow the [migration guide](docs/migration-state.md).
+
+## Planned 3.1.0
+
+[3.1.0 release notes](docs/changelog/3.1.0.md) describe removal of mutable
+`DataResult` execution settings, per-call helper parameters and bounded sequence
+checks. The removed setters and changed method signatures require consumer
+migration and recompilation. See [result, event and saved-state
+examples](docs/core-concepts.md#result-event-or-persisted-state) for choosing the
+appropriate lifetime. Existing 3.0.0 migration rules remain applicable.
 
 ## 3.0.0 migration and release notes
 

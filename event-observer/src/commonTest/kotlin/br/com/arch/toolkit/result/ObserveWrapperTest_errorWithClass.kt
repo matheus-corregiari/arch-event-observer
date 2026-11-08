@@ -162,10 +162,9 @@ class ObserveWrapperTest_errorWithClass {
     @Test
     fun `DataResult reified error helper delegates correctly`() = runTest {
         var received: IllegalStateException? = null
-        val result = DataResult<Any>(null, illegalStateException, ERROR).scope(this)
-            .transformDispatcher(StandardTestDispatcher(testScheduler))
+        val result = DataResult<Any>(null, illegalStateException, ERROR)
 
-        result.error<IllegalStateException> { error -> received = error }
+        result.error<IllegalStateException>(scope = this) { error -> received = error }
 
         advanceUntilIdle()
         assertSame(illegalStateException, received)
@@ -191,14 +190,12 @@ class ObserveWrapperTest_errorWithClass {
         var calls = 0
         val observer: suspend () -> Unit = { calls++ }
 
-        DataResult<Any>(null, illegalArgumentException, ERROR).scope(this)
-            .transformDispatcher(StandardTestDispatcher(testScheduler))
-            .error<IllegalStateException>(func = observer)
+        DataResult<Any>(null, illegalArgumentException, ERROR)
+            .error<IllegalStateException>(scope = this, func = observer)
         advanceUntilIdle()
         assertEquals(0, calls)
-        DataResult<Any>(null, illegalStateException, ERROR).scope(this)
-            .transformDispatcher(StandardTestDispatcher(testScheduler))
-            .error<IllegalStateException>(func = observer)
+        DataResult<Any>(null, illegalStateException, ERROR)
+            .error<IllegalStateException>(scope = this, func = observer)
         advanceUntilIdle()
         assertEquals(1, calls)
     }
@@ -212,15 +209,21 @@ class ObserveWrapperTest_errorWithClass {
             it.message.orEmpty()
         }
 
-        DataResult<Any>(null, illegalArgumentException, ERROR).scope(this)
-            .transformDispatcher(StandardTestDispatcher(testScheduler))
-            .error<IllegalStateException, String>(transformer) { error -> received = error }
+        DataResult<Any>(null, illegalArgumentException, ERROR)
+            .error<IllegalStateException, String>(
+                transformer,
+                scope = this,
+                transformDispatcher = StandardTestDispatcher(testScheduler)
+            ) { error -> received = error }
         advanceUntilIdle()
         assertEquals(0, transformations)
         assertEquals(null, received)
-        DataResult<Any>(null, illegalStateException, ERROR).scope(this)
-            .transformDispatcher(StandardTestDispatcher(testScheduler))
-            .error<IllegalStateException, String>(transformer) { error -> received = error }
+        DataResult<Any>(null, illegalStateException, ERROR)
+            .error<IllegalStateException, String>(
+                transformer,
+                scope = this,
+                transformDispatcher = StandardTestDispatcher(testScheduler)
+            ) { error -> received = error }
         advanceUntilIdle()
         assertEquals(1, transformations)
         assertEquals("Illegal State", received)

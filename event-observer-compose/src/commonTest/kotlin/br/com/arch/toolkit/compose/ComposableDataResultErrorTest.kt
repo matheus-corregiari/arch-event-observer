@@ -3,6 +3,9 @@
 
 package br.com.arch.toolkit.compose
 
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
@@ -18,6 +21,70 @@ class ComposableDataResultErrorTest : PlatformTest() {
     init {
         Dispatchers.setMain(StandardTestDispatcher())
     }
+
+    @Test
+    fun `typed errors render matching subclasses with partial data`() = scenario(
+        result = DataResult("cached", IllegalArgumentException("invalid"), DataResultStatus.ERROR),
+        config = {
+            OnError(RuntimeException::class) { error, data ->
+                BasicText("${error.message}: $data", Modifier.testTag("matching"))
+            }
+            OnError(IllegalStateException::class) { error ->
+                BasicText(error.toString(), Modifier.testTag("unrelated"))
+            }
+            OnError { error, data ->
+                BasicText("${error.message}: $data", Modifier.testTag("partial"))
+            }
+        },
+        assert = {
+            onNodeWithTag("matching").assertTextEquals("invalid: cached")
+            onNodeWithTag("unrelated").assertDoesNotExist()
+            onNodeWithTag("partial").assertTextEquals("invalid: cached")
+        }
+    )
+
+    @Test
+    fun `only argumentless error content renders without throwable`() = scenario(
+        result = DataResult("cached", null, DataResultStatus.ERROR),
+        config = {
+            OnError { ->
+                BasicText("Error", Modifier.testTag("generic"))
+            }
+            OnError { error, data ->
+                BasicText("${error.message}: $data", Modifier.testTag("partial"))
+            }
+            OnError(Throwable::class) { error ->
+                BasicText(error.toString(), Modifier.testTag("typed"))
+            }
+        },
+        assert = {
+            onNodeWithTag("generic").assertTextEquals("Error")
+            onNodeWithTag("partial").assertDoesNotExist()
+            onNodeWithTag("typed").assertDoesNotExist()
+        }
+    )
+
+    private sealed interface ScreenState {
+        data class Ready(val title: String) : ScreenState
+        data object Empty : ScreenState
+    }
+
+    @Test
+    fun `typed success renders only the matching sealed variant`() = scenario(
+        result = DataResult<ScreenState>(ScreenState.Ready("Home"), null, DataResultStatus.SUCCESS),
+        config = {
+            OnSuccess(ScreenState.Ready::class) { ready ->
+                BasicText(ready.title, Modifier.testTag("ready"))
+            }
+            OnSuccess(ScreenState.Empty::class) {
+                BasicText("Empty", Modifier.testTag("empty"))
+            }
+        },
+        assert = {
+            onNodeWithTag("ready").assertTextEquals("Home")
+            onNodeWithTag("empty").assertDoesNotExist()
+        }
+    )
 
     @Test
     fun `1 - String - ERROR - null`() = scenario(

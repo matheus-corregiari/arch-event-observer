@@ -3,6 +3,8 @@
  *
  * The plugin enables Dokka with repository-wide defaults for API reference material.
  */
+import br.com.arch.toolkit.convention.Versions
+import br.com.arch.toolkit.convention.versionName
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.dokka.gradle.DokkaExtension
 
@@ -20,10 +22,10 @@ extensions.configure(DokkaExtension::class) {
             localDirectory.set(projectDir.resolve("src"))
             remoteUrl("${env("POM_URL")}/tree/master/${project.name}/src")
         }
-        reportUndocumented.set(true)
+        reportUndocumented.set(false)
         skipDeprecated.set(true)
         skipEmptyPackages.set(true)
-        jdkVersion.set(projectJavaVersionCode)
+        jdkVersion.set(Versions.JAVA)
         enableAndroidDocumentationLink.set(true)
         enableJdkDocumentationLink.set(true)
         enableKotlinStdLibDocumentationLink.set(true)

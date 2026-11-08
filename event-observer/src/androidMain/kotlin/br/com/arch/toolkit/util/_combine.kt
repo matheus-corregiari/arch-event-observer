@@ -206,7 +206,7 @@ fun <T, R> LiveData<T>.combine(
  * - **OmitFail**:
  *      - **Description**: Omits the result when the transformation fails, without handling the error.
  *      - **Constructor Parameters**:
- *           - `dispatcher`: The [CoroutineDispatcher] on which the transformation will occur. Default is [Dispatchers.IO].
+ *           - `dispatcher`: The [kotlinx.coroutines.CoroutineDispatcher] on which the transformation will occur. Default is [Dispatchers.IO].
  *           - `func`: The transformation function to apply to the paired non-nullable values.
  *      - **Example**:
  *   ```kotlin
@@ -218,7 +218,7 @@ fun <T, R> LiveData<T>.combine(
  * - **NullFail**:
  *      - **Description**: Emits `null` when the transformation fails, without handling the error.
  *      - **Constructor Parameters**:
- *           - `dispatcher`: The [CoroutineDispatcher] on which the transformation will occur. Default is [Dispatchers.IO].
+ *           - `dispatcher`: The [kotlinx.coroutines.CoroutineDispatcher] on which the transformation will occur. Default is [Dispatchers.IO].
  *           - `func`: The transformation function to apply to the paired nullable values.
  *      - **Example**:
  *   ```kotlin
@@ -230,7 +230,7 @@ fun <T, R> LiveData<T>.combine(
  * - **Fallback**:
  *       - **Description**: Omits the result when the transformation fails but provides a fallback value via `onErrorReturn`.
  *       - **Constructor Parameters**:
- *           - `dispatcher`: The [CoroutineDispatcher] on which the transformation will occur. Default is [Dispatchers.IO].
+ *           - `dispatcher`: The [kotlinx.coroutines.CoroutineDispatcher] on which the transformation will occur. Default is [Dispatchers.IO].
  *           - `func`: The transformation function to apply to the paired nullable values.
  *           - `onErrorReturn`: A function that handles errors during transformation, allowing you to provide an alternate result.
  *      - **Example**:
@@ -245,7 +245,7 @@ fun <T, R> LiveData<T>.combine(
  *      - **Description**: A customizable transformation that lets you define the dispatcher, fail mode,
  *   transformation function, and optional error handling.
  *      - **Constructor Parameters**:
- *           - `dispatcher`: The [CoroutineDispatcher] on which the transformation will occur.
+ *           - `dispatcher`: The [kotlinx.coroutines.CoroutineDispatcher] on which the transformation will occur.
  *           - `failMode`: Specifies how to handle failures during transformation. Options include:
  *                - `OMIT_WHEN_FAIL`: Omits the emission if the transformation fails.
  *                - `NULL_WHEN_FAIL`: Emits `null` if the transformation fails.
@@ -369,7 +369,7 @@ fun <T, R> LiveData<T>.combineNotNull(
  * - **OmitFail**:
  *      - **Description**: Transforms the values and omits the emission if the transformation fails.
  *      - **Constructor Parameters**:
- *           - `dispatcher`: The [CoroutineDispatcher] on which the transformation will occur. Default is [Dispatchers.IO].
+ *           - `dispatcher`: The [kotlinx.coroutines.CoroutineDispatcher] on which the transformation will occur. Default is [Dispatchers.IO].
  *           - `func`: The transformation function to apply to the paired non-nullable values.
  *      - **Example**:
  *   ```kotlin
@@ -381,7 +381,7 @@ fun <T, R> LiveData<T>.combineNotNull(
  * - **Fallback**:
  *      - **Description**: Transforms the values and applies a fallback function if the transformation fails.
  *      - **Constructor Parameters**:
- *           - `dispatcher`: The [CoroutineDispatcher] on which the transformation will occur. Default is [Dispatchers.IO].
+ *           - `dispatcher`: The [kotlinx.coroutines.CoroutineDispatcher] on which the transformation will occur. Default is [Dispatchers.IO].
  *           - `func`: The transformation function to apply to the paired non-nullable values.
  *           - `onErrorReturn`: A function that handles errors during transformation, allowing you to provide an alternate result.
  *      - **Example**:
