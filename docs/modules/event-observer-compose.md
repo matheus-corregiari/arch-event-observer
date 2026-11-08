@@ -140,6 +140,11 @@ statuses. Like the unfiltered overload, it skips the `NONE` state. Its callbacks
 can receive the typed data alone, with the status, or with both the status and
 the optional throwable.
 
+`OnShowLoading { data -> ... }` and `OnHideLoading { data -> ... }` receive
+the original data when present. Pass `Subtype::class` to either observer to
+receive matching data with its concrete type. Show observes loading, and hide
+observes success and error.
+
 Use `OnError { error, data -> ... }` to receive the throwable and optional partial data.
 For error results without a throwable, use `OnError { -> ... }`.
 

@@ -6,6 +6,7 @@ import br.com.arch.toolkit.result.DataResultStatus
 
 internal class DataObservable<T, R>(
     private val selectData: (T) -> R?,
+    private val matchesResult: (DataResult<T>) -> Boolean = { true },
     private val func: @Composable (R, DataResultStatus, Throwable?) -> Unit
 ) : ComposeObservable<T, R>() {
     @Composable
@@ -16,5 +17,5 @@ internal class DataObservable<T, R>(
     }
 
     override fun hasVisibleContent(result: DataResult<T>) =
-        result.isNone.not() && result.data?.let(selectData) != null
+        result.isNone.not() && matchesResult(result) && result.data?.let(selectData) != null
 }

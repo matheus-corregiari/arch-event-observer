@@ -54,7 +54,7 @@ class DataResultContentScope<T> internal constructor() {
     /** Renders the original data from a successful result when data is present. */
     fun OnSuccess(
         dataStatus: EventDataStatus = DoesNotMatter,
-        func: SuccessDataContent<T>
+        func: ResultDataContent<T>
     ) = register(SuccessWithDataObservable(dataStatus, { it }) { func.Content(it) })
 
     /** Renders successful data when it is an instance of [clazz], including subtypes. */
@@ -86,6 +86,19 @@ class DataResultContentScope<T> internal constructor() {
         func: @Composable () -> Unit
     ) = register(ShowLoadingObservable(dataStatus, func))
 
+    /** Renders the original data from a loading result when data is present. */
+    fun OnShowLoading(
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: ResultDataContent<T>
+    ) = registerLoadingData(dataStatus, { it.isLoading }, { it }) { func.Content(it) }
+
+    /** Renders data from a loading result when it is an instance of [clazz]. */
+    fun <R : Any> OnShowLoading(
+        clazz: KClass<R>,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: @Composable (R) -> Unit
+    ) = registerLoadingData(dataStatus, { it.isLoading }, { clazz.selectInstance(it) }, func)
+
     /**
      * Registers a composable to be displayed when the [DataResult] is in a success or error state.
      *
@@ -96,6 +109,24 @@ class DataResultContentScope<T> internal constructor() {
         dataStatus: EventDataStatus = DoesNotMatter,
         func: @Composable () -> Unit
     ) = register(HideLoadingObservable(dataStatus, func))
+
+    /** Renders the original data from a completed result when data is present. */
+    fun OnHideLoading(
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: ResultDataContent<T>
+    ) = registerLoadingData(dataStatus, { it.isLoading.not() }, { it }) { func.Content(it) }
+
+    /** Renders data from a completed result when it is an instance of [clazz]. */
+    fun <R : Any> OnHideLoading(
+        clazz: KClass<R>,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: @Composable (R) -> Unit
+    ) = registerLoadingData(
+        dataStatus,
+        { it.isLoading.not() },
+        { clazz.selectInstance(it) },
+        func
+    )
 
     // endregion
 
@@ -188,7 +219,7 @@ class DataResultContentScope<T> internal constructor() {
      */
     fun OnData(
         func: @Composable (T, DataResultStatus, Throwable?) -> Unit
-    ) = register(DataObservable({ it }, func))
+    ) = register(DataObservable({ it }, func = func))
 
     /** Renders data that is an instance of [clazz], including subtypes. */
     inline fun <R : Any> OnData(
@@ -386,6 +417,19 @@ class DataResultContentScope<T> internal constructor() {
     ) = register(ManyObservable(func))
     // endregion
 
+    private fun <R> registerLoadingData(
+        dataStatus: EventDataStatus,
+        matchesStatus: (DataResult<T>) -> Boolean,
+        selectData: (T) -> R?,
+        func: @Composable (R) -> Unit
+    ) = register(
+        DataObservable(
+            selectData = selectData,
+            matchesResult = { matchesStatus(it) && dataStatus.considerEvent(it) },
+            func = { data, _, _ -> func(data) }
+        )
+    )
+
     internal fun clear() = list.clear()
     private fun register(observable: ComposeObservable<T, *>) {
         list.add(observable)
@@ -393,11 +437,11 @@ class DataResultContentScope<T> internal constructor() {
 }
 
 /**
- * Composable content for a successful result carrying data of type [T].
+ * Composable content for a result carrying data of type [T].
  *
- * The SAM type preserves overload resolution for existing argumentless success lambdas.
+ * The SAM type preserves overload resolution for existing argumentless lambdas.
  */
-fun interface SuccessDataContent<T> {
+fun interface ResultDataContent<T> {
     @Composable
     @Suppress("FunctionNaming")
     fun Content(data: T)
