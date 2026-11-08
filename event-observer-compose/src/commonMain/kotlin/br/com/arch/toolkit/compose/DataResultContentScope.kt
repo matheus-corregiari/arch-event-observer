@@ -51,12 +51,28 @@ class DataResultContentScope<T> internal constructor() {
         func: @Composable () -> Unit
     ) = register(SuccessObservable(dataStatus, func))
 
+    /** Renders the original data from a successful result when data is present. */
+    fun OnSuccess(
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: SuccessDataContent<T>
+    ) = register(SuccessWithDataObservable(dataStatus, { it }) { func.Content(it) })
+
     /** Renders successful data when it is an instance of [clazz], including subtypes. */
     fun <R : Any> OnSuccess(
         clazz: KClass<R>,
         dataStatus: EventDataStatus = DoesNotMatter,
         func: @Composable (R) -> Unit
-    ) = register(SuccessWithDataObservable(dataStatus, clazz, func))
+    ) {
+        val observable = SuccessWithDataObservable<T, R>(
+            status = dataStatus,
+            selectData = { data ->
+                @Suppress("UNCHECKED_CAST")
+                if (clazz.isInstance(data)) data as R else null
+            },
+            func = func
+        )
+        register(observable)
+    }
 
     // endregion
 
@@ -353,4 +369,15 @@ class DataResultContentScope<T> internal constructor() {
     private fun register(observable: ComposeObservable<T, *>) {
         list.add(observable)
     }
+}
+
+/**
+ * Composable content for a successful result carrying data of type [T].
+ *
+ * The SAM type preserves overload resolution for existing argumentless success lambdas.
+ */
+fun interface SuccessDataContent<T> {
+    @Composable
+    @Suppress("FunctionNaming")
+    fun Content(data: T)
 }

@@ -121,7 +121,8 @@ slot, preserving outgoing snapshots during transitions. Registration keys preser
 remembered state when an earlier observer becomes hidden. This trades a filtered-list
 allocation on changes for avoiding repeated visibility checks on unchanged inputs.
 
-Use `OnSuccess(Subtype::class)` to render a particular variant of a sealed result with
+Use `OnSuccess { data -> ... }` to render successful data with its original type.
+This observer renders when data is present. Use `OnSuccess(Subtype::class)` to render a particular variant of a sealed result with
 its concrete type. Use `OnError(ExceptionType::class)` to render errors whose throwable is
 an instance of that class, including subclasses.
 
