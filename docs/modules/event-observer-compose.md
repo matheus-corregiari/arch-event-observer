@@ -135,6 +135,11 @@ result.Content {
 }
 ```
 
+Use `OnData(Subtype::class)` when the matching data should render across result
+statuses. Like the unfiltered overload, it skips the `NONE` state. Its callbacks
+can receive the typed data alone, with the status, or with both the status and
+the optional throwable.
+
 Use `OnError { error, data -> ... }` to receive the throwable and optional partial data.
 For error results without a throwable, use `OnError { -> ... }`.
 

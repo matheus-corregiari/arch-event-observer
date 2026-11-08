@@ -65,10 +65,7 @@ class DataResultContentScope<T> internal constructor() {
     ) {
         val observable = SuccessWithDataObservable<T, R>(
             status = dataStatus,
-            selectData = { data ->
-                @Suppress("UNCHECKED_CAST")
-                if (clazz.isInstance(data)) data as R else null
-            },
+            selectData = { data -> clazz.selectInstance(data) },
             func = func
         )
         register(observable)
@@ -191,7 +188,31 @@ class DataResultContentScope<T> internal constructor() {
      */
     fun OnData(
         func: @Composable (T, DataResultStatus, Throwable?) -> Unit
-    ) = register(DataObservable(func))
+    ) = register(DataObservable({ it }, func))
+
+    /** Renders data that is an instance of [clazz], including subtypes. */
+    inline fun <R : Any> OnData(
+        clazz: KClass<R>,
+        crossinline func: @Composable (R) -> Unit
+    ) = OnData(clazz) { data, _, _ -> func(data) }
+
+    /** Renders matching data with the current result status. */
+    inline fun <R : Any> OnData(
+        clazz: KClass<R>,
+        crossinline func: @Composable (R, DataResultStatus) -> Unit
+    ) = OnData(clazz) { data, status, _ -> func(data, status) }
+
+    /** Renders matching data with the current result status and optional error. */
+    fun <R : Any> OnData(
+        clazz: KClass<R>,
+        func: @Composable (R, DataResultStatus, Throwable?) -> Unit
+    ) {
+        val observable = DataObservable<T, R>(
+            selectData = { data -> clazz.selectInstance(data) },
+            func = func
+        )
+        register(observable)
+    }
 
     // endregion
 
@@ -381,3 +402,7 @@ fun interface SuccessDataContent<T> {
     @Suppress("FunctionNaming")
     fun Content(data: T)
 }
+
+@Suppress("UNCHECKED_CAST")
+private fun <R : Any> KClass<R>.selectInstance(data: Any?): R? =
+    if (isInstance(data)) data as R else null
