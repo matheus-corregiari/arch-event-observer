@@ -134,8 +134,8 @@ result.Content {
 }
 ```
 
-Use `OnError { error, data -> ... }` to receive the nullable throwable and partial data
-for any error result.
+Use `OnError { error, data -> ... }` to receive the throwable and optional partial data.
+For error results without a throwable, use `OnError { -> ... }`.
 
 All matching observers render together, in registration order: for example, `OnSuccess`,
 `OnData` and `OnStatus` can render the same snapshot. Selecting only the first match

@@ -97,7 +97,7 @@ class DataResultContentScope<T> internal constructor() {
     fun OnError(
         dataStatus: EventDataStatus = DoesNotMatter,
         func: @Composable () -> Unit
-    ) = OnError(dataStatus) { _, _ -> func() }
+    ) = register(ErrorObservable(dataStatus, func))
 
     /**
      * Registers a composable to be displayed when the [DataResult] is in an error state,
@@ -118,11 +118,11 @@ class DataResultContentScope<T> internal constructor() {
         func: @Composable (E) -> Unit
     ) = OnError(clazz, dataStatus) { error, _ -> func(error) }
 
-    /** Renders an error with its optional throwable and any partial data. */
+    /** Renders an error with its throwable and any partial data. */
     fun OnError(
         dataStatus: EventDataStatus = DoesNotMatter,
-        func: @Composable (Throwable?, T?) -> Unit
-    ) = register(ErrorObservable(dataStatus, func))
+        func: @Composable (Throwable, T?) -> Unit
+    ) = OnError(Throwable::class, dataStatus, func)
 
     /** Renders a matching throwable and any partial data carried by the error result. */
     fun <E : Throwable> OnError(

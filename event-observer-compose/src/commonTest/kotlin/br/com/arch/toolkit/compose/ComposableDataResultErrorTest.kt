@@ -33,7 +33,7 @@ class ComposableDataResultErrorTest : PlatformTest() {
                 BasicText(error.toString(), Modifier.testTag("unrelated"))
             }
             OnError { error, data ->
-                BasicText("${error?.message}: $data", Modifier.testTag("partial"))
+                BasicText("${error.message}: $data", Modifier.testTag("partial"))
             }
         },
         assert = {
@@ -44,18 +44,22 @@ class ComposableDataResultErrorTest : PlatformTest() {
     )
 
     @Test
-    fun `partial data can render without a throwable`() = scenario(
+    fun `only argumentless error content renders without throwable`() = scenario(
         result = DataResult("cached", null, DataResultStatus.ERROR),
         config = {
+            OnError { ->
+                BasicText("Error", Modifier.testTag("generic"))
+            }
             OnError { error, data ->
-                BasicText("$error: $data", Modifier.testTag("partial"))
+                BasicText("${error.message}: $data", Modifier.testTag("partial"))
             }
             OnError(Throwable::class) { error ->
                 BasicText(error.toString(), Modifier.testTag("typed"))
             }
         },
         assert = {
-            onNodeWithTag("partial").assertTextEquals("null: cached")
+            onNodeWithTag("generic").assertTextEquals("Error")
+            onNodeWithTag("partial").assertDoesNotExist()
             onNodeWithTag("typed").assertDoesNotExist()
         }
     )

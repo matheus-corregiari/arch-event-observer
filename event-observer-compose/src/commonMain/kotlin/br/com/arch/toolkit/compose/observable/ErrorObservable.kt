@@ -6,10 +6,10 @@ import br.com.arch.toolkit.result.EventDataStatus
 
 internal class ErrorObservable<T>(
     private val status: EventDataStatus,
-    private val func: @Composable (Throwable?, T?) -> Unit
+    private val func: @Composable () -> Unit
 ) : ComposeObservable<T, Unit>() {
     @Composable
-    override fun Content(result: DataResult<T>) = func(result.error, result.data)
+    override fun Content(result: DataResult<T>) = func()
 
     override fun hasVisibleContent(result: DataResult<T>) =
         result.isError && status.considerEvent(result) && result.isNone.not()
