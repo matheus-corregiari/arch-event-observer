@@ -94,6 +94,6 @@ and the [SDK repository](https://dl.google.com/android/repository/repository2-3.
   Android/CodeQL **v4**, GitHub App/release **v3** and Pages **v5**. Latest stable tags remain in
   those majors; floating major tags receive their compatible patch updates.
 - MkDocs Material **9.7.7** remains current. Library modules have no application `targetSdk`;
-  compile SDK **37.2** and `minSdk` **23** are configured in the catalog.
+  compile SDK **37.2** and `minSdk` **23** are configured in build-logic `Versions`.
 - Do not introduce Compose 1.13 alpha or prerelease AGP/Kotlin in this publication.
 - Both settings files use [Foojay resolver 1.0.0](https://plugins.gradle.org/plugin/org.gradle.toolchains.foojay-resolver-convention/1.0.0).

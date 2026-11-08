@@ -53,12 +53,12 @@ extensions.configure<KotlinMultiplatformExtension> {
     android {
         compilerOptions.jvmTarget.set(JvmTarget.fromTarget(Versions.java.toString()))
         compileSdk {
-            version = release(libraries.version("build-sdk-compile").toInt()) {
-                minorApiLevel = libraries.version("build-sdk-minor").toInt()
+            version = release(Versions.compileSdk) {
+                minorApiLevel = Versions.compileSdkMinor
             }
         }
-        minSdk = libraries.version("build-sdk-min").toInt()
-        buildToolsVersion = libraries.version("build-tools")
+        minSdk = Versions.minSdk
+        buildToolsVersion = Versions.buildTools
         namespace = "br.com.arch.toolkit.$formatName"
         testNamespace = "test.$namespace"
         androidResources { enable = false }
@@ -74,7 +74,7 @@ extensions.configure<KotlinMultiplatformExtension> {
             absolutePaths = false
             warningsAsErrors = false
         }
-        testCoverage { jacocoVersion = libraries.version("jacoco") }
+        testCoverage { jacocoVersion = Versions.jacoco }
         project.file("consumer-proguard-rules.pro")
             .takeIf(File::exists)
             ?.let(optimization.consumerKeepRules::file)

@@ -1,15 +1,7 @@
 # ------------------------------------------------------------------------------------------------ #
 [versions]
 ## --- Plugins and more general stuff --- ##
-#noinspection UnusedVersionCatalogEntry
-jacoco = "0.8.16"
 detekt = "2.0.0-alpha.6"
-
-## --- Build Config and SDK --- ##
-build-sdk-min = "23"
-build-sdk-compile = "37"
-build-sdk-minor = "2"
-build-tools = "37.0.0"
 
 ## JetBrains
 jetbrains-kotlin = "2.4.21"
