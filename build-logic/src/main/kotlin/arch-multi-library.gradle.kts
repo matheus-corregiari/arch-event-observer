@@ -26,14 +26,14 @@ tasks.withType<Test>().configureEach {
 }
 
 tasks.withType<JavaCompile>().matching { it.name.startsWith("compileJvm") }.configureEach {
-    options.release.set(Versions.java)
+    options.release.set(Versions.JAVA)
 }
 
 private val formatName = project.name.split("-").joinToString("") { it }
     .replaceFirstChar { it.lowercase() }
 extensions.configure<KotlinMultiplatformExtension> {
     compilerOptions {
-        jvmToolchain(Versions.java)
+        jvmToolchain(Versions.JAVA)
         progressiveMode.set(true)
     }
     withSourcesJar(true)
@@ -51,14 +51,14 @@ extensions.configure<KotlinMultiplatformExtension> {
     }
 
     android {
-        compilerOptions.jvmTarget.set(JvmTarget.fromTarget(Versions.java.toString()))
+        compilerOptions.jvmTarget.set(JvmTarget.fromTarget(Versions.JAVA.toString()))
         compileSdk {
-            version = release(Versions.compileSdk) {
-                minorApiLevel = Versions.compileSdkMinor
+            version = release(Versions.COMPILE_SDK) {
+                minorApiLevel = Versions.COMPILE_SDK_MINOR
             }
         }
-        minSdk = Versions.minSdk
-        buildToolsVersion = Versions.buildTools
+        minSdk = Versions.MIN_SDK
+        buildToolsVersion = Versions.BUILD_TOOLS
         namespace = "br.com.arch.toolkit.$formatName"
         testNamespace = "test.$namespace"
         androidResources { enable = false }
@@ -74,13 +74,13 @@ extensions.configure<KotlinMultiplatformExtension> {
             absolutePaths = false
             warningsAsErrors = false
         }
-        testCoverage { jacocoVersion = Versions.jacoco }
+        testCoverage { jacocoVersion = Versions.JACOCO }
         project.file("consumer-proguard-rules.pro")
             .takeIf(File::exists)
             ?.let(optimization.consumerKeepRules::file)
     }
     jvm {
-        compilerOptions.jvmTarget.set(JvmTarget.fromTarget(Versions.java.toString()))
+        compilerOptions.jvmTarget.set(JvmTarget.fromTarget(Versions.JAVA.toString()))
     }
     wasmJs {
         browser { testTask { useKarma { useChromeHeadless() } } }

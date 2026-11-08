@@ -4,6 +4,7 @@
  * The plugin wires Maven Central, GitHub Packages, local publication, POM metadata, source jars,
  * Dokka-backed javadocs, and signing behavior used by release workflows.
  */
+import br.com.arch.toolkit.convention.versionName
 import com.vanniktech.maven.publish.DeploymentValidation
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinMultiplatform

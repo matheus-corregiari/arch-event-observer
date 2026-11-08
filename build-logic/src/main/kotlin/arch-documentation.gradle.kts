@@ -4,6 +4,7 @@
  * The plugin enables Dokka with repository-wide defaults for API reference material.
  */
 import br.com.arch.toolkit.convention.Versions
+import br.com.arch.toolkit.convention.versionName
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.dokka.gradle.DokkaExtension
 
@@ -24,7 +25,7 @@ extensions.configure(DokkaExtension::class) {
         reportUndocumented.set(true)
         skipDeprecated.set(true)
         skipEmptyPackages.set(true)
-        jdkVersion.set(Versions.java)
+        jdkVersion.set(Versions.JAVA)
         enableAndroidDocumentationLink.set(true)
         enableJdkDocumentationLink.set(true)
         enableKotlinStdLibDocumentationLink.set(true)
