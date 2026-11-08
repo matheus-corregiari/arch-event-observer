@@ -4,17 +4,16 @@ import androidx.compose.runtime.Composable
 import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.result.EventDataStatus
 
-internal class SuccessWithDataObservable<T, R>(
+internal class SuccessWithDataObservable<T>(
     private val status: EventDataStatus,
-    private val selectData: (T) -> R?,
-    private val func: @Composable (R) -> Unit
-) : ComposeObservable<T, R>() {
+    private val func: @Composable (T) -> Unit
+) : ComposeObservable<T, T>() {
     @Composable
     override fun Content(result: DataResult<T>) {
-        val data = result.data?.let(selectData) ?: return
+        val data = result.data ?: return
         func(data)
     }
 
     override fun hasVisibleContent(result: DataResult<T>) =
-        result.isSuccess && result.data?.let(selectData) != null && status.considerEvent(result)
+        result.isSuccess && result.hasData && status.considerEvent(result)
 }

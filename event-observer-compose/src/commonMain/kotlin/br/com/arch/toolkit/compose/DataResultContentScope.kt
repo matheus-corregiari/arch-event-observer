@@ -5,10 +5,12 @@ package br.com.arch.toolkit.compose
 import androidx.compose.runtime.Composable
 import br.com.arch.toolkit.compose.observable.ComposeObservable
 import br.com.arch.toolkit.compose.observable.DataObservable
+import br.com.arch.toolkit.compose.observable.DataWithClassObservable
 import br.com.arch.toolkit.compose.observable.EmptyObservable
 import br.com.arch.toolkit.compose.observable.ErrorObservable
 import br.com.arch.toolkit.compose.observable.ErrorWithThrowableObservable
 import br.com.arch.toolkit.compose.observable.HideLoadingObservable
+import br.com.arch.toolkit.compose.observable.LoadingWithDataObservable
 import br.com.arch.toolkit.compose.observable.ManyObservable
 import br.com.arch.toolkit.compose.observable.NoneObservable
 import br.com.arch.toolkit.compose.observable.NotEmptyObservable
@@ -55,21 +57,18 @@ class DataResultContentScope<T> internal constructor() {
     fun OnSuccess(
         dataStatus: EventDataStatus = DoesNotMatter,
         func: ResultDataContent<T>
-    ) = register(SuccessWithDataObservable(dataStatus, { it }) { func.Content(it) })
+    ) = register(SuccessWithDataObservable(dataStatus) { func.Content(it) })
 
     /** Renders successful data when it is an instance of [clazz], including subtypes. */
     fun <R : Any> OnSuccess(
         clazz: KClass<R>,
         dataStatus: EventDataStatus = DoesNotMatter,
         func: @Composable (R) -> Unit
-    ) {
-        val observable = SuccessWithDataObservable<T, R>(
-            status = dataStatus,
-            selectData = { data -> clazz.selectInstance(data) },
-            func = func
-        )
-        register(observable)
-    }
+    ) = register(
+        DataWithClassObservable(clazz, dataStatus, setOf(DataResultStatus.SUCCESS)) { data, _, _ ->
+            func(data)
+        }
+    )
 
     // endregion
 
@@ -90,14 +89,16 @@ class DataResultContentScope<T> internal constructor() {
     fun OnShowLoading(
         dataStatus: EventDataStatus = DoesNotMatter,
         func: ResultDataContent<T>
-    ) = registerLoadingData(dataStatus, { it.isLoading }, { it }) { func.Content(it) }
+    ) = register(LoadingWithDataObservable(dataStatus, loadingStatuses) { func.Content(it) })
 
     /** Renders data from a loading result when it is an instance of [clazz]. */
     fun <R : Any> OnShowLoading(
         clazz: KClass<R>,
         dataStatus: EventDataStatus = DoesNotMatter,
         func: @Composable (R) -> Unit
-    ) = registerLoadingData(dataStatus, { it.isLoading }, { clazz.selectInstance(it) }, func)
+    ) = register(
+        DataWithClassObservable(clazz, dataStatus, loadingStatuses) { data, _, _ -> func(data) }
+    )
 
     /**
      * Registers a composable to be displayed when the [DataResult] is in a success or error state.
@@ -114,18 +115,15 @@ class DataResultContentScope<T> internal constructor() {
     fun OnHideLoading(
         dataStatus: EventDataStatus = DoesNotMatter,
         func: ResultDataContent<T>
-    ) = registerLoadingData(dataStatus, { it.isLoading.not() }, { it }) { func.Content(it) }
+    ) = register(LoadingWithDataObservable(dataStatus, completedStatuses) { func.Content(it) })
 
     /** Renders data from a completed result when it is an instance of [clazz]. */
     fun <R : Any> OnHideLoading(
         clazz: KClass<R>,
         dataStatus: EventDataStatus = DoesNotMatter,
         func: @Composable (R) -> Unit
-    ) = registerLoadingData(
-        dataStatus,
-        { it.isLoading.not() },
-        { clazz.selectInstance(it) },
-        func
+    ) = register(
+        DataWithClassObservable(clazz, dataStatus, completedStatuses) { data, _, _ -> func(data) }
     )
 
     // endregion
@@ -219,7 +217,7 @@ class DataResultContentScope<T> internal constructor() {
      */
     fun OnData(
         func: @Composable (T, DataResultStatus, Throwable?) -> Unit
-    ) = register(DataObservable({ it }, func = func))
+    ) = register(DataObservable(func))
 
     /** Renders data that is an instance of [clazz], including subtypes. */
     inline fun <R : Any> OnData(
@@ -237,13 +235,7 @@ class DataResultContentScope<T> internal constructor() {
     fun <R : Any> OnData(
         clazz: KClass<R>,
         func: @Composable (R, DataResultStatus, Throwable?) -> Unit
-    ) {
-        val observable = DataObservable<T, R>(
-            selectData = { data -> clazz.selectInstance(data) },
-            func = func
-        )
-        register(observable)
-    }
+    ) = register(DataWithClassObservable(clazz, func = func))
 
     // endregion
 
@@ -417,19 +409,6 @@ class DataResultContentScope<T> internal constructor() {
     ) = register(ManyObservable(func))
     // endregion
 
-    private fun <R> registerLoadingData(
-        dataStatus: EventDataStatus,
-        matchesStatus: (DataResult<T>) -> Boolean,
-        selectData: (T) -> R?,
-        func: @Composable (R) -> Unit
-    ) = register(
-        DataObservable(
-            selectData = selectData,
-            matchesResult = { matchesStatus(it) && dataStatus.considerEvent(it) },
-            func = { data, _, _ -> func(data) }
-        )
-    )
-
     internal fun clear() = list.clear()
     private fun register(observable: ComposeObservable<T, *>) {
         list.add(observable)
@@ -447,6 +426,5 @@ fun interface ResultDataContent<T> {
     fun Content(data: T)
 }
 
-@Suppress("UNCHECKED_CAST")
-private fun <R : Any> KClass<R>.selectInstance(data: Any?): R? =
-    if (isInstance(data)) data as R else null
+private val loadingStatuses = setOf(DataResultStatus.LOADING)
+private val completedStatuses = setOf(DataResultStatus.SUCCESS, DataResultStatus.ERROR)

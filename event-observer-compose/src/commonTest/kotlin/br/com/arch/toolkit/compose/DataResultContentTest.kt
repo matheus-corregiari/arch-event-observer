@@ -218,6 +218,40 @@ class DataResultContentTest : PlatformTest() {
         }
 
     @Test
+    fun `typed observers switch with the payload while an unfiltered observer keeps state`() =
+        withGraphicsReady {
+            var result by mutableStateOf(DataResult<Any>("cached", null, DataResultStatus.LOADING))
+            var instances = 0
+            val content: DataResultContentScope<Any>.() -> Unit = {
+                OnShowLoading(String::class) { data ->
+                    BasicText(data.uppercase(), Modifier.testTag("loading"))
+                }
+                OnHideLoading(Int::class) { data ->
+                    BasicText((data + 1).toString(), Modifier.testTag("completed"))
+                }
+                OnData { data ->
+                    val instance = remember { ++instances }
+                    BasicText("$data/$instance", Modifier.testTag("data"))
+                }
+            }
+            runComposeUiTest {
+                setContent { DataResultContent(result, content = content) }
+                onNodeWithTag("loading").assertTextEquals("CACHED")
+                onNodeWithTag("completed").assertDoesNotExist()
+                onNodeWithTag("data").assertTextEquals("cached/1")
+
+                runOnIdle { result = DataResult(41, null, DataResultStatus.LOADING) }
+                onNodeWithTag("loading").assertDoesNotExist()
+                onNodeWithTag("completed").assertDoesNotExist()
+                onNodeWithTag("data").assertTextEquals("41/1")
+
+                runOnIdle { result = DataResult(41, null, DataResultStatus.SUCCESS) }
+                onNodeWithTag("completed").assertTextEquals("42")
+                onNodeWithTag("data").assertTextEquals("41/1")
+            }
+        }
+
+    @Test
     fun `changed content lambda refreshes observer registrations`() = withGraphicsReady {
         var label by mutableStateOf("first")
         val result = DataResult("data", null, DataResultStatus.SUCCESS)
