@@ -109,41 +109,6 @@ async latency, 100-read time and allocated bytes on the owner. JVM allocation co
 ThreadMXBean and include coroutine scheduling/measurement overhead. Large-list tests remain codec
 stress tests, not recommendations for Android saved state.
 
-## Android frame comparison
-
-Opt in with `-PstateBenchmarks=true`; ordinary CI/publication excludes the benchmark modules.
-The app includes a frozen baseline from hotfix commit `f483b58` and the new implementation in the
-same APK, with identical UI, dependencies and integer fixtures. Run on a physical API 29+ device:
-
-```shell
-./gradlew -PstateBenchmarks=true :state-macrobenchmark:connectedReleaseAndroidTest
-```
-
-The parameterized benchmark measures both backends at 100, 1,000 and 10,000 rows, ten iterations
-per case with full compilation. It renders a list, refreshes, merges, scrolls, rotates, backgrounds,
-kills the background process and restores. FrameTimingMetric records frame costs; StateSave and
-StateRestore trace metrics measure lifecycle costs. Logcat `StateBenchmark` records saved Bundle
-bytes and process allocation deltas (including UI work). Keep JSON reports and Perfetto traces
-from `build/bench/test/outputs/`. Benchmark build paths are shortened for Windows trace exports.
-
-Compare frame CPU/overrun percentiles on the same device, refresh rate and power/thermal conditions.
-Repeat full runs to establish variability; a regression outside that observed variability blocks
-release. Keep device measurements separate from deterministic CI. Emulator runs only validate the
-harness and cannot certify hardware frame performance. No measured Android frame envelope is
-claimed until physical-device reports are available. iOS requires macOS for its test target.
-
-## Android harness validation (2026-10-01)
-
-All six cases passed on an API 37.1 Android emulator: both backends at 100, 1,000 and
-10,000 rows, one iteration per case. Rotation and background-process death restored the
-payload without a new load (`sequence=0`). The complete Activity Bundle, measured through
-Parcel, contained 2,272, 9,476 and 99,484 bytes respectively for these integer fixtures.
-This validates the harness and platform save/restore path, not hardware frame acceptance.
-
-For a quick harness run, pass `stateBenchmarkIterations=1` as an instrumentation argument
-and explicitly suppress the `EMULATOR` benchmark check. `stateBenchmarkSmoke=true` limits
-that run to 100 rows. Do not suppress device checks for the physical-device acceptance run.
-
 ## Current local JVM observations
 
 A Windows/JDK 21 instrumented run with live payload/result collectors produced:

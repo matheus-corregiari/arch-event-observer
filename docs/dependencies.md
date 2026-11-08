@@ -91,33 +91,13 @@ and the [SDK repository](https://dl.google.com/android/repository/repository2-3.
 - Gradle **9.8.0**, Kotlin **2.4.20**, Compose **1.12.1**, AGP **9.4.1**, SDK **37.2**,
   Build Tools **37.0.0**, AtomicFU **0.33.0**, Dokka **2.2.0**, coroutines/serialization **1.11.0**,
   JaCoCo **0.8.15**, ktlint **14.2.0**, publishing **0.37.0**, Robolectric **4.17** and MockK **1.14.11**
-  match stable metadata. The dependency table covers published library modules; optional benchmark dependencies are audited below.
+  match stable metadata.
 - Detekt **2.0.0-alpha.6** has no stable release in the `dev.detekt` line. Keep the existing tool;
   reverting to the old stable 1.x coordinates would be a migration, not a patch update.
 - Retain current major references for Actions: checkout/Python/artifact/Codecov **v7**, Java/Gradle **v6**,
   Android/CodeQL **v4**, GitHub App/release **v3** and Pages **v5**. Latest stable tags remain in
   those majors; floating major tags receive their compatible patch updates.
 - MkDocs Material **9.7.7** remains current. Library modules have no application `targetSdk`;
-  opt-in benchmark apps use the catalog's API **37**. Compile SDK **37.2** is a minor API level,
-  not a reason to invent a library target API or raise `minSdk` **23**.
+  compile SDK **37.2** and `minSdk` **23** are configured in the catalog.
 - Do not introduce Compose 1.13 alpha or prerelease AGP/Kotlin in this publication.
-
-## Optional benchmark tooling
-
-| Component       | Declared | Latest stable | Decision                                    |
-| --------------- | -------- | ------------- | ------------------------------------------- |
-| Activity KTX    | 1.13.0   | 1.13.0        | Retain                                      |
-| Macrobenchmark  | 1.5.0    | 1.5.0         | Retain                                      |
-| UI Automator    | 2.3.0    | 2.4.0         | Candidate for a separate device-test update |
-| Foojay resolver | 1.0.0    | 1.0.0         | Retain in both settings files               |
-
-[UI Automator 2.4.0](https://developer.android.com/jetpack/androidx/releases/test-uiautomator#2.4.0)
-adds a scoped test API, conditional waits, app-stability helpers and screenshot/reporting support.
-It can improve the opt-in benchmark harness, but requires compiling and rerunning all six device
-cases, including rotation and background-process restoration, before adoption. Keep the currently
-validated 2.3.0 harness in this publication; the new version does not affect published library artifacts.
-Sources: Google Maven metadata for
-[Activity](https://dl.google.com/dl/android/maven2/androidx/activity/activity-ktx/maven-metadata.xml),
-[Macrobenchmark](https://dl.google.com/dl/android/maven2/androidx/benchmark/benchmark-macro-junit4/maven-metadata.xml),
-[UI Automator](https://dl.google.com/dl/android/maven2/androidx/test/uiautomator/uiautomator/maven-metadata.xml)
-and the [Foojay plugin](https://plugins.gradle.org/m2/org/gradle/toolchains/foojay-resolver-convention/org.gradle.toolchains.foojay-resolver-convention.gradle.plugin/maven-metadata.xml).
+- Both settings files use [Foojay resolver 1.0.0](https://plugins.gradle.org/plugin/org.gradle.toolchains.foojay-resolver-convention/1.0.0).
