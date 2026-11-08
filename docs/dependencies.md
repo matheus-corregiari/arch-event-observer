@@ -51,10 +51,8 @@ with Node 24 and the maintained command-line tools provided by the action.
 
 ## JavaScript lockfile
 
-Commit `kotlin-js-store/yarn.lock` to keep resolved npm dependencies reproducible in
-local builds and CI, as recommended by the [Kotlin/JS setup guide](https://kotlinlang.org/docs/js-project-setup.html).
-After an intentional dependency change, run `./gradlew kotlinUpgradeYarnLock` and
-review the lockfile diff. Do not delete it to bypass dependency mismatches.
+Gradle keeps Yarn's generated lockfile in the ignored `kotlin-js-store/` directory.
+A fresh checkout resolves npm dependencies on its first web build.
 
 AtomicFU remains available for modules that use atomic state; the Compose module no
 longer applies its plugin because observer registration is local to composition.
