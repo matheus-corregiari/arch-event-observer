@@ -17,10 +17,12 @@ import br.com.arch.toolkit.compose.observable.ShowLoadingObservable
 import br.com.arch.toolkit.compose.observable.SingleObservable
 import br.com.arch.toolkit.compose.observable.StatusObservable
 import br.com.arch.toolkit.compose.observable.SuccessObservable
+import br.com.arch.toolkit.compose.observable.TypedSuccessObservable
 import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.result.DataResultStatus
 import br.com.arch.toolkit.result.EventDataStatus
 import br.com.arch.toolkit.result.EventDataStatus.DoesNotMatter
+import kotlin.reflect.KClass
 
 /**
  * A DSL scope used to register @Composable state observers for a [ComposableDataResult].
@@ -48,6 +50,13 @@ class DataResultContentScope<T> internal constructor() {
         dataStatus: EventDataStatus = DoesNotMatter,
         func: @Composable () -> Unit
     ) = register(SuccessObservable(dataStatus, func))
+
+    /** Renders successful data when it is an instance of [clazz], including subtypes. */
+    fun <R : Any> OnSuccess(
+        clazz: KClass<R>,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: @Composable (R) -> Unit
+    ) = register(TypedSuccessObservable(dataStatus, clazz, func))
 
     // endregion
 
@@ -88,7 +97,7 @@ class DataResultContentScope<T> internal constructor() {
     fun OnError(
         dataStatus: EventDataStatus = DoesNotMatter,
         func: @Composable () -> Unit
-    ) = register(ErrorObservable(dataStatus, func))
+    ) = OnError(dataStatus) { _, _ -> func() }
 
     /**
      * Registers a composable to be displayed when the [DataResult] is in an error state,
@@ -100,7 +109,27 @@ class DataResultContentScope<T> internal constructor() {
     fun OnError(
         dataStatus: EventDataStatus = DoesNotMatter,
         func: @Composable (Throwable) -> Unit
-    ) = register(ErrorWithThrowableObservable(dataStatus, func))
+    ) = OnError(Throwable::class, dataStatus, func)
+
+    /** Renders an error when its throwable is an instance of [clazz], including subtypes. */
+    fun <E : Throwable> OnError(
+        clazz: KClass<E>,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: @Composable (E) -> Unit
+    ) = OnError(clazz, dataStatus) { error, _ -> func(error) }
+
+    /** Renders an error with its optional throwable and any partial data. */
+    fun OnError(
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: @Composable (Throwable?, T?) -> Unit
+    ) = register(ErrorObservable(dataStatus, func))
+
+    /** Renders a matching throwable and any partial data carried by the error result. */
+    fun <E : Throwable> OnError(
+        clazz: KClass<E>,
+        dataStatus: EventDataStatus = DoesNotMatter,
+        func: @Composable (E, T?) -> Unit
+    ) = register(ErrorWithThrowableObservable(dataStatus, clazz, func))
 
     // endregion
 

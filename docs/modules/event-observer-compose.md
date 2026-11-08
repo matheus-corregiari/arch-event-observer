@@ -121,6 +121,22 @@ slot, preserving outgoing snapshots during transitions. Registration keys preser
 remembered state when an earlier observer becomes hidden. This trades a filtered-list
 allocation on changes for avoiding repeated visibility checks on unchanged inputs.
 
+Use `OnSuccess(Subtype::class)` to render a particular variant of a sealed result with
+its concrete type. Use `OnError(ExceptionType::class)` to render errors whose throwable is
+an instance of that class, including subclasses.
+
+```kotlin
+result.Content {
+    OnSuccess(ScreenState.Ready::class) { ready -> Text(ready.title) }
+    OnError(IllegalArgumentException::class) { error, data ->
+        Text("${error.message}: $data")
+    }
+}
+```
+
+Use `OnError { error, data -> ... }` to receive the nullable throwable and partial data
+for any error result.
+
 All matching observers render together, in registration order: for example, `OnSuccess`,
 `OnData` and `OnStatus` can render the same snapshot. Selecting only the first match
 would discard content. The animated container stays composed even when no observer
