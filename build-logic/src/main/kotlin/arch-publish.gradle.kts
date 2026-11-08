@@ -53,13 +53,13 @@ extensions.configure(MavenPublishBaseExtension::class) {
     signAllPublications()
     publishToMavenCentral(
         automaticRelease = true,
-        validateDeployment = DeploymentValidation.VALIDATED,
+        validateDeployment = DeploymentValidation.VALIDATED
     )
     configure(
         KotlinMultiplatform(
             javadocJar = JavadocJar.Dokka("dokkaGenerate"),
-            sourcesJar = SourcesJar.Sources(),
-        ),
+            sourcesJar = SourcesJar.Sources()
+        )
     )
 }
 

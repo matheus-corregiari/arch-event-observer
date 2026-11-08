@@ -18,13 +18,22 @@ kover {
             total {
                 verify {
                     rule("Minimum line coverage") {
-                        minBound(providers.gradleProperty("ci.coverage.lines").get().toInt(), CoverageUnit.LINE)
+                        minBound(
+                            providers.gradleProperty("ci.coverage.lines").get().toInt(),
+                            CoverageUnit.LINE
+                        )
                     }
                     rule("Minimum instruction coverage") {
-                        minBound(providers.gradleProperty("ci.coverage.instructions").get().toInt(), CoverageUnit.INSTRUCTION)
+                        minBound(
+                            providers.gradleProperty("ci.coverage.instructions").get().toInt(),
+                            CoverageUnit.INSTRUCTION
+                        )
                     }
                     rule("Minimum branch coverage") {
-                        minBound(providers.gradleProperty("ci.coverage.branches").get().toInt(), CoverageUnit.BRANCH)
+                        minBound(
+                            providers.gradleProperty("ci.coverage.branches").get().toInt(),
+                            CoverageUnit.BRANCH
+                        )
                     }
                 }
             }

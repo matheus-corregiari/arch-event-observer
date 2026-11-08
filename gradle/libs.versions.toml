@@ -67,6 +67,7 @@ mockk-test-agent = { module = "io.mockk:mockk", version = "1.14.12" }
 
 # ------------------------------------------------------------------------------------------------ #
 [plugins]
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 jetbrains-atomic = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "jetbrains-atomic" }
 jetbrains-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "jetbrains-kotlin" }
 jetbrains-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "jetbrains-kotlin" }

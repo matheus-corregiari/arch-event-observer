@@ -1,4 +1,4 @@
-@file:Suppress("UnstableApiUsage")
+@file:Suppress("UnstableApiUsage", "UNCHECKED_CAST")
 
 pluginManagement {
     apply(from = "$rootDir/gradle/repositories.gradle.kts")
@@ -22,4 +22,3 @@ include(":test")
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
-

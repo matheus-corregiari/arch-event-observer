@@ -6,7 +6,7 @@ internal val Project.versionName: String
     get() = runGitCommand(
         fileName = "version-name.txt",
         command = "git describe",
-        default = "0.0.0",
+        default = "0.0.0"
     )
 
 @Suppress("DEPRECATION")
@@ -22,7 +22,7 @@ private val String.executeWithText: String?
 private fun Project.runGitCommand(
     fileName: String,
     command: String,
-    default: String,
+    default: String
 ): String {
     val file = File("$rootDir/build", fileName)
     return when {

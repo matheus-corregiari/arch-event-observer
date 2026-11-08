@@ -5,7 +5,8 @@ plugins {
 }
 
 dependencies {
-    subprojects.filter { it.name in setOf("event-observer", "event-observer-compose", "event-observer-state") }.forEach { add("kover", project(it.path)) }
+    val coveredModules = setOf("event-observer", "event-observer-compose", "event-observer-state")
+    subprojects.filter { it.name in coveredModules }.forEach { add("kover", project(it.path)) }
 }
 
 val syncContributingDocs = tasks.register("syncContributingDocs", Copy::class) {
@@ -15,11 +16,20 @@ val syncContributingDocs = tasks.register("syncContributingDocs", Copy::class) {
     filter { line: String -> line.replace("(docs/ci.md)", "(ci.md)") }
 }
 
-val ciLint = tasks.register("ciLint") { group = "CI" }
-val ciDocs = tasks.register("ciDocs") { group = "CI"; dependsOn(syncContributingDocs) }
+val ciLint = tasks.register("ciLint") {
+    group = "CI"
+    dependsOn(gradle.includedBuild("build-logic").task(":ktlintCheck"))
+}
+val ciDocs = tasks.register("ciDocs") {
+    group = "CI"
+    dependsOn(syncContributingDocs)
+}
 val ciBuild = tasks.register("ciBuild") { group = "CI" }
 val ciTest = tasks.register("ciTest") { group = "CI" }
-val ciCoverage = tasks.register("ciCoverage") { group = "CI"; dependsOn(ciTest) }
+val ciCoverage = tasks.register("ciCoverage") {
+    group = "CI"
+    dependsOn(ciTest)
+}
 val ciCodeql = tasks.register("ciCodeql") { group = "CI" }
 val ciPublishMavenCentral = tasks.register("ciPublishMavenCentral") { group = "CI" }
 val ciPublishGithubPackages = tasks.register("ciPublishGithubPackages") { group = "CI" }
@@ -27,14 +37,20 @@ val ciPublishLocal = tasks.register("ciPublishLocal") { group = "CI" }
 val ciPublicationManifest = tasks.register("ciPublicationManifest") { group = "CI" }
 
 gradle.projectsEvaluated {
-    val libraries = subprojects.filter { it.plugins.hasPlugin("org.jetbrains.kotlin.multiplatform") }
+    val libraries = subprojects.filter {
+        it.plugins.hasPlugin(
+            "org.jetbrains.kotlin.multiplatform"
+        )
+    }
     val publishable = subprojects.filter { it.plugins.hasPlugin("com.vanniktech.maven.publish") }
     fun List<Project>.paths(name: String) = mapNotNull { it.tasks.findByName(name)?.path }
     fun List<Project>.pathsStartingWith(prefix: String) =
         flatMap { project -> project.tasks.matching { it.name.startsWith(prefix) }.map { it.path } }
 
     // Master must execute tests again; compilation remains cacheable.
-    if (System.getenv("GITHUB_EVENT_NAME") == "push" && System.getenv("GITHUB_REF") == "refs/heads/master") {
+    if (System.getenv("GITHUB_EVENT_NAME") == "push" &&
+        System.getenv("GITHUB_REF") == "refs/heads/master"
+    ) {
         libraries.forEach { project ->
             project.tasks.withType(AbstractTestTask::class.java).configureEach {
                 outputs.upToDateWhen { false }
@@ -48,7 +64,7 @@ gradle.projectsEvaluated {
             libraries.paths("detekt"),
             libraries.paths("ktlintCheck"),
             libraries.paths("lint"),
-            libraries.pathsStartingWith("lintAnalyze"),
+            libraries.pathsStartingWith("lintAnalyze")
         )
     }
     ciDocs.configure { dependsOn(publishable.paths("dokkaGenerate")) }
@@ -59,12 +75,19 @@ gradle.projectsEvaluated {
         dependsOn(publishable.paths("koverVerify"))
     }
     ciCodeql.configure {
-        val compilations = libraries.paths("compileKotlinJvm") + libraries.paths("compileAndroidMain")
+        val compilations =
+            libraries.paths("compileKotlinJvm") + libraries.paths("compileAndroidMain")
         check(compilations.isNotEmpty()) { "No JVM/Android compilation configured for CodeQL" }
         dependsOn(compilations)
     }
-    ciPublishMavenCentral.configure { dependsOn(publishable.paths("publishAndReleaseToMavenCentral")) }
-    ciPublishGithubPackages.configure { dependsOn(publishable.paths("publishAllPublicationsToGithubRepository")) }
+    ciPublishMavenCentral.configure {
+        dependsOn(
+            publishable.paths("publishAndReleaseToMavenCentral")
+        )
+    }
+    ciPublishGithubPackages.configure {
+        dependsOn(publishable.paths("publishAllPublicationsToGithubRepository"))
+    }
     ciPublishLocal.configure { dependsOn(publishable.paths("publishToMavenLocal")) }
     ciPublicationManifest.configure {
         doLast {

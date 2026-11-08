@@ -7,6 +7,7 @@
  * The plugin owns common compiler, hierarchy, Android namespace, lint, test coverage, native
  * framework, and source jar defaults shared by publishable library modules.
  */
+
 import com.android.build.api.variant.impl.capitalizeFirstChar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -71,7 +72,6 @@ extensions.configure<KotlinMultiplatformExtension> {
             ignoreWarnings = false
             absolutePaths = false
             warningsAsErrors = false
-
         }
         testCoverage { jacocoVersion = libraries.version("jacoco") }
         project.file("consumer-proguard-rules.pro")

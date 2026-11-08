@@ -1,5 +1,12 @@
 plugins {
     `kotlin-dsl`
+    alias(libs.plugins.ktlint)
+}
+
+configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    filter {
+        exclude { it.file.path.contains("build") }
+    }
 }
 
 kotlin { jvmToolchain(25) }
