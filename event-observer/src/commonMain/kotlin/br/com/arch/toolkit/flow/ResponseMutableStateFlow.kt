@@ -67,7 +67,7 @@ class ResponseMutableStateFlow<T> private constructor(
     // endregion
 
     companion object Companion {
-        /** Creates a mutable state flow initialized with [DataResultStatus.NONE]. */
+        /** Creates a mutable state flow initialized with [br.com.arch.toolkit.result.DataResultStatus.NONE]. */
         operator fun <T> invoke(): ResponseMutableStateFlow<T> =
             ResponseMutableStateFlow(MutableStateFlow(dataResultNone()))
 

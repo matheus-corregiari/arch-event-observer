@@ -20,6 +20,11 @@ plugins {
 
 // Robolectric 4.17 accesses SharedSecrets when bootstrapping Android on JDK 21.
 tasks.withType<Test>().configureEach {
+    jvmArgs(
+        "-Xshare:off",
+        "--enable-native-access=ALL-UNNAMED",
+        "--sun-misc-unsafe-memory-access=allow"
+    )
     if (name.contains("AndroidHostTest")) {
         jvmArgs("--add-opens=java.base/jdk.internal.access=ALL-UNNAMED")
     }
@@ -35,6 +40,7 @@ extensions.configure<KotlinMultiplatformExtension> {
     compilerOptions {
         jvmToolchain(Versions.JAVA)
         progressiveMode.set(true)
+        optIn.add("kotlinx.coroutines.ExperimentalCoroutinesApi")
     }
     withSourcesJar(true)
     applyDefaultHierarchyTemplate {

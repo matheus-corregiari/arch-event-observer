@@ -22,7 +22,7 @@ extensions.configure(DokkaExtension::class) {
             localDirectory.set(projectDir.resolve("src"))
             remoteUrl("${env("POM_URL")}/tree/master/${project.name}/src")
         }
-        reportUndocumented.set(true)
+        reportUndocumented.set(false)
         skipDeprecated.set(true)
         skipEmptyPackages.set(true)
         jdkVersion.set(Versions.JAVA)
