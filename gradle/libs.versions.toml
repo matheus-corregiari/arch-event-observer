@@ -12,7 +12,7 @@ build-sdk-minor = "2"
 build-tools = "37.0.0"
 
 ## JetBrains
-jetbrains-kotlin = "2.4.20"
+jetbrains-kotlin = "2.4.21"
 jetbrains-atomic = "0.33.0"
 jetbrains-dokka = "2.3.0"
 jetbrains-kover = "0.9.11"

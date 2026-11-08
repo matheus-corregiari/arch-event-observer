@@ -8,6 +8,7 @@
  * framework, and source jar defaults shared by publishable library modules.
  */
 
+import br.com.arch.toolkit.convention.Versions
 import com.android.build.api.variant.impl.capitalizeFirstChar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -25,14 +26,14 @@ tasks.withType<Test>().configureEach {
 }
 
 tasks.withType<JavaCompile>().matching { it.name.startsWith("compileJvm") }.configureEach {
-    options.release.set(libraryJvmTarget)
+    options.release.set(Versions.java)
 }
 
 private val formatName = project.name.split("-").joinToString("") { it }
     .replaceFirstChar { it.lowercase() }
 extensions.configure<KotlinMultiplatformExtension> {
     compilerOptions {
-        jvmToolchain(projectJavaVersionCode)
+        jvmToolchain(Versions.java)
         progressiveMode.set(true)
     }
     withSourcesJar(true)
@@ -50,7 +51,7 @@ extensions.configure<KotlinMultiplatformExtension> {
     }
 
     android {
-        compilerOptions.jvmTarget.set(JvmTarget.fromTarget(libraryJvmTarget.toString()))
+        compilerOptions.jvmTarget.set(JvmTarget.fromTarget(Versions.java.toString()))
         compileSdk {
             version = release(libraries.version("build-sdk-compile").toInt()) {
                 minorApiLevel = libraries.version("build-sdk-minor").toInt()
@@ -79,7 +80,7 @@ extensions.configure<KotlinMultiplatformExtension> {
             ?.let(optimization.consumerKeepRules::file)
     }
     jvm {
-        compilerOptions.jvmTarget.set(JvmTarget.fromTarget(libraryJvmTarget.toString()))
+        compilerOptions.jvmTarget.set(JvmTarget.fromTarget(Versions.java.toString()))
     }
     wasmJs {
         browser { testTask { useKarma { useChromeHeadless() } } }

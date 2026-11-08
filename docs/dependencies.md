@@ -2,14 +2,14 @@
 
 Audited against Maven Central, Google Maven and the Gradle Plugin Portal on 2026-11-08 for `3.1.0`.
 Runtime dependencies and AGP use stable releases. Detekt retains its existing alpha line.
-Gradle **9.8.2**, JDK **25**, Kover **0.9.11**, MkDocs Material **9.8.1**.
-Published JVM bytecode targets Java **21**.
+Gradle **9.9.0**, JDK **25**, Kover **0.9.11**, MkDocs Material **9.8.1**.
+Published JVM bytecode targets Java **25**.
 
 | Alias                                      | Version         | Source                                                                                                                                                                 |
 | ------------------------------------------ | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `jetbrains-dokka`                          | `2.3.0`         | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/dokka/dokka-gradle-plugin/maven-metadata.xml)                                                            |
-| `jetbrains-plugin`                         | `2.4.20`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/maven-metadata.xml)                                                          |
-| `jetbrains-multiplatform`                  | `2.4.20`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/multiplatform/org.jetbrains.kotlin.multiplatform.gradle.plugin/maven-metadata.xml)                |
+| `jetbrains-plugin`                         | `2.4.21`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/maven-metadata.xml)                                                          |
+| `jetbrains-multiplatform`                  | `2.4.21`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/multiplatform/org.jetbrains.kotlin.multiplatform.gradle.plugin/maven-metadata.xml)                |
 | `jetbrains-kover`                          | `0.9.11`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kover-gradle-plugin/maven-metadata.xml)                                                          |
 | `jetbrains-compose-runtime`                | `1.12.2`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/runtime/runtime/maven-metadata.xml)                                                              |
 | `jetbrains-compose-animation`              | `1.12.2`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/animation/animation/maven-metadata.xml)                                                          |
@@ -19,7 +19,7 @@ Published JVM bytecode targets Java **21**.
 | `jetbrains-compose-ui-test-junit4-desktop` | `1.12.2`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/compose/ui/ui-test-junit4-desktop/maven-metadata.xml)                                                    |
 | `jetbrains-coroutines-core`                | `1.11.0`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core/maven-metadata.xml)                                                      |
 | `jetbrains-coroutines-test`                | `1.11.0`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-test/maven-metadata.xml)                                                      |
-| `jetbrains-kotlin-test`                    | `2.4.20`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-test/maven-metadata.xml)                                                                   |
+| `jetbrains-kotlin-test`                    | `2.4.21`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-test/maven-metadata.xml)                                                                   |
 | `jetbrains-serialization-json`             | `1.12.0`        | [Metadata](https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-serialization-json/maven-metadata.xml)                                                   |
 | `androidx-library`                         | `9.5.1`         | [Metadata](https://dl.google.com/dl/android/maven2/com/android/kotlin/multiplatform/library/com.android.kotlin.multiplatform.library.gradle.plugin/maven-metadata.xml) |
 | `androidx-arch-coreTesting`                | `2.2.0`         | [Metadata](https://dl.google.com/dl/android/maven2/androidx/arch/core/core-testing/maven-metadata.xml)                                                                 |
@@ -73,12 +73,10 @@ and the [SDK repository](https://dl.google.com/android/repository/repository2-3.
 
 ## Stable update assessment (2026-11-08)
 
-- Update Gradle to **9.8.2**, Compose Multiplatform to **1.12.2**,
+- Update Gradle to **9.9.0**, Kotlin to **2.4.21**, Compose Multiplatform to **1.12.2**,
   AGP to **9.5.1**, Dokka to **2.3.0**, serialization to **1.12.0**, JaCoCo to **0.8.16**,
   MockK to **1.14.12**, and MkDocs Material to **9.8.1**.
-- Keep Kotlin **2.4.20**, the latest version supported by the release
-  [CodeQL gate](https://codeql.github.com/docs/codeql-overview/supported-languages-and-frameworks/).
-- Use Temurin **25** for the Gradle daemon and CI. The published JVM target remains **21**.
+- Use Temurin **25** for the Gradle daemon and CI. The published JVM target is **25**.
 
 ## Previous stable update assessment (2026-10-01)
 

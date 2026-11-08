@@ -5,7 +5,7 @@ plugins {
 
 configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
     filter {
-        exclude { it.file.path.contains("build") }
+        exclude { it.file.startsWith(layout.buildDirectory.get().asFile) }
     }
 }
 
@@ -28,7 +28,7 @@ dependencies {
     implementation(libs.ktlint)
 }
 
-configurations.configureEach {
+configurations.matching { !it.name.contains("ktlint", ignoreCase = true) }.configureEach {
     resolutionStrategy {
         failOnVersionConflict()
         preferProjectModules()
