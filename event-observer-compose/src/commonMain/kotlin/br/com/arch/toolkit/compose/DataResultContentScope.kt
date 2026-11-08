@@ -17,7 +17,7 @@ import br.com.arch.toolkit.compose.observable.ShowLoadingObservable
 import br.com.arch.toolkit.compose.observable.SingleObservable
 import br.com.arch.toolkit.compose.observable.StatusObservable
 import br.com.arch.toolkit.compose.observable.SuccessObservable
-import br.com.arch.toolkit.compose.observable.TypedSuccessObservable
+import br.com.arch.toolkit.compose.observable.SuccessWithDataObservable
 import br.com.arch.toolkit.result.DataResult
 import br.com.arch.toolkit.result.DataResultStatus
 import br.com.arch.toolkit.result.EventDataStatus
@@ -56,7 +56,7 @@ class DataResultContentScope<T> internal constructor() {
         clazz: KClass<R>,
         dataStatus: EventDataStatus = DoesNotMatter,
         func: @Composable (R) -> Unit
-    ) = register(TypedSuccessObservable(dataStatus, clazz, func))
+    ) = register(SuccessWithDataObservable(dataStatus, clazz, func))
 
     // endregion
 
