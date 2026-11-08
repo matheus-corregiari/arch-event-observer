@@ -1,4 +1,4 @@
 @file:Suppress("ktlint:standard:property-naming", "TopLevelPropertyNaming")
 
-const val projectJavaVersionCode: Int = 21
-const val projectJavaVersionName: String = "21"
+const val projectJavaVersionCode: Int = 25
+const val libraryJvmTarget: Int = 21

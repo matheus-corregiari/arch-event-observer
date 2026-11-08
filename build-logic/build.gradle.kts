@@ -2,7 +2,7 @@ plugins {
     `kotlin-dsl`
 }
 
-kotlin { jvmToolchain(21) }
+kotlin { jvmToolchain(25) }
 
 group = "com.toolkit.plugin"
 version = "1.0.0"

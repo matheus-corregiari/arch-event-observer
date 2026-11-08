@@ -5,7 +5,7 @@ Thanks for taking the time to contribute.
 ## Quick Start
 
 1. Fork and clone the repo.
-2. Use JDK `21`.
+2. Use JDK `25`.
 3. Build once to warm up Gradle:
 
 ```bash

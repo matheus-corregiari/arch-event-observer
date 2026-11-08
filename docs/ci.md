@@ -90,7 +90,7 @@ python -m pip install -r .github/requirements-docs.txt
 python -m mkdocs build --strict
 ```
 
-Use JDK 21 and the project wrapper. Publication also has `ciPublicationManifest` for verifying the
+Use JDK 25 and the project wrapper. Publication also has `ciPublicationManifest` for verifying the
 complete list of Maven coordinates, without uploading packages.
 
 ## Coverage and Codecov

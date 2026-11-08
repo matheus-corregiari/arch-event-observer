@@ -19,10 +19,10 @@ The project is split into three public modules:
 ## Building this checkout
 
 - Kotlin `2.4.20`
-- Gradle wrapper `9.8.0`
-- JDK `21` via the Gradle toolchain
+- Gradle wrapper `9.8.2`
+- JDK `25` via the Gradle toolchain; published JVM bytecode targets Java `21`
 - Android `minSdk 23` and `compileSdk 37.2`
-- Compose Multiplatform `1.12.1` with iOS ARM targets
+- Compose Multiplatform `1.12.2` with iOS ARM targets
 - Use the project wrapper instead of a local Gradle install
 
 ## Overview

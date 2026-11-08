@@ -2,7 +2,7 @@
 [versions]
 ## --- Plugins and more general stuff --- ##
 #noinspection UnusedVersionCatalogEntry
-jacoco = "0.8.15"
+jacoco = "0.8.16"
 detekt = "2.0.0-alpha.6"
 
 ## --- Build Config and SDK --- ##
@@ -14,14 +14,14 @@ build-tools = "37.0.0"
 ## JetBrains
 jetbrains-kotlin = "2.4.20"
 jetbrains-atomic = "0.33.0"
-jetbrains-dokka = "2.2.0"
+jetbrains-dokka = "2.3.0"
 jetbrains-kover = "0.9.11"
-jetbrains-compose = "1.12.1"
+jetbrains-compose = "1.12.2"
 jetbrains-coroutines = "1.11.0"
-jetbrains-serialization = "1.11.0"
+jetbrains-serialization = "1.12.0"
 
 ## AndroidX
-androidx-plugin = "9.4.1"
+androidx-plugin = "9.5.1"
 
 ## Tools
 ktlint = "14.2.0"
@@ -62,8 +62,8 @@ vanniktech-publish = { module = "com.vanniktech:gradle-maven-publish-plugin", ve
 robolectric-test = { module = "org.robolectric:robolectric", version = "4.17" }
 
 ## Test
-mockk-test-android = { module = "io.mockk:mockk-android", version = "1.14.11" }
-mockk-test-agent = { module = "io.mockk:mockk", version = "1.14.11" }
+mockk-test-android = { module = "io.mockk:mockk-android", version = "1.14.12" }
+mockk-test-agent = { module = "io.mockk:mockk", version = "1.14.12" }
 
 # ------------------------------------------------------------------------------------------------ #
 [plugins]

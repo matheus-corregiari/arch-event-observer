@@ -8,6 +8,7 @@
  * framework, and source jar defaults shared by publishable library modules.
  */
 import com.android.build.api.variant.impl.capitalizeFirstChar
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 plugins {
@@ -20,6 +21,10 @@ tasks.withType<Test>().configureEach {
     if (name.contains("AndroidHostTest")) {
         jvmArgs("--add-opens=java.base/jdk.internal.access=ALL-UNNAMED")
     }
+}
+
+tasks.withType<JavaCompile>().matching { it.name.startsWith("compileJvm") }.configureEach {
+    options.release.set(libraryJvmTarget)
 }
 
 private val formatName = project.name.split("-").joinToString("") { it }
@@ -44,6 +49,7 @@ extensions.configure<KotlinMultiplatformExtension> {
     }
 
     android {
+        compilerOptions.jvmTarget.set(JvmTarget.fromTarget(libraryJvmTarget.toString()))
         compileSdk {
             version = release(libraries.version("build-sdk-compile").toInt()) {
                 minorApiLevel = libraries.version("build-sdk-minor").toInt()
@@ -72,7 +78,9 @@ extensions.configure<KotlinMultiplatformExtension> {
             .takeIf(File::exists)
             ?.let(optimization.consumerKeepRules::file)
     }
-    jvm { }
+    jvm {
+        compilerOptions.jvmTarget.set(JvmTarget.fromTarget(libraryJvmTarget.toString()))
+    }
     wasmJs {
         browser { testTask { useKarma { useChromeHeadless() } } }
         binaries.library()
